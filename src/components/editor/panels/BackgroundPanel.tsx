@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { toast } from "@/lib/store/toastStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -216,7 +216,7 @@ const MESH_PRESETS: { name: string; tl: string; tr: string; bl: string; br: stri
   { name: "Ocean",     tl: "#1e3a5f", tr: "#1a56db", bl: "#134e4a", br: "#14b8a6" },
 ];
 
-export function BackgroundPanel() {
+export const BackgroundPanel = memo(function BackgroundPanel() {
   const { getActiveSet, getActiveScreen, updateScreenBackground, updateAllScreensBackground, applyPanoramicBackground } = useEditorStore();
   const [tab, setTab] = useState<Tab>("color");
   const [applyAll, setApplyAll] = useState(false);
@@ -694,4 +694,4 @@ export function BackgroundPanel() {
       </div>
     </ScrollArea>
   );
-}
+});

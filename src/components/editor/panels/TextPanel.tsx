@@ -1,12 +1,12 @@
 "use client";
 
+import { useState, memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { Lock, Sparkles, Link2, Palette, Check, RefreshCw } from "lucide-react";
 import { TEXT_GRADIENT_PRESETS, TextGradientPreset } from "@/lib/textPresets";
 
@@ -690,7 +690,7 @@ function AICopywriterWidget() {
 }
 
 // ── Main TextPanel ─────────────────────────────────────────────────────────────
-export function TextPanel() {
+export const TextPanel = memo(function TextPanel() {
   const { getActiveSet, getActiveScreen, addLayer, getActiveLayer } = useEditorStore();
   const [activeCategory, setActiveCategory] = useState("Niche Copy (AI)");
   const activeLayer = getActiveLayer();
@@ -805,4 +805,4 @@ export function TextPanel() {
       </ScrollArea>
     </div>
   );
-}
+});

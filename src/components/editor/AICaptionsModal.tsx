@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, X, Loader2, CheckCircle2, Globe, AlertCircle, Link2, Search, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/lib/store/editorStore";
@@ -183,10 +183,21 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-captions-title"
     >
       <div
         className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
@@ -199,7 +210,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
               <Sparkles className="w-4 h-4 text-violet-400" />
             </div>
             <div>
-              <h2 className="font-semibold text-base">AI Captions</h2>
+              <h2 id="ai-captions-title" className="font-semibold text-base">AI Captions</h2>
               <p className="text-xs text-muted-foreground">
                 {activeTab === "translate" ? "Auto-translate text layers" : "Generate from App Store URL"}
               </p>
@@ -207,7 +218,8 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors"
+            aria-label="Close AI captions dialog"
+            className="w-7 h-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>

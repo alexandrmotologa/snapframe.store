@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Download, Package, Loader2, CheckCircle2, Apple, Smartphone, Globe, Copy, ShieldCheck, FileText, Check, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -340,8 +340,22 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
     toast.success(`Exported ${exported} screenshots successfully!`);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="export-modal-title"
+    >
       <div
         className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -353,12 +367,13 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
               <Download className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold text-base">Export Screenshots</h2>
+              <h2 id="export-modal-title" className="font-semibold text-base">Export Screenshots</h2>
               <p className="text-xs text-muted-foreground">{appName}</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close export dialog"
             className="w-7 h-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />

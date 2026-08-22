@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect, useState } from "react";
+import { useCallback, useRef, useEffect, useState, memo } from "react";
 import { Trash2, Copy, ArrowUp, ArrowDown, Lock, RefreshCw, GripHorizontal, AlignCenter, AlignJustify, Edit3, Upload } from "lucide-react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useLanguageStore } from "@/lib/store/languageStore";
@@ -107,7 +107,7 @@ function drawGooglePlayLogo(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
   ctx.restore();
 }
 
-export function ScreenCard({ screen, screenSet, index, hideScreenshots }: ScreenCardProps) {
+export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, hideScreenshots }: ScreenCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [editingCaption, setEditingCaption] = useState(false);
   const [captionDraft, setCaptionDraft] = useState(screen.caption ?? "");
@@ -3069,7 +3069,7 @@ export function ScreenCard({ screen, screenSet, index, hideScreenshots }: Screen
       )}
     </Draggable>
   );
-}
+});
 
 // ── Resize handles overlay ─────────────────────────────────────────────────────
 function ResizeOverlay({

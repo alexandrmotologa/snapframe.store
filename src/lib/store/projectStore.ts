@@ -2,14 +2,19 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Project, Screen, Layer, ScreenSet, Background } from "@/lib/types";
 import { nanoid } from "@/lib/utils";
-import { ALL_TEMPLATES, BLANK_TEMPLATE } from "@/lib/templates";
+import { BASE_TEMPLATES, BLANK_TEMPLATE } from "@/lib/templates";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { saveProjectToCloud, deleteProjectFromCloud } from "@/lib/cloudProjectSync";
 
 interface ProjectStore {
   projects: Project[];
-  createProject: (templateId: string | null, name: string, platforms?: { ios: boolean; android: boolean }) => Project;
+  createProject: (
+    templateId: string | null,
+    name: string,
+    platforms?: { ios: boolean; android: boolean },
+    templateData?: import("@/lib/types").Template | null
+  ) => Project;
   updateProject: (id: string, updates: Partial<Project>) => void;
   deleteProject: (id: string) => void;
   duplicateProject: (id: string) => Project;
@@ -22,7 +27,7 @@ export const useProjectStore = create<ProjectStore>()(
     (set, get) => ({
       projects: [],
 
-      createProject: (templateId, name, platforms = { ios: true, android: true }) => {
+      createProject: (templateId, name, platforms = { ios: true, android: true }, templateData = null) => {
         const ID_ALIASES: Record<string, string> = {
           "premium-dark": "template-28",
           "minimal-light": "template-29",
@@ -32,9 +37,9 @@ export const useProjectStore = create<ProjectStore>()(
           "dynamic-flow": "template-33",
         };
         const resolvedId = templateId ? (ID_ALIASES[templateId] ?? templateId) : null;
-        const template = resolvedId
-          ? ALL_TEMPLATES.find((t) => t.id === resolvedId)
-          : null;
+        const template = templateData ?? (resolvedId
+          ? BASE_TEMPLATES.find((t) => t.id === resolvedId)
+          : null);
 
         const baseScreens = template?.screens && template.screens.length > 0
           ? template.screens

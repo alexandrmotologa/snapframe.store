@@ -3493,8 +3493,6 @@ export const LAYOUT_META: Record<string, { icon: string; label: string; descript
   'text-only':         { icon: '✍️', label: 'Text Only',   description: 'No screenshot zone' },
 };
 
-import { FIGMA_TEMPLATES } from "./figmaTemplates";
-
 const FIGMA_METADATA_MAP: Record<string, { name: string; description: string; category?: string; tags?: string[] }> = {
   figma_1: { name: "Emerald Forest Pro", description: "Deep emerald green theme with bold headline focus (10 screens)", category: "Business", tags: ["emerald", "green", "business", "pro"] },
   figma_2: { name: "Cobalt Sapphire Flow", description: "Deep oceanic blue with dual subtitle captions (10 screens)", category: "Technology", tags: ["cobalt", "sapphire", "blue", "technology"] },
@@ -3525,104 +3523,132 @@ const FIGMA_METADATA_MAP: Record<string, { name: string; description: string; ca
   figma_27: { name: "Neon Violet Luxury", description: "Dark purple velvet theme with elevated device frames (10 screens)", category: "Entertainment", tags: ["neon", "violet", "entertainment", "luxury"] },
 };
 
-const mappedFigmaTemplates: Template[] = FIGMA_TEMPLATES.map((ft) => {
-  const meta = FIGMA_METADATA_MAP[ft.id];
-  const maxScreenIndex = ft.screens.reduce((max, s) => Math.max(max, s.screenIndex), -1);
-  const totalScreens = Math.max(5, maxScreenIndex + 1);
+export function mapFigmaTemplates(templates: import("./figmaTemplates").FigmaTemplate[]): Template[] {
+  return templates.map((ft: import("./figmaTemplates").FigmaTemplate) => {
+    const meta = FIGMA_METADATA_MAP[ft.id];
+    const maxScreenIndex = ft.screens.reduce((max: number, s: import("./figmaTemplates").FigmaScreenData) => Math.max(max, s.screenIndex), -1);
+    const totalScreens = Math.max(5, maxScreenIndex + 1);
 
-  // Derive a preview color from the background
-  const previewColor =
-    ft.background.type === "solid"
-      ? (ft.background.color ?? "#1a1a2e")
-      : ft.background.gradient?.stops?.[0]?.color ?? "#1a1a2e";
+    // Derive a preview color from the background
+    const previewColor =
+      ft.background.type === "solid"
+        ? (ft.background.color ?? "#1a1a2e")
+        : ft.background.gradient?.stops?.[0]?.color ?? "#1a1a2e";
 
-  const templateScreens: TemplateScreen[] = [];
-  for (let i = 0; i < totalScreens; i++) {
-    const screenData = ft.screens.find((s) => s.screenIndex === i);
+    const templateScreens: TemplateScreen[] = [];
+    for (let i = 0; i < totalScreens; i++) {
+      const screenData = ft.screens.find((s: import("./figmaTemplates").FigmaScreenData) => s.screenIndex === i);
 
-    let allLayers: import("@/lib/types").Layer[] = [];
+      let allLayers: import("@/lib/types").Layer[] = [];
 
-    if (screenData) {
-      // Map each Figma device zone as a ScreenshotLayer
-      const mockupLayers = screenData.mockups.map((m, mIdx) => {
-        let rotation = 0;
-        if (m.transform && m.transform.includes("rotate")) {
-          const match = m.transform.match(/rotate\(([-0-9.]+)/);
-          if (match) rotation = parseFloat(match[1]);
-        }
+      if (screenData) {
+        // Map each Figma device zone as a ScreenshotLayer
+        const mockupLayers = screenData.mockups.map((m: import("./figmaTemplates").FigmaMockupData, mIdx: number) => {
+          let rotation = 0;
+          if (m.transform && m.transform.includes("rotate")) {
+            const match = m.transform.match(/rotate\(([-0-9.]+)/);
+            if (match) rotation = parseFloat(match[1]);
+          }
 
-        return {
-          id: `mockup_${ft.id}_s${i}_${mIdx}`,
-          type: "screenshot" as const,
-          src: undefined,
-          x: m.x,
-          y: m.y,
-          width: m.width,
-          height: m.height,
-          rotation: rotation,
-          opacity: 1,
-          objectFit: "cover" as const,
-          cornerRadius: 54,
-          showDeviceFrame: true,
-          shadow: { blur: 80, spread: 0, color: "rgba(0,0,0,0.35)", offsetX: 0, offsetY: 20 },
-          label: "Drop your screenshot here",
+          return {
+            id: `mockup_${ft.id}_s${i}_${mIdx}`,
+            type: "screenshot" as const,
+            src: undefined,
+            x: m.x,
+            y: m.y,
+            width: m.width,
+            height: m.height,
+            rotation: rotation,
+            opacity: 1,
+            objectFit: "cover" as const,
+            cornerRadius: 54,
+            showDeviceFrame: true,
+            shadow: { blur: 80, spread: 0, color: "rgba(0,0,0,0.35)", offsetX: 0, offsetY: 20 },
+            label: "Drop your screenshot here",
+          };
+        });
+
+        // Layers from Figma: bg_shapes first, then texts/logo
+        allLayers = [...mockupLayers, ...screenData.layers];
+      }
+
+      const figBg = screenData?.background ?? ft.background;
+
+      let screenBg: import("@/lib/types").Background;
+      if (figBg.type === "gradient" && figBg.gradient) {
+        screenBg = {
+          type: "gradient",
+          gradient: {
+            direction: figBg.gradient.direction as import("@/lib/types").GradientDirection,
+            stops: figBg.gradient.stops.map((s) => ({
+              color: s.color,
+              position: s.position,
+            })),
+          },
         };
+      } else {
+        screenBg = {
+          type: "solid",
+          color: figBg.color ?? "#1a1a2e",
+        };
+      }
+
+      templateScreens.push({
+        name: `Screen ${i + 1}`,
+        background: screenBg,
+        layers: allLayers,
       });
-
-      // Layers from Figma: bg_shapes first, then texts/logo
-      allLayers = [...mockupLayers, ...screenData.layers];
     }
 
-    const figBg = screenData?.background ?? ft.background;
-
-    let screenBg: import("@/lib/types").Background;
-    if (figBg.type === "gradient" && figBg.gradient) {
-      screenBg = {
-        type: "gradient",
-        gradient: {
-          direction: figBg.gradient.direction as import("@/lib/types").GradientDirection,
-          stops: figBg.gradient.stops.map((s) => ({
-            color: s.color,
-            position: s.position,
-          })),
-        },
-      };
-    } else {
-      screenBg = {
-        type: "solid",
-        color: figBg.color ?? "#1a1a2e",
-      };
-    }
-
-    templateScreens.push({
-      name: `Screen ${i + 1}`,
-      background: screenBg,
-      layers: allLayers,
-    });
-  }
-
-  return {
-    id: ft.id,
-    name: meta?.name ?? ft.name,
-    description: meta?.description ?? "Imported from Figma kit (10 screens)",
-    category: meta?.category ?? "Classic",
-    tags: meta?.tags ?? ["Figma", "Classic"],
-    previewColor,
-    layout: "screenshot-full",
-    screens: templateScreens,
-  };
-});
+    return {
+      id: ft.id,
+      name: meta?.name ?? ft.name,
+      description: meta?.description ?? "Imported from Figma kit (10 screens)",
+      category: meta?.category ?? "Classic",
+      tags: meta?.tags ?? ["Figma", "Classic"],
+      previewColor,
+      layout: "screenshot-full",
+      screens: templateScreens,
+    };
+  });
+}
 
 import { NICHE_TEMPLATES } from "./nicheTemplates";
 export { NICHE_TEMPLATES };
 
-// All templates ordered: Blank, then Niche Industry Pro Templates, then Community Templates, then Figma Templates 1 to 27, then Core Templates
-export const ALL_TEMPLATES: Template[] = [
+// Base templates available synchronously at runtime
+export const BASE_TEMPLATES: Template[] = [
   BLANK_TEMPLATE,
   ...NICHE_TEMPLATES,
   ...COMMUNITY_TEMPLATES,
-  ...mappedFigmaTemplates,
   ...CORE_TEMPLATES,
 ];
 
-export const DEFAULT_TEMPLATES: Template[] = ALL_TEMPLATES;
+let cachedAllTemplates: Template[] | null = null;
+
+/**
+ * Lazily loads all 50+ templates including the 27 heavy Figma kits (10-screen sets)
+ * on demand without bloating the initial application bundle.
+ */
+export async function getAllTemplates(): Promise<Template[]> {
+  if (cachedAllTemplates) return cachedAllTemplates;
+  try {
+    const { FIGMA_TEMPLATES } = await import("./figmaTemplates");
+    const mapped = mapFigmaTemplates(FIGMA_TEMPLATES);
+    cachedAllTemplates = [
+      BLANK_TEMPLATE,
+      ...NICHE_TEMPLATES,
+      ...COMMUNITY_TEMPLATES,
+      ...mapped,
+      ...CORE_TEMPLATES,
+    ];
+  } catch (err) {
+    console.warn("Failed to load Figma templates dynamically, falling back to base templates:", err);
+    cachedAllTemplates = BASE_TEMPLATES;
+  }
+  return cachedAllTemplates;
+}
+
+// Export synchronous reference for backward compatibility
+export const ALL_TEMPLATES: Template[] = BASE_TEMPLATES;
+export const DEFAULT_TEMPLATES: Template[] = BASE_TEMPLATES;

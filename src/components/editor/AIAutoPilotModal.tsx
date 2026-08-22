@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, X, Loader2, CheckCircle2, Wand2, Palette, Type, Layers, ArrowRight, Lock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/lib/store/editorStore";
@@ -30,6 +30,15 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
   const [applyGradients, setApplyGradients] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressStep, setProgressStep] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onOpenChange]);
 
   if (!open || !activeSet) return null;
 
@@ -175,7 +184,13 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => onOpenChange(false)}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={() => onOpenChange(false)}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-autopilot-title"
+    >
       <div
         className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -187,7 +202,7 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-foreground flex items-center gap-2">
+              <h2 id="ai-autopilot-title" className="font-bold text-base text-foreground flex items-center gap-2">
                 <span>AI Project Auto-Pilot</span>
                 <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                   VISION + ASO
@@ -210,6 +225,7 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
             )}
             <button
               onClick={() => onOpenChange(false)}
+              aria-label="Close AI Auto-Pilot dialog"
               className="w-7 h-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, memo } from "react";
 import {
   Layers, Type, Square, Flag,
   Cpu, Upload, Grid3X3, X, Palette, Smile, Globe, User,
@@ -130,7 +130,7 @@ interface EditorSidebarProps {
   onOpenGif?: () => void;
 }
 
-export function EditorSidebar({
+export const EditorSidebar = memo(function EditorSidebar({
   onOpenStorePreview,
   onOpenAIAutoPilot,
   onOpenAssetsStudio,
@@ -337,4 +337,4 @@ export function EditorSidebar({
       )}
     </div>
   );
-}
+});

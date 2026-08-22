@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
@@ -34,7 +34,7 @@ export const SHADOW_PRESETS_LIST = [
   { id: "none", label: "None (Flat)", desc: "Zero shadow" },
 ];
 
-export function PlatformsPanel() {
+export const PlatformsPanel = memo(function PlatformsPanel() {
   const {
     screenSets,
     addScreenSet,
@@ -791,4 +791,4 @@ export function PlatformsPanel() {
       )}
     </div>
   );
-}
+});

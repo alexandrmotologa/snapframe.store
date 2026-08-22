@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { TextLayer, ImageLayer, ShapeLayer, Background, GradientStop, GradientDirection } from "@/lib/types";
 import { Slider } from "@/components/ui/slider";
@@ -37,7 +38,7 @@ const GRADIENT_DIRECTIONS = [
   { value: "to-tl", label: "↖ Diagonal" },
 ];
 
-export function PropertiesPanel() {
+export const PropertiesPanel = memo(function PropertiesPanel() {
   const {
     activeLayerId,
     getActiveLayer,
@@ -225,7 +226,7 @@ export function PropertiesPanel() {
       </div>
     </div>
   );
-}
+});
 
 function ScreenshotChecklist({ screen }: { screen: import("@/lib/types").Screen }) {
   const screenshotLayers = screen.layers.filter((l) => l.type === "screenshot") as import("@/lib/types").ScreenshotLayer[];

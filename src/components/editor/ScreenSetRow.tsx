@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, memo } from "react";
 import {
   Plus, ChevronDown, Smartphone, Square, Circle,
   Sun, Moon, Link2, Upload, EyeOff, Eye, CopyCheck,
@@ -61,7 +61,7 @@ interface ScreenSetRowProps {
   isDragging?: boolean;
 }
 
-export function ScreenSetRow({ screenSet, isDragging = false }: ScreenSetRowProps) {
+export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging = false }: ScreenSetRowProps) {
   const {
     activeSetId, setActiveSet, setActiveScreen, addScreen, zoom,
     updateDevice, updateMockup, screenSets, updateLayer, 
@@ -546,4 +546,4 @@ export function ScreenSetRow({ screenSet, isDragging = false }: ScreenSetRowProp
       </DragDropContext>
     </div>
   );
-}
+});

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { FLAGS, POPULAR_FLAGS, FlagItem } from "@/lib/flags";
 
-export function FlagsPanel() {
+export const FlagsPanel = memo(function FlagsPanel() {
   const [query, setQuery] = useState("");
   const { getActiveSet, getActiveScreen, addLayer } = useEditorStore();
 
@@ -84,4 +84,4 @@ export function FlagsPanel() {
       </ScrollArea>
     </div>
   );
-}
+});

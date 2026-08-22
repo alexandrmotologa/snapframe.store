@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { Plus, Trash2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Maximize2, Minimize2, Smartphone, Tablet } from "lucide-react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,7 @@ import { ScreenThumbnailCanvas } from "@/components/editor/ScreenThumbnailCanvas
 import { AppleStoreIcon, GooglePlayIcon, APP_STORE_LABEL, GOOGLE_PLAY_LABEL } from "@/components/icons/StoreIcons";
 import { isTabletDevice, ALL_DEVICES } from "@/lib/devices";
 
-export function ScreenStrip() {
+export const ScreenStrip = memo(function ScreenStrip() {
   const {
     screenSets,
     activeSetId,
@@ -301,4 +301,4 @@ export function ScreenStrip() {
       </div>
     </div>
   );
-}
+});

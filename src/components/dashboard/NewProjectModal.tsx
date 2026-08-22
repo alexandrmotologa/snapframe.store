@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ALL_TEMPLATES, TEMPLATE_CATEGORIES, LAYOUT_META } from "@/lib/templates";
+import { BASE_TEMPLATES, getAllTemplates, TEMPLATE_CATEGORIES, LAYOUT_META } from "@/lib/templates";
 import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import {
@@ -60,23 +60,23 @@ function LayoutPreview({ template }: { template: Template }) {
         </clipPath>
       </defs>
 
+      {/* Background with rounded corners */}
       <rect width="120" height="160" rx="10" fill={`url(#${id})`} />
 
+      {/* Mock layout shapes */}
       {layout === "screenshot-top" && (
         <>
-          <rect x="16" y="8" width="88" height="88" rx="6" fill={phoneBg} stroke={phoneBorder} strokeWidth="1.5" strokeDasharray="5 3" />
-          <rect x="38" y="22" width="44" height="70" rx="5" fill={phoneColor} />
-          <rect x="10" y="104" width="60" height="8" rx="3" fill={textColor} />
-          <rect x="10" y="118" width="95" height="5" rx="2" fill={textLight} />
-          <rect x="10" y="127" width="75" height="5" rx="2" fill={textLight} />
+          <rect x="20" y="10" width="80" height="110" rx="6" fill={phoneBg} stroke={phoneBorder} strokeWidth="1.5" strokeDasharray="5 3" />
+          <rect x="28" y="18" width="64" height="95" rx="5" fill={phoneColor} />
+          <rect x="20" y="130" width="80" height="8" rx="3" fill={textColor} />
+          <rect x="30" y="142" width="60" height="5" rx="2" fill={textLight} />
         </>
       )}
       {layout === "screenshot-bottom" && (
         <>
-          <rect x="10" y="12" width="65" height="9" rx="3" fill={textColor} />
-          <rect x="10" y="24" width="80" height="6" rx="2" fill={textColor} />
-          <rect x="10" y="34" width="95" height="4" rx="2" fill={textLight} />
-          <rect x="16" y="46" width="88" height="106" rx="6" fill={phoneBg} stroke={phoneBorder} strokeWidth="1.5" strokeDasharray="5 3" />
+          <rect x="20" y="18" width="80" height="8" rx="3" fill={textColor} />
+          <rect x="30" y="30" width="60" height="5" rx="2" fill={textLight} />
+          <rect x="20" y="48" width="80" height="112" rx="6" fill={phoneBg} stroke={phoneBorder} strokeWidth="1.5" strokeDasharray="5 3" />
           <rect x="28" y="56" width="64" height="90" rx="5" fill={phoneColor} />
         </>
       )}
@@ -144,6 +144,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
   const [projectName, setProjectName] = useState("My App Screenshots");
   const [platforms, setPlatforms] = useState<{ ios: boolean; android: boolean }>({ ios: true, android: true });
   const [creating, setCreating] = useState(false);
+  const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
 
   // Search and sort state
   const [searchQuery, setSearchQuery] = useState("");
@@ -163,6 +164,9 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
   useEffect(() => {
     if (!open) return;
 
+    // Load full template catalog dynamically
+    getAllTemplates().then(setTemplates).catch(() => {});
+
     // Fetch global popularity counts from API
     fetch("/api/templates/popularity")
       .then((res) => res.json())
@@ -177,28 +181,28 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
   // Categories list
   const categories = useMemo(() => {
     const set = new Set<string>();
-    ALL_TEMPLATES.forEach((t) => {
+    templates.forEach((t) => {
       if (t.id !== "blank" && t.category) set.add(t.category);
     });
     return ["All", ...Array.from(set)];
-  }, []);
+  }, [templates]);
 
   // Filtered & Sorted Themes
   const themes = useMemo(() => {
-    let base = ALL_TEMPLATES.filter((t) => t.id !== "blank");
+    let base = templates.filter((t) => t.id !== "blank");
     if (selectedCategory !== "All") {
       base = base.filter((t) => t.category === selectedCategory);
     }
     return sortAndFilterTemplates(base, searchQuery, sortBy, globalCounts);
-  }, [searchQuery, sortBy, selectedCategory, globalCounts]);
+  }, [templates, searchQuery, sortBy, selectedCategory, globalCounts]);
 
   // Identify top 3 popular templates for 🔥 Popular badge
   const topPopularIds = useMemo(() => {
-    const sorted = [...ALL_TEMPLATES.filter((t) => t.id !== "blank")].sort((a, b) => {
+    const sorted = [...templates.filter((t) => t.id !== "blank")].sort((a, b) => {
       return getTemplateScore(b.id, globalCounts) - getTemplateScore(a.id, globalCounts);
     });
     return new Set(sorted.slice(0, 3).map((t) => t.id));
-  }, [globalCounts]);
+  }, [templates, globalCounts]);
 
   const handleCreate = async () => {
     if (hasReachedGuestLimit) {
@@ -217,7 +221,8 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
       // Record popularity (+1 in localStorage + Firebase sync)
       recordTemplateSelection(selectedTemplate);
 
-      const project = createProject(selectedTemplate, projectName.trim(), platforms);
+      const chosenTemplate = templates.find((t) => t.id === selectedTemplate);
+      const project = createProject(selectedTemplate, projectName.trim(), platforms, chosenTemplate);
       onClose();
       onCreated(project.id);
     } finally {
@@ -238,7 +243,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                 Choose a pre-designed theme for your screenshots
               </p>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleClose} className="rounded-full -mr-2 -mt-2">
+            <Button variant="ghost" size="icon" onClick={handleClose} aria-label="Close dialog" className="rounded-full -mr-2 -mt-2">
               <X className="w-5 h-5" />
             </Button>
           </div>
@@ -258,6 +263,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-3.5 h-3.5" />

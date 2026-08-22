@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Sparkles, Check, Layers, LayoutTemplate } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { toast } from "@/lib/store/toastStore";
-import { ALL_TEMPLATES } from "@/lib/templates";
+import { BASE_TEMPLATES, getAllTemplates } from "@/lib/templates";
 import { recordTemplateSelection } from "@/lib/templatePopularity";
 import { cn } from "@/lib/utils";
 import type { Template } from "@/lib/types";
@@ -98,24 +98,16 @@ function TemplateCard({
           )}
           <div className="px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9.5px] font-semibold text-white/95 border border-white/15 flex items-center gap-1">
             <Layers className="w-2.5 h-2.5" />
-            <span>{screenCount} {screenCount === 1 ? "Screen" : "Screens"}</span>
+            <span>{screenCount} screens</span>
           </div>
         </div>
 
-        {/* Hover overlay */}
-        {hovered && (
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center transition-all">
-            <span className="text-white text-xs font-bold bg-primary px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              Apply Preset
-            </span>
-          </div>
-        )}
-
-        {/* Applied check */}
+        {/* Applied checkmark overlay */}
         {isApplied && (
-          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-lg animate-in zoom-in-50">
-            <Check className="w-3 h-3 text-white font-bold" />
+          <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+              <Check className="w-5 h-5" />
+            </div>
           </div>
         )}
       </div>
@@ -135,15 +127,20 @@ function TemplateCard({
 // ── Main panel ──────────────────────────────────────────────────────────────
 export function TemplatesPanel() {
   const { screenSets, getActiveSet, applyTemplate } = useEditorStore();
+  const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("All");
   const [applyScope, setApplyScope] = useState<"all" | "active">("all");
   const [appliedId, setAppliedId] = useState<string | null>(null);
 
+  useEffect(() => {
+    getAllTemplates().then(setTemplates).catch(() => {});
+  }, []);
+
   const activeSet = getActiveSet();
 
   const filtered = useMemo(() => {
-    return ALL_TEMPLATES.filter((t) => {
+    return templates.filter((t) => {
       const count = t.screens?.length || 1;
       let matchCat = false;
       if (category === "All") matchCat = true;
@@ -162,7 +159,7 @@ export function TemplatesPanel() {
         t.tags.some((tag) => tag.includes(q));
       return matchCat && matchQ;
     });
-  }, [query, category]);
+  }, [templates, query, category]);
 
   const handleApply = (template: Template) => {
     // Record template usage count (+1)

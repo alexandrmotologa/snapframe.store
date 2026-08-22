@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   X,
@@ -33,6 +33,17 @@ export function AuthModal() {
     linkWithGoogle,
     linkWithGithub,
   } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isLoading) {
+        setAuthModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isAuthModalOpen, isLoading, setAuthModalOpen]);
 
   if (!isAuthModalOpen) return null;
 
@@ -74,16 +85,19 @@ export function AuthModal() {
   };
 
   const handleCancel = () => {
-    useAuthStore.setState({ isLoading: false, authError: null, isAuthModalOpen: false });
     setActiveProvider(null);
+    setAuthModalOpen(false);
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200 select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200"
       onClick={() => {
         if (!isLoading) setAuthModalOpen(false);
       }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
     >
       <div
         className="bg-card border border-border/80 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 relative"
@@ -98,6 +112,7 @@ export function AuthModal() {
             type="button"
             onClick={() => setAuthModalOpen(false)}
             className="absolute top-4 right-4 w-8 h-8 rounded-xl hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            aria-label="Close authentication dialog"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -147,7 +162,7 @@ export function AuthModal() {
                   <BrandHeroIcon size="md" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-extrabold text-foreground tracking-tight">
+                  <h2 id="auth-modal-title" className="text-xl font-extrabold text-foreground tracking-tight">
                     {isAnonymous ? "Upgrade Your Account" : "Sign In to SnapFrame"}
                   </h2>
                   <p className="text-xs text-muted-foreground max-w-xs mx-auto mt-1 leading-relaxed">
