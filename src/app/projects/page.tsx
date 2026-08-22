@@ -30,27 +30,9 @@ import { GithubIcon } from "@/components/ui/GithubIcon";
 import { toast } from "@/lib/store/toastStore";
 
 // ── Mini Canvas Thumbnail with Real Screen Render & Multi-Screen Stack ────────
-function ProjectThumbnail({ project }: { project: Project }) {
+function ProjectCanvasPreview({ screen1, screen2 }: { screen1: Screen; screen2?: Screen }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const firstSet = project.screenSets[0];
-  const screens = firstSet?.screens ?? [];
-  const screen1 = screens[0];
-  const screen2 = screens[1];
 
-  // If we have a saved screenshot thumbnail from the editor, use it
-  if (project.thumbnail) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={project.thumbnail}
-        alt={project.name}
-        className="w-full h-full object-cover object-top"
-      />
-    );
-  }
-
-  // Fallback: dynamic canvas rendering with realistic layered screens preview
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !screen1) return;
@@ -229,6 +211,33 @@ function ProjectThumbnail({ project }: { project: Project }) {
     }
   }, [screen1, screen2]);
 
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full object-cover"
+      style={{ display: "block" }}
+    />
+  );
+}
+
+function ProjectThumbnail({ project }: { project: Project }) {
+  const firstSet = project.screenSets[0];
+  const screens = firstSet?.screens ?? [];
+  const screen1 = screens[0];
+  const screen2 = screens[1];
+
+  // If we have a saved screenshot thumbnail from the editor, use it
+  if (project.thumbnail) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={project.thumbnail}
+        alt={project.name}
+        className="w-full h-full object-cover object-top"
+      />
+    );
+  }
+
   if (!screen1) {
     return (
       <div
@@ -240,13 +249,8 @@ function ProjectThumbnail({ project }: { project: Project }) {
     );
   }
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full object-cover"
-      style={{ display: "block" }}
-    />
-  );
+  // Fallback: dynamic canvas rendering with realistic layered screens preview
+  return <ProjectCanvasPreview screen1={screen1} screen2={screen2} />;
 }
 
 // ── Project Card (Grid View) ──────────────────────────────────────────────────

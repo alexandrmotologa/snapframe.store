@@ -619,7 +619,14 @@ export default function AccountPage() {
                 </button>
               </div>
 
-              {billingData?.creditLogs && billingData.creditLogs.length > 0 ? (
+              {isLoading ? (
+                <div className="p-6 space-y-3">
+                  <div className="h-4 bg-muted/60 rounded-md animate-pulse w-1/4" />
+                  <div className="h-10 bg-muted/30 rounded-xl animate-pulse w-full" />
+                  <div className="h-10 bg-muted/30 rounded-xl animate-pulse w-full" />
+                  <div className="h-10 bg-muted/30 rounded-xl animate-pulse w-full" />
+                </div>
+              ) : billingData?.creditLogs && billingData.creditLogs.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-secondary/40 border-b border-border/40 text-muted-foreground font-semibold uppercase tracking-wider text-[10px]">

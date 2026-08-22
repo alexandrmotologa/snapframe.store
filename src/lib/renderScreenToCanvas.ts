@@ -15,13 +15,17 @@ export interface RenderOptions {
   isActiveScreen?: boolean;
 }
 
-// ── Image Cache ──────────────────────────────────────────────────────────────
+// ── Image Cache with LRU Eviction (Max 100 entries to prevent RAM bloat) ──────
+const MAX_IMAGE_CACHE_SIZE = 100;
 const imgCache = new Map<string, HTMLImageElement>();
 
 export function loadCachedImage(src: string): Promise<HTMLImageElement> {
   if (imgCache.has(src)) {
     const cached = imgCache.get(src)!;
     if (cached.complete && cached.naturalWidth > 0) {
+      // Refresh recency in Map
+      imgCache.delete(src);
+      imgCache.set(src, cached);
       return Promise.resolve(cached);
     }
   }
@@ -29,10 +33,18 @@ export function loadCachedImage(src: string): Promise<HTMLImageElement> {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
+      // LRU Eviction: Remove oldest entries if capacity reached
+      if (imgCache.size >= MAX_IMAGE_CACHE_SIZE) {
+        const oldestKey = imgCache.keys().next().value;
+        if (oldestKey) imgCache.delete(oldestKey);
+      }
       imgCache.set(src, img);
       resolve(img);
     };
-    img.onerror = reject;
+    img.onerror = (err) => {
+      console.warn(`[renderScreenToCanvas] Failed to load image asset: ${src.slice(0, 60)}...`);
+      reject(err);
+    };
     img.src = src;
   });
 }

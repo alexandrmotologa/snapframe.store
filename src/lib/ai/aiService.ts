@@ -114,16 +114,22 @@ export async function callGemini(
   return text;
 }
 
-// ─── CALL OPENAI (GPT-4o / GPT-4o-mini) ──────────────────────────────────────
-export async function callOpenAI(
+// ─── HELPER: OpenAI-Compatible Provider Request ──────────────────────────────
+async function callOpenAICompatible(
+  endpoint: string,
+  model: string,
   prompt: string,
   apiKey: string,
   imagesBase64?: Array<{ mimeType: string; data: string }>,
-  responseJson: boolean = true
+  responseJson: boolean = true,
+  providerName: string = "AI",
+  temperature: number = 0.3
 ): Promise<string> {
-  const content: any[] = [{ type: "text", text: prompt }];
+  const hasImages = imagesBase64 && imagesBase64.length > 0;
+  let content: any = prompt;
 
-  if (imagesBase64 && imagesBase64.length > 0) {
+  if (hasImages) {
+    content = [{ type: "text", text: prompt }];
     imagesBase64.forEach((img) => {
       content.push({
         type: "image_url",
@@ -134,27 +140,46 @@ export async function callOpenAI(
     });
   }
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model,
       messages: [{ role: "user", content }],
-      temperature: 0.4,
+      temperature,
       response_format: responseJson ? { type: "json_object" } : undefined,
     }),
   });
 
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`OpenAI API Error (${res.status}): ${errText}`);
+    throw new Error(`${providerName} API Error (${res.status}): ${errText}`);
   }
 
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? "";
+}
+
+// ─── CALL OPENAI (GPT-4o / GPT-4o-mini) ──────────────────────────────────────
+export async function callOpenAI(
+  prompt: string,
+  apiKey: string,
+  imagesBase64?: Array<{ mimeType: string; data: string }>,
+  responseJson: boolean = true
+): Promise<string> {
+  return callOpenAICompatible(
+    "https://api.openai.com/v1/chat/completions",
+    "gpt-4o-mini",
+    prompt,
+    apiKey,
+    imagesBase64,
+    responseJson,
+    "OpenAI",
+    0.4
+  );
 }
 
 // ─── CALL GROQ (GPT-OSS 120B / Llama 3.2 11B Vision) ───────────────────────
@@ -166,41 +191,16 @@ export async function callGroq(
 ): Promise<string> {
   const hasImages = imagesBase64 && imagesBase64.length > 0;
   const model = hasImages ? "llama-3.2-11b-vision-preview" : "openai/gpt-oss-120b";
-
-  let content: any = prompt;
-  if (hasImages) {
-    content = [{ type: "text", text: prompt }];
-    imagesBase64.forEach((img) => {
-      content.push({
-        type: "image_url",
-        image_url: {
-          url: `data:${img.mimeType || "image/png"};base64,${img.data}`,
-        },
-      });
-    });
-  }
-
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "user", content }],
-      temperature: 0.3,
-      response_format: responseJson ? { type: "json_object" } : undefined,
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Groq API Error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content ?? "";
+  return callOpenAICompatible(
+    "https://api.groq.com/openai/v1/chat/completions",
+    model,
+    prompt,
+    apiKey,
+    imagesBase64,
+    responseJson,
+    "Groq",
+    0.3
+  );
 }
 
 // ─── CALL MISTRAL (Mistral Small / Pixtral 12B Vision) ─────────────────────────
@@ -212,41 +212,16 @@ export async function callMistral(
 ): Promise<string> {
   const hasImages = imagesBase64 && imagesBase64.length > 0;
   const model = hasImages ? "pixtral-12b-2409" : "mistral-small-latest";
-
-  let content: any = prompt;
-  if (hasImages) {
-    content = [{ type: "text", text: prompt }];
-    imagesBase64.forEach((img) => {
-      content.push({
-        type: "image_url",
-        image_url: {
-          url: `data:${img.mimeType || "image/png"};base64,${img.data}`,
-        },
-      });
-    });
-  }
-
-  const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "user", content }],
-      temperature: 0.3,
-      response_format: responseJson ? { type: "json_object" } : undefined,
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Mistral API Error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content ?? "";
+  return callOpenAICompatible(
+    "https://api.mistral.ai/v1/chat/completions",
+    model,
+    prompt,
+    apiKey,
+    imagesBase64,
+    responseJson,
+    "Mistral",
+    0.3
+  );
 }
 
 // ─── CALL XAI (Grok 3 / Grok 2 Vision) ───────────────────────────────────────
@@ -258,41 +233,16 @@ export async function callXAI(
 ): Promise<string> {
   const hasImages = imagesBase64 && imagesBase64.length > 0;
   const model = hasImages ? "grok-2-vision-1212" : "grok-3";
-
-  let content: any = prompt;
-  if (hasImages) {
-    content = [{ type: "text", text: prompt }];
-    imagesBase64.forEach((img) => {
-      content.push({
-        type: "image_url",
-        image_url: {
-          url: `data:${img.mimeType || "image/png"};base64,${img.data}`,
-        },
-      });
-    });
-  }
-
-  const res = await fetch("https://api.x.ai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "user", content }],
-      temperature: 0.3,
-      response_format: responseJson ? { type: "json_object" } : undefined,
-    }),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`xAI (Grok) API Error (${res.status}): ${errText}`);
-  }
-
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content ?? "";
+  return callOpenAICompatible(
+    "https://api.x.ai/v1/chat/completions",
+    model,
+    prompt,
+    apiKey,
+    imagesBase64,
+    responseJson,
+    "xAI (Grok)",
+    0.3
+  );
 }
 
 // ─── UNIVERSAL RESILIENT AI RUNNER ──────────────────────────────────────────
