@@ -76,8 +76,9 @@
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Icons:** [Lucide Icons](https://lucide.dev/)
+- **Testing:** [Vitest](https://vitest.dev/) automated unit test suite with 100% path-alias resolution
 - **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) with undo/redo history stack & local persistence
-- **Canvas Rendering:** Native HTML5 Canvas 2D with high-DPI supersampling
+- **Canvas Rendering:** Native HTML5 Canvas 2D with high-DPI supersampling & LRU cache eviction
 - **Export & Compression:** [JSZip](https://stuk.github.io/jszip/) & FileSaver
 - **AI Backend:** Universal 5-provider failover engine (Google Gemini, OpenAI, Groq, Mistral, xAI Grok)
 - **Security:** Firebase Admin ID token authentication, sliding window rate limiting, anti-SSRF protections, and SVG sandbox CSP
@@ -115,7 +116,12 @@ NEXT_PUBLIC_FIREBASE_API_KEY=...
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
 ```
 
-### 4. Run the development server
+### 4. Run automated test suite
+```bash
+npm test
+```
+
+### 5. Run the development server
 ```bash
 npm run dev
 ```

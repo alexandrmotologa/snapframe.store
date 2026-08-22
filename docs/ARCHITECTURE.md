@@ -142,3 +142,31 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
   - Dedicated route `loading.tsx` skeletons for `/projects`, `/account`, and `/editor/[projectId]` providing instantaneous feedback without layout shift.
   - Route-level `layout.tsx` metadata ensuring granular SEO, canonical URLs, and OpenGraph social preview tags across `/pricing`, `/faq`, `/projects`, and `/account`.
   - Root error boundaries (`not-found.tsx`, `error.tsx`, `global-error.tsx`).
+
+---
+
+## 6. Performance, Memoization & Automated Quality Assurance
+
+### 6.1 Lazy-Loaded Template Architecture
+- High-volume Figma template dictionaries (~12,000 lines) are partitioned into dynamic async chunks via `getAllTemplates(): Promise<Template[]>`.
+- The synchronous `BASE_TEMPLATES` registry enables instant zero-latency initialization of the `NewProjectModal` and editor sidebar, asynchronously resolving community presets without blocking initial paint or inflating bundle size (>500KB bundle payload reduction).
+
+### 6.2 Editor Component Memoization (`React.memo`)
+- Critical multi-layer canvas controls and sidebar inspectors are wrapped in `React.memo`:
+  - `ScreenCard.tsx`, `ScreenStrip.tsx`, `ScreenSetRow.tsx`
+  - `PropertiesPanel.tsx`, `EditorSidebar.tsx`
+  - `TextPanel.tsx`, `BackgroundPanel.tsx`, `PlatformsPanel.tsx`, `FlagsPanel.tsx`
+- Prevents cascading re-renders across the studio filmstrip during active panning, zooming, and inspector adjustments.
+
+### 6.3 Accessibility (A11y) & Keyboard Dismissal
+- Modal overlays implement Escape key listeners (`keydown`) with non-blocking cleanup.
+- Dialog containers enforce accessibility standards with semantic `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, and `aria-label` attributes on interactive icon buttons.
+
+### 6.4 Automated Unit Test Suite (`vitest`)
+- Automated unit test runner powered by **Vitest** configured in `vitest.config.ts` with path alias support (`@/*` -> `./src/*`).
+- Coverage spans:
+  - Utility math, formatting, CSS background generators, and ID generators (`utils.test.ts`).
+  - Device matrices, official color HEX mappings, tablet detection, and store dimensions (`devices.test.ts`).
+  - Template popularity algorithms, search filtering, and multi-field sorting (`templatePopularity.test.ts`).
+  - AI string limit truncation, word boundary preservation, and provider key discovery (`aiService.test.ts`).
+
