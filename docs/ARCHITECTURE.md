@@ -85,6 +85,12 @@ SnapFrame uses three primary Zustand stores designed for reactivity, persistence
 
 The rendering engine guarantees **100% visual parity** between the live editor workspace, interactive store simulators, animated GIF exports, and lossless 4K production exports.
 
+### LRU Image Memory Management (`imgCache`):
+- `renderScreenToCanvas.ts` maintains an in-memory `imgCache` with a safety threshold (max 100 images).
+- Accessing an existing cached image refreshes its recency key.
+- When capacity is reached, the oldest unused image entries are evicted automatically, preventing browser RAM leakage during long editing sessions with multiple high-resolution uploads.
+- Explicit non-fatal `console.warn` diagnostics track failed image asset loads without breaking fallback canvas rendering.
+
 ### Rendering Order Pipeline:
 1. **Background Layer:**
    - Solid fill
@@ -128,7 +134,11 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 
 - **Server-Side Token Verification (`serverAuth.ts`):** All critical routes (`/api/account/billing`, `/api/ai/*`, `/api/uploadthing`) verify Firebase ID Tokens via `firebaseAdmin.ts` (`adminAuth.verifyIdToken`) preventing unauthorized impersonation.
 - **Sliding-Window Rate Limiting (`rateLimiter.ts`):** In-memory sliding window rate limiting prevents scraping, DoS, and automated credential consumption across IP and user identifiers.
+- **Unified AI Provider Abstraction (`aiService.ts`):** Consolidated `callOpenAICompatible` handler standardizes requests, timeouts, and error handling across OpenAI, Groq, Mistral, and xAI with Gemini as multimodal primary.
 - **Anti-SSRF Protection (`/api/scrape-app`):** Strict DNS resolution filtering blocks requests to private IPv4 (RFC 1918), loopback, link-local, carrier-grade NAT, cloud metadata IP (169.254.169.254), and private IPv6 ranges.
 - **SVG Sandbox Proxy (`/api/proxy-svg`):** Origin whitelisting, Content Security Policy (`sandbox; default-src 'none'`), and `X-Content-Type-Options: nosniff` prevent XSS via maliciously crafted vector SVGs.
 - **HTTP Security Headers (`next.config.ts`):** Enforces HSTS, `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
-- **Next.js App Router Boundaries:** Robust error handling with dedicated root boundaries (`not-found.tsx`, `error.tsx`, `global-error.tsx`, and `loading.tsx`).
+- **Next.js App Router Boundaries & Skeletons:**
+  - Dedicated route `loading.tsx` skeletons for `/projects`, `/account`, and `/editor/[projectId]` providing instantaneous feedback without layout shift.
+  - Route-level `layout.tsx` metadata ensuring granular SEO, canonical URLs, and OpenGraph social preview tags across `/pricing`, `/faq`, `/projects`, and `/account`.
+  - Root error boundaries (`not-found.tsx`, `error.tsx`, `global-error.tsx`).

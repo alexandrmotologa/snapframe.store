@@ -138,15 +138,16 @@ snapframe.store/
 │   ├── logos/                 # High-resolution vector and 3D brand logo assets
 │   └── mockups/               # SVG & PNG vector device frames
 ├── src/
-│   ├── app/                   # Next.js App Router (pages & API routes)
-│   │   ├── account/           # User Account, Subscriptions, AI Credit Ledger & Paddle Hub
+│   ├── app/                   # Next.js App Router (pages, layouts, skeletons & API routes)
+│   │   ├── account/           # User Account, Subscriptions, AI Credit Ledger & Paddle Hub (with loading skeleton)
 │   │   ├── api/
 │   │   │   ├── account/       # Billing & subscription management endpoint
 │   │   │   ├── ai/            # AI endpoints (vision-screens, copywriter, store-listing, translate, palette)
 │   │   │   └── webhooks/      # Paddle signature verification & subscription webhooks
-│   │   ├── editor/[projectId]/# Main interactive studio workspace
-│   │   ├── projects/          # Dedicated Projects dashboard, search, sort & management
-│   │   ├── pricing/           # Pricing plans & transparent comparison
+│   │   ├── editor/[projectId]/# Main interactive studio workspace (with loading skeleton)
+│   │   ├── projects/          # Dedicated Projects dashboard, search & management (with loading skeleton)
+│   │   ├── pricing/           # Pricing plans & transparent comparison (with SEO layout)
+│   │   ├── faq/               # Frequently asked questions & guides (with SEO layout)
 │   │   ├── refunds/           # 14-day refund policy & dispute guidelines
 │   │   ├── terms/             # Terms of Service & Commercial licensing
 │   │   ├── privacy/           # Privacy Policy & Data protection (GDPR/CCPA)
