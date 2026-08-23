@@ -770,23 +770,35 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                               )}
                             </div>
                           </div>
-                          <input
-                            type="range"
-                            min="0.5"
-                            max="1.5"
-                            step="0.05"
-                            value={ss.mockup?.scale || 1}
-                            onChange={(e) => {
+                          <div
+                            className="relative"
+                            onClick={() => {
                               if (!isPro) {
                                 toast.info("Custom Mockup Scaling (50%–150%) is a SnapFrame Pro feature.");
                                 setUpgradeModalOpen(true);
-                                return;
                               }
-                              const scaleVal = parseFloat(e.target.value);
-                              setMockupScale(ss.id, scaleVal);
                             }}
-                            className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
-                          />
+                          >
+                            <input
+                              type="range"
+                              min="0.5"
+                              max="1.5"
+                              step="0.05"
+                              disabled={!isPro}
+                              value={ss.mockup?.scale || 1}
+                              onChange={(e) => {
+                                if (!isPro) return;
+                                const scaleVal = parseFloat(e.target.value);
+                                setMockupScale(ss.id, scaleVal);
+                              }}
+                              className={cn(
+                                "w-full h-1.5 rounded-lg appearance-none accent-primary transition-all",
+                                isPro
+                                  ? "bg-secondary cursor-pointer"
+                                  : "bg-secondary/40 cursor-not-allowed opacity-60 pointer-events-none"
+                              )}
+                            />
+                          </div>
                         </div>
 
                         {/* Device Shadow Dropdown */}
