@@ -3652,3 +3652,16 @@ export async function getAllTemplates(): Promise<Template[]> {
 // Export synchronous reference for backward compatibility
 export const ALL_TEMPLATES: Template[] = BASE_TEMPLATES;
 export const DEFAULT_TEMPLATES: Template[] = BASE_TEMPLATES;
+
+/**
+ * Returns true if the template is part of the SnapFrame Pro Suite.
+ */
+export function isProTemplate(template?: Partial<Template> | null): boolean {
+  if (!template || !template.id) return false;
+  return Boolean(
+    template.id.startsWith("niche-") ||
+    template.id.includes("pro-") ||
+    template.category?.toLowerCase() === "pro niches" ||
+    template.tags?.some((t) => t.toLowerCase() === "pro" || t.toLowerCase() === "pro suite")
+  );
+}

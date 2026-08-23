@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, Sparkles, Check, Layers, LayoutTemplate } from "lucide-react";
+import { Search, Sparkles, Check, Layers, LayoutTemplate, Lock, Crown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEditorStore } from "@/lib/store/editorStore";
+import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
-import { BASE_TEMPLATES, getAllTemplates } from "@/lib/templates";
+import { BASE_TEMPLATES, getAllTemplates, isProTemplate } from "@/lib/templates";
 import { recordTemplateSelection } from "@/lib/templatePopularity";
 import { cn } from "@/lib/utils";
 import type { Template } from "@/lib/types";
@@ -31,10 +32,12 @@ type Category = (typeof CATEGORIES)[number];
 function TemplateCard({
   template,
   isApplied,
+  isProUser,
   onApply,
 }: {
   template: Template;
   isApplied: boolean;
+  isProUser: boolean;
   onApply: () => void;
 }) {
   // Preview gradient colors from template
@@ -44,6 +47,7 @@ function TemplateCard({
   };
 
   const screenCount = template.screens?.length || 1;
+  const isProTpl = isProTemplate(template);
 
   return (
     <button
@@ -87,10 +91,19 @@ function TemplateCard({
         {/* Screen count & Pro badges */}
         <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none z-10 gap-1">
           <div>
-            {(template.id.startsWith("niche-") || template.id.includes("pro") || screenCount >= 6) && (
+            {isProTpl && (
               <div className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 text-[9px] font-black tracking-wide shadow-xs flex items-center gap-1 border border-amber-300/40">
-                <Sparkles className="w-2.5 h-2.5 text-zinc-950 fill-zinc-950" />
-                <span>PRO</span>
+                {!isProUser ? (
+                  <>
+                    <Lock className="w-2.5 h-2.5 text-zinc-950 stroke-[3]" />
+                    <span>PRO</span>
+                  </>
+                ) : (
+                  <>
+                    <Crown className="w-2.5 h-2.5 text-zinc-950 fill-zinc-950" />
+                    <span>PRO</span>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -112,9 +125,14 @@ function TemplateCard({
 
       {/* Info */}
       <div className="px-2.5 py-2 bg-card/90 dark:bg-secondary/40 border-t border-border/40 flex flex-col justify-center min-w-0">
-        <p className="text-xs font-semibold text-foreground truncate leading-tight" title={template.name}>
-          {template.name}
-        </p>
+        <div className="flex items-center justify-between gap-1">
+          <p className="text-xs font-semibold text-foreground truncate leading-tight flex-1" title={template.name}>
+            {template.name}
+          </p>
+          {isProTpl && !isProUser && (
+            <Lock className="w-3 h-3 text-amber-500 shrink-0" />
+          )}
+        </div>
         <div className="flex items-center gap-1.5 mt-1 min-w-0">
           <span className="text-[8.5px] font-mono uppercase font-semibold text-muted-foreground/90 px-1 py-0.2 rounded bg-secondary/80 shrink-0 border border-border/30">
             {template.category}
@@ -131,6 +149,9 @@ function TemplateCard({
 // ── Main panel ──────────────────────────────────────────────────────────────
 export function TemplatesPanel() {
   const { screenSets, getActiveSet, applyTemplate } = useEditorStore();
+  const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
+  const isGuest = Boolean(!user || user.isAnonymous);
+
   const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("All");
@@ -148,7 +169,7 @@ export function TemplatesPanel() {
       const count = t.screens?.length || 1;
       let matchCat = false;
       if (category === "All") matchCat = true;
-      else if (category === "Pro Niches") matchCat = t.id.startsWith("niche-") || t.tags.some(tag => ["fintech", "crypto", "fitness", "saas", "social", "ecommerce", "meditation"].includes(tag.toLowerCase()));
+      else if (category === "Pro Niches") matchCat = isProTemplate(t) || t.tags.some(tag => ["fintech", "crypto", "fitness", "saas", "social", "ecommerce", "meditation"].includes(tag.toLowerCase()));
       else if (category === "10 Screens") matchCat = count === 10;
       else if (category === "8 Screens") matchCat = count === 8;
       else if (category === "6 Screens") matchCat = count === 6;
@@ -165,6 +186,18 @@ export function TemplatesPanel() {
   }, [templates, query, category]);
 
   const handleApply = (template: Template) => {
+    // Check Pro Gating
+    if (isProTemplate(template) && !isPro) {
+      if (isGuest) {
+        setAuthModalOpen(true);
+        toast.info("Pro Suite Templates require SnapFrame Pro. Sign in with Google or GitHub to upgrade.");
+      } else {
+        setUpgradeModalOpen(true);
+        toast.info("Pro Suite Templates require SnapFrame Pro. Upgrade to unlock luxury industry presets.");
+      }
+      return;
+    }
+
     // Record template usage count (+1)
     recordTemplateSelection(template.id);
     // Apply to all sets or active set
@@ -274,6 +307,7 @@ export function TemplatesPanel() {
               key={template.id}
               template={template}
               isApplied={appliedId === template.id}
+              isProUser={isPro}
               onApply={() => handleApply(template)}
             />
           ))}

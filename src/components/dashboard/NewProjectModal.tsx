@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { X, Search, Check, Sparkles, ArrowRight, Monitor, Plus, Flame, ArrowUpDown, Tag, ShieldAlert, Lock } from "lucide-react";
+import { X, Search, Check, Sparkles, ArrowRight, Monitor, Plus, Flame, ArrowUpDown, Tag, ShieldAlert, Lock, Crown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BASE_TEMPLATES, getAllTemplates, TEMPLATE_CATEGORIES, LAYOUT_META } from "@/lib/templates";
+import { BASE_TEMPLATES, getAllTemplates, TEMPLATE_CATEGORIES, LAYOUT_META, isProTemplate } from "@/lib/templates";
 import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
+import { toast } from "@/lib/store/toastStore";
 import {
   sortAndFilterTemplates,
   recordTemplateSelection,
@@ -216,12 +217,25 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
       return;
     }
     if (!projectName.trim() || !selectedTemplate || (!platforms.ios && !platforms.android)) return;
+
+    const chosenTemplate = templates.find((t) => t.id === selectedTemplate);
+    if (isProTemplate(chosenTemplate) && !isPro) {
+      if (isGuest) {
+        setAuthModalOpen(true);
+        toast.info("Pro Suite Templates require SnapFrame Pro. Sign in with Google or GitHub to upgrade.");
+      } else {
+        setUpgradeModalOpen(true);
+        toast.info("Pro Suite Templates require SnapFrame Pro. Upgrade to unlock luxury presets.");
+      }
+      onClose();
+      return;
+    }
+
     setCreating(true);
     try {
       // Record popularity (+1 in localStorage + Firebase sync)
       recordTemplateSelection(selectedTemplate);
 
-      const chosenTemplate = templates.find((t) => t.id === selectedTemplate);
       const project = createProject(selectedTemplate, projectName.trim(), platforms, chosenTemplate);
       onClose();
       onCreated(project.id);
@@ -341,6 +355,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
             {themes.map((tpl) => {
               const isSelected = selectedTemplate === tpl.id;
               const isPopular = topPopularIds.has(tpl.id);
+              const isProTpl = isProTemplate(tpl);
 
               return (
                 <div 
@@ -351,13 +366,34 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                       ? "bg-primary/5 shadow-2xl shadow-primary/10 ring-2 ring-primary scale-[1.01]" 
                       : "bg-background shadow-md hover:shadow-xl hover:-translate-y-1 hover:ring-2 hover:ring-primary/30 border border-border/50"
                   )}
-                  onClick={() => setSelectedTemplate(tpl.id)}
+                  onClick={() => {
+                    if (isProTpl && !isPro) {
+                      if (isGuest) {
+                        setAuthModalOpen(true);
+                        toast.info("Pro Suite Templates require SnapFrame Pro. Sign in with Google or GitHub to upgrade.");
+                      } else {
+                        setUpgradeModalOpen(true);
+                        toast.info("Pro Suite Templates require SnapFrame Pro. Upgrade to unlock luxury presets.");
+                      }
+                      return;
+                    }
+                    setSelectedTemplate(tpl.id);
+                  }}
                 >
                   {/* Pro Industry or Popular Badge */}
-                  {tpl.id.startsWith("niche-") ? (
+                  {isProTpl ? (
                     <div className="absolute top-4 left-4 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 border border-amber-300/40 shadow-sm">
-                      <Sparkles className="w-3 h-3 text-zinc-950 fill-zinc-950" />
-                      PRO SUITE
+                      {!isPro ? (
+                        <>
+                          <Lock className="w-3 h-3 text-zinc-950 stroke-[3]" />
+                          <span>PRO SUITE</span>
+                        </>
+                      ) : (
+                        <>
+                          <Crown className="w-3 h-3 text-zinc-950 fill-zinc-950" />
+                          <span>PRO SUITE</span>
+                        </>
+                      )}
                     </div>
                   ) : isPopular ? (
                     <div className="absolute top-4 left-4 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-xs">
@@ -371,7 +407,11 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                     "absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10",
                     isSelected ? "border-primary bg-primary" : "border-muted-foreground/30 group-hover:border-primary/50 bg-background/50 backdrop-blur"
                   )}>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+                    {isSelected ? (
+                      <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                    ) : isProTpl && !isPro ? (
+                      <Lock className="w-3 h-3 text-muted-foreground" />
+                    ) : null}
                   </div>
 
                   {/* Single Screen Preview */}
