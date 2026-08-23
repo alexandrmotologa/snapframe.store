@@ -115,7 +115,7 @@ export default function PricingPage() {
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground">
             Ship High-Converting Screenshots{" "}
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               In Seconds
             </span>
           </h1>
@@ -137,7 +137,7 @@ export default function PricingPage() {
                 }`}
               >
                 <span>Annual Billing</span>
-                <span className="px-2 py-0.5 text-[10px] rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <span className="px-2 py-0.5 text-[10px] rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                   Save 36%
                 </span>
               </button>
@@ -159,7 +159,7 @@ export default function PricingPage() {
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
           {/* FREE TIER CARD */}
-          <div className="p-8 rounded-3xl bg-card border border-border/70 shadow-sm flex flex-col justify-between space-y-6 hover:border-border transition-colors">
+          <div className="p-8 rounded-3xl bg-card border border-border/70 shadow-sm flex flex-col justify-between space-y-6 hover:shadow-md hover:border-border transition-all">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-foreground">Free Starter</h3>
@@ -177,42 +177,42 @@ export default function PricingPage() {
 
               <div className="pt-4 border-t border-border/50 space-y-3 text-xs">
                 <div className="flex items-center gap-2.5 text-foreground">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
                   <span>3 Free AI Generations (Auto-Pilot &amp; Copywriter)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
                   <span>Up to 3 Projects (Stored locally in browser)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
                   <span>Export up to 3 screens per set (1 platform, 1 language)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
                   <span>1-Click Clipboard PNG copy (Screens 1 to 3)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
                   <span>Phone Live Store Simulator &amp; App Icon Studio</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
-                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
                   <span>Standard 1x &amp; 2x PNG / JPEG Exports</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
+                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Multi-Device Real-Time Cloud Sync</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
+                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android)</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
+                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Dual Theme Generator (Light &amp; Dark matching sets)</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
+                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Batch 40+ Language Export &amp; Fastlane Suite</span>
                 </div>
@@ -229,7 +229,7 @@ export default function PricingPage() {
           </div>
 
           {/* PRO TIER CARD */}
-          <div className="relative p-8 rounded-3xl bg-gradient-to-b from-indigo-950/40 via-purple-950/20 to-card border-2 border-indigo-500/50 shadow-2xl flex flex-col justify-between space-y-6">
+          <div className="relative p-8 rounded-3xl bg-gradient-to-b from-indigo-500/[0.08] via-purple-500/[0.04] to-card dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-card border-2 border-indigo-500/30 dark:border-indigo-500/50 shadow-xl shadow-indigo-500/10 dark:shadow-2xl flex flex-col justify-between space-y-6">
             {/* Popular Badge */}
             <div className="absolute -top-3.5 right-8 px-3.5 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-pink-500 text-white text-[11px] font-bold shadow-md uppercase tracking-wider">
               Most Popular
@@ -238,10 +238,10 @@ export default function PricingPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-400" />
+                  <Crown className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                   <h3 className="text-xl font-bold text-foreground">SnapFrame Pro</h3>
                 </div>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/25">
                   Full Access
                 </span>
               </div>
@@ -259,51 +259,51 @@ export default function PricingPage() {
 
               <div className="pt-4 border-t border-border/50 space-y-3 text-xs">
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Full 10-Screen Multi-Platform ZIP</strong> (iPhone + iPad + Android + Tablet)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Custom Canvas Dimensions &amp; Freeform W × H</strong></span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Social Media Presets</strong> (Product Hunt, Twitter, Instagram 1:1, Web Hero)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Mockup Frame Scaling (50%–150%)</strong> &amp; Luxury 3D Frames</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>1-Click Clipboard PNG copy on all 10 screens</strong></span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Batch 40+ Language Localization Export</strong> in organized folders</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Fastlane &amp; Store Listing Metadata Suite</strong> (.txt, .json)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Dual Theme Generator</strong> (1-Click Light &amp; Dark matching sets)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>iPad Pro &amp; Tablet Store Simulator</strong></span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Unlimited Projects &amp; Multi-Device Cloud Sync</strong> (Firestore)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>500 AI Generations / Month</strong> (Vision Auto-Pilot, Copy &amp; Tone)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>4K Lossless Ultra-HD Master Exports</strong> (Pixel-perfect 3x/4K)</span>
                 </div>
               </div>
@@ -325,7 +325,7 @@ export default function PricingPage() {
         {/* Merchant of Record & Guarantee Banner */}
         <div className="p-6 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 max-w-4xl mx-auto">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
               <Shield className="w-6 h-6" />
             </div>
             <div>
