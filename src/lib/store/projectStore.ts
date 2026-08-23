@@ -135,9 +135,15 @@ export const useProjectStore = create<ProjectStore>()(
           });
         }
 
-        // Free tier project limit check (Max 3 projects for Free/Guest)
+        // Project limit check: 1 for Guest, 3 for Free Registered, Unlimited for Pro
         try {
-          const { isPro, setUpgradeModalOpen } = useAuthStore.getState();
+          const { isPro, user, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore.getState();
+          const isGuest = Boolean(!user || user.isAnonymous);
+          if (isGuest && get().projects.length >= 1) {
+            setAuthModalOpen(true);
+            toast.info("Guest mode is limited to 1 active project. Sign in free with Google or GitHub to create up to 3 projects!");
+            throw new Error("Guest project limit reached (1 max).");
+          }
           if (!isPro && get().projects.length >= 3) {
             setUpgradeModalOpen(true);
             toast.info("Free plan includes up to 3 local projects. Upgrade to SnapFrame Pro for unlimited projects & multi-device cloud sync!");
@@ -145,7 +151,7 @@ export const useProjectStore = create<ProjectStore>()(
           }
         } catch (e: unknown) {
           const err = e as Error;
-          if (err.message?.includes("Free project limit")) throw err;
+          if (err.message?.includes("project limit reached")) throw err;
         }
 
         const project: Project = {
@@ -209,9 +215,15 @@ export const useProjectStore = create<ProjectStore>()(
       },
 
       duplicateProject: (id) => {
-        // Free tier project limit check
+        // Project limit check: 1 for Guest, 3 for Free Registered, Unlimited for Pro
         try {
-          const { isPro, setUpgradeModalOpen } = useAuthStore.getState();
+          const { isPro, user, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore.getState();
+          const isGuest = Boolean(!user || user.isAnonymous);
+          if (isGuest && get().projects.length >= 1) {
+            setAuthModalOpen(true);
+            toast.info("Guest mode is limited to 1 active project. Sign in free with Google or GitHub to create up to 3 projects!");
+            throw new Error("Guest project limit reached (1 max).");
+          }
           if (!isPro && get().projects.length >= 3) {
             setUpgradeModalOpen(true);
             toast.info("Free plan includes up to 3 local projects. Upgrade to SnapFrame Pro for unlimited projects & multi-device cloud sync!");
@@ -219,7 +231,7 @@ export const useProjectStore = create<ProjectStore>()(
           }
         } catch (e: unknown) {
           const err = e as Error;
-          if (err.message?.includes("Free project limit")) throw err;
+          if (err.message?.includes("project limit reached")) throw err;
         }
 
         const project = get().projects.find((p) => p.id === id);
