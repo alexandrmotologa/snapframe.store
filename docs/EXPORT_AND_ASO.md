@@ -88,5 +88,5 @@ The export suite generates ready-to-deploy **Fastlane Deliver** and **Fastlane S
 
 - **👤 Guest Mode (Unregistered):** 1-Click Clipboard copy for the first active screen. ZIP downloads prompt a free Google/GitHub sign-in.
 - **🟢 Free Registered ($0):** Free export of up to 3 screenshots per set for 1 primary device platform in 1 language, 1-Click Clipboard PNG copy for screens 1 to 3, and standard resolution (1x/2x).
-- **⭐ SnapFrame Pro ($9/mo or $69/yr):** Complete 10-screen multi-platform ZIP package (iOS + iPad + Android + Tablet), 1-Click Clipboard PNG copy for all 10 screens, batch 40+ language localizations, Fastlane metadata suite, and 4K lossless master resolution (@3x).
+- **⭐ SnapFrame Pro ($9/mo or $69/yr):** Complete 10-screen multi-platform ZIP package (iOS + iPad + Android + Tablet), Custom Canvas Dimensions & Freeform W × H, Social Media & Marketing Presets (Product Hunt, Twitter/X, Instagram, Web Hero), Custom Mockup Frame Scaling (50%–150%), 1-Click Clipboard PNG copy for all 10 screens, Dual Theme Generator (Light & Dark sets in 1-click), iPad Pro & Tablet Store Simulator, batch 40+ language localizations, Fastlane metadata suite, and 4K lossless master resolution (@3x).
 

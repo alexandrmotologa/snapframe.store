@@ -8,6 +8,7 @@ import { useLanguageStore } from "@/lib/store/languageStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { TextLayer, ScreenshotLayer, ImageLayer } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface AIAutoPilotModalProps {
   open: boolean;
@@ -194,37 +195,53 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-border/50 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-border/50 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
-            <div>
-              <h2 id="ai-autopilot-title" className="font-bold text-base text-foreground flex items-center gap-2">
-                <span>AI Project Auto-Pilot</span>
-                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                <h2 id="ai-autopilot-title" className="font-bold text-sm sm:text-base text-foreground truncate">
+                  AI Project Auto-Pilot
+                </h2>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shrink-0">
                   VISION + ASO
                 </span>
-              </h2>
-              <p className="text-xs text-muted-foreground">
+              </div>
+              <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
                 1-Click complete transformation: Headlines, Subtitles &amp; Palettes
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {!isGuest && (
-              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
-                isPro
-                  ? "bg-amber-500/15 text-amber-400 border-amber-500/30 font-bold"
-                  : "bg-secondary text-muted-foreground border-border/60"
-              }`}>
-                {isPro ? "👑 Pro Unlimited" : `⚡ ${aiCredits} / 3 Credits`}
+              <span
+                className={cn(
+                  "text-[10.5px] font-semibold px-2.5 py-1 rounded-full border whitespace-nowrap shrink-0 flex items-center gap-1 shadow-2xs select-none",
+                  isPro
+                    ? "bg-amber-500/15 text-amber-400 border-amber-500/30 font-bold"
+                    : "bg-secondary/90 text-foreground border-border/70"
+                )}
+              >
+                {isPro ? (
+                  <>
+                    <span className="text-xs">👑</span>
+                    <span>Pro Unlimited</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-amber-500 dark:text-amber-400 text-xs">⚡</span>
+                    <span className="font-bold text-foreground font-mono">{aiCredits} / 3</span>
+                    <span className="text-muted-foreground font-normal">Credits</span>
+                  </>
+                )}
               </span>
             )}
             <button
               onClick={() => onOpenChange(false)}
               aria-label="Close AI Auto-Pilot dialog"
-              className="w-7 h-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-lg hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0"
             >
               <X className="w-4 h-4" />
             </button>

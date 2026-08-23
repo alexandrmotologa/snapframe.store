@@ -99,7 +99,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap gap-2.5 justify-center mb-10 max-w-2xl">
               {[
                 "📱 3D & 2D Device Mockups", "🎨 Continuous Panorama Flows", "📐 App Store & Google Play Ready",
-                "💾 Ultra HD PNG & ZIP Export", "🌐 30+ Languages i18n", "✨ AI Captions & Superpowers",
+                "📐 Custom Canvas & Social Presets", "💾 Ultra HD PNG & ZIP Export", "🌐 40+ Languages i18n", "✨ AI Captions & Superpowers",
               ].map((f) => (
                 <span key={f} className="px-3.5 py-1.5 rounded-full bg-secondary/60 border border-border/50 text-secondary-foreground text-xs font-medium backdrop-blur-md">
                   {f}
@@ -153,7 +153,7 @@ export default function LandingPage() {
             </div>
             <h3 className="font-bold text-base text-foreground">Instant Multi-Language i18n</h3>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Localize entire screenshot sets across 30+ App Store and Google Play languages with 1-click batch translation and custom typography.
+              Localize entire screenshot sets across 40+ App Store and Google Play languages with 1-click batch translation and custom typography.
             </p>
           </div>
 
