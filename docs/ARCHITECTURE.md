@@ -182,11 +182,12 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 
 SnapFrame enforces a conversion-optimized 3-tier architecture:
 
-| Tier | Project Limit | Export Scope | AI Generations | Cloud Sync | Pricing |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **👤 Guest** | 1 Active Session Project | 1-Click Clipboard Copy only (ZIP prompts free sign-in) | 🔒 Locked (Prompts sign-in) | ❌ Local memory | $0 (No sign-in) |
-| **🟢 Free Registered** | Up to 3 Local Projects | Up to 3 screens per set (1 device platform, 1 language) | 3 Complimentary Credits | ❌ LocalStorage | $0 (Google / GitHub) |
-| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless | 500 Credits / Month | ✅ Google Firestore | $9/mo or $69/yr |
+| Tier | Project Limit | Export Scope | Clipboard Copy | Store Simulator | AI Generations | Cloud Sync | Pricing |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **👤 Guest** | 1 Active Session Project | 1-Click Clipboard Copy only (ZIP prompts free sign-in) | Active Screen only | 🔒 Locked (Prompts sign-in) | 🔒 Locked (Prompts sign-in) | ❌ Local memory | $0 (No sign-in) |
+| **🟢 Free Registered** | Up to 3 Local Projects | Up to 3 screens per set (1 device platform, 1 language) | Screens 1 to 3 | Phone Simulator (iPhone & Android) | 3 Complimentary Credits | ❌ LocalStorage | $0 (Google / GitHub) |
+| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless, Dual Theme | All 10 screens lossless | Phone & Tablet Simulator (iPad Pro 13" & Tabs) | 500 Credits / Month | ✅ Google Firestore | $9/mo or $69/yr |
+
 
 
 

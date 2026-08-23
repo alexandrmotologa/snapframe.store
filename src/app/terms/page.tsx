@@ -204,14 +204,14 @@ export default function TermsOfServicePage() {
               <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60">
                 <span className="font-bold text-foreground">🟢 Free Account Tier ($0 Forever):</span>
                 <p className="text-muted-foreground mt-0.5">
-                  Includes up to <strong>three (3) active projects</strong> stored locally within your browser storage (<code className="text-foreground">localStorage</code>), free ZIP export for up to <strong>3 screenshots per set</strong> for a single device platform, unlimited client-side Video/GIF and Store Assets exports, and three (3) complimentary AI credits upon registration. Free accounts do not include multi-device cloud synchronization or Fastlane metadata suites.
+                  Includes up to <strong>three (3) active projects</strong> stored locally within your browser storage (<code className="text-foreground">localStorage</code>), free ZIP export for up to <strong>3 screenshots per set</strong> for a single device platform, 1-click clipboard copy for screens 1 to 3, Phone live store simulator, standard 2D &amp; Titanium frames, unlimited client-side Video/GIF and Store Assets exports, and three (3) complimentary AI credits upon registration. Free accounts do not include multi-device cloud synchronization, tablet store simulation, dual theme generators, luxury 3D frames, or Fastlane metadata suites.
                 </p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-card border border-primary/30 shadow-xs">
                 <span className="font-bold text-foreground">⭐ SnapFrame Pro Tier ($9/month or $69/year):</span>
                 <p className="text-muted-foreground mt-0.5">
-                  Includes <strong>unlimited projects</strong>, automatic real-time <strong>Multi-Device Cloud Synchronization</strong> powered by Google Cloud Firestore (allowing instant seamless access across Mac, PC, and mobile), full <strong>10-screen multi-platform ZIP exports</strong> (iOS, iPadOS, Android, and Tablets), batch <strong>40+ language localization exports</strong>, complete Fastlane metadata packages, 4K lossless master resolution, and up to <strong>500 AI generations per month</strong> governed by our Fair Usage Policy.
+                  Includes <strong>unlimited projects</strong>, automatic real-time <strong>Multi-Device Cloud Synchronization</strong> powered by Google Cloud Firestore (allowing instant seamless access across Mac, PC, and mobile), full <strong>10-screen multi-platform ZIP exports</strong> (iOS, iPadOS, Android, and Tablets), 1-click clipboard PNG copying on all 10 screens, batch <strong>40+ language localization exports</strong>, complete Fastlane metadata packages, 4K lossless master resolution, Dual Theme generators (1-click Light &amp; Dark matching sets), iPad Pro 13&quot; &amp; Tablet store simulators, all luxury 3D mockup frames (Clay, Glass, Neon, Wireframe), and up to <strong>500 AI generations per month</strong> governed by our Fair Usage Policy.
                 </p>
               </div>
             </div>
