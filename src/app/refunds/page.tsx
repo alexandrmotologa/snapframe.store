@@ -164,10 +164,10 @@ export default function RefundPolicyPage() {
             </ul>
           </section>
 
-          {/* Section 3 */}
+          {/* Section 4 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">3</span>
+              <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">4</span>
               How to Request a Refund
             </h2>
             <p>
@@ -196,10 +196,10 @@ export default function RefundPolicyPage() {
             </div>
           </section>
 
-          {/* Section 4 */}
+          {/* Section 5 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">4</span>
+              <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">5</span>
               Refund Processing &amp; Payout Timelines
             </h2>
             <p>
@@ -212,10 +212,10 @@ export default function RefundPolicyPage() {
             </ul>
           </section>
 
-          {/* Section 5 */}
+          {/* Section 6 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">5</span>
+              <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">6</span>
               Merchant of Record Notice (Paddle.com)
             </h2>
             <div className="p-4 rounded-xl bg-secondary/30 border border-border/60 text-xs space-y-2">

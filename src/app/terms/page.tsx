@@ -194,17 +194,24 @@ export default function TermsOfServicePage() {
               SnapFrame provides multiple service tiers to accommodate independent developers, studios, and agencies:
             </p>
             <div className="space-y-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60">
-                <span className="font-bold text-foreground">🟢 Free Account Tier:</span>
+              <div className="p-3.5 rounded-xl bg-secondary/30 border border-border/40">
+                <span className="font-bold text-foreground">👤 Guest Mode (Unregistered):</span>
                 <p className="text-muted-foreground mt-0.5">
-                  Includes up to <strong>three (3) active projects</strong> stored locally within your browser storage (<code className="text-foreground">localStorage</code>), unlimited client-side Video/GIF and Store Assets exports, and three (3) complimentary AI credits upon registration. Free accounts do not include multi-device cloud synchronization.
+                  Includes <strong>one (1) active session project</strong>, 1-click clipboard PNG copying, and full canvas editing playground. Exporting screenshot ZIP packages and AI generation require registering for a free account.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60">
+                <span className="font-bold text-foreground">🟢 Free Account Tier ($0 Forever):</span>
+                <p className="text-muted-foreground mt-0.5">
+                  Includes up to <strong>three (3) active projects</strong> stored locally within your browser storage (<code className="text-foreground">localStorage</code>), free ZIP export for up to <strong>3 screenshots per set</strong> for a single device platform, unlimited client-side Video/GIF and Store Assets exports, and three (3) complimentary AI credits upon registration. Free accounts do not include multi-device cloud synchronization or Fastlane metadata suites.
                 </p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-card border border-primary/30 shadow-xs">
                 <span className="font-bold text-foreground">⭐ SnapFrame Pro Tier ($9/month or $69/year):</span>
                 <p className="text-muted-foreground mt-0.5">
-                  Includes <strong>unlimited projects</strong>, automatic real-time <strong>Multi-Device Cloud Synchronization</strong> powered by Google Cloud Firestore (allowing instant seamless access across Mac, PC, and mobile), 4K lossless exports, and up to <strong>500 AI generations per month</strong> governed by our Fair Usage Policy.
+                  Includes <strong>unlimited projects</strong>, automatic real-time <strong>Multi-Device Cloud Synchronization</strong> powered by Google Cloud Firestore (allowing instant seamless access across Mac, PC, and mobile), full <strong>10-screen multi-platform ZIP exports</strong> (iOS, iPadOS, Android, and Tablets), batch <strong>40+ language localization exports</strong>, complete Fastlane metadata packages, 4K lossless master resolution, and up to <strong>500 AI generations per month</strong> governed by our Fair Usage Policy.
                 </p>
               </div>
             </div>

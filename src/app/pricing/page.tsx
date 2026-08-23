@@ -25,6 +25,10 @@ import { toast } from "@/lib/store/toastStore";
 
 const PRICING_FAQS = [
   {
+    q: "What are the export differences between Free and Pro?",
+    a: "Free accounts can export up to 3 screenshots per set for a single platform (e.g. iPhone) in your primary language, with full commercial rights. SnapFrame Pro unlocks the complete 10-screen multi-platform ZIP package (iPhone, iPad Pro, Android Phone, and Android Tablet), batch 40+ language exports in organized subfolders, and the complete Fastlane & App Store Connect metadata suite.",
+  },
+  {
     q: "How does project saving and Multi-Device Cloud Sync work?",
     a: "Free accounts can create up to 3 projects, which are saved locally in your current browser (localStorage). When you upgrade to SnapFrame Pro, Multi-Device Cloud Sync via Google Cloud Firestore is automatically activated: all your existing local projects are securely backed up to the cloud and available in real-time across your Mac, PC, and iPad.",
   },
@@ -182,11 +186,11 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Unlimited Video &amp; Animated GIF Studio Exports</span>
+                  <span>Export up to 3 screens per set (1 device platform)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Unlimited App Icon Studio &amp; Developer Zip Packs</span>
+                  <span>Live Store Simulator &amp; App Icon Studio</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -198,7 +202,11 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
                   <X className="w-4 h-4 shrink-0" />
-                  <span>4K Lossless Ultra-HD Master Exports</span>
+                  <span>Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
+                  <X className="w-4 h-4 shrink-0" />
+                  <span>Batch 40+ Language Export &amp; Fastlane Suite</span>
                 </div>
               </div>
             </div>
@@ -244,27 +252,27 @@ export default function PricingPage() {
               <div className="pt-4 border-t border-border/50 space-y-3 text-xs">
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Full 10-Screen Multi-Platform ZIP</strong> (iPhone + iPad + Android + Tablet)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Batch 40+ Language Localization Export</strong> in organized folders</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Fastlane &amp; Store Listing Metadata Suite</strong> (.txt, .json)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>Unlimited Projects &amp; Multi-Device Cloud Sync</strong> (Firestore)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>500 AI Generations / Month</strong> (Vision Auto-Pilot, Copy &amp; 40+ Languages)</span>
+                  <span><strong>500 AI Generations / Month</strong> (Vision Auto-Pilot, Copy &amp; Tone)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>4K Lossless Ultra-HD Master Exports</strong> (Pixel-perfect 3x/4K)</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>Video &amp; Animated GIF Carousel Studio</strong> (60fps MP4/WebM)</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>AI 3D Background Cutout &amp; Pop-Out</strong></span>
-                </div>
-                <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>Fastlane &amp; Store Listing Metadata Package</strong> (.txt, .json)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />

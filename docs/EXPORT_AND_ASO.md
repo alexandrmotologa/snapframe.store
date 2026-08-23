@@ -81,3 +81,12 @@ The export suite generates ready-to-deploy **Fastlane Deliver** and **Fastlane S
 
 - Available directly in the top editor navbar and inside the export dialog.
 - Generates a full-resolution PNG on an off-screen canvas and writes it directly to the system clipboard via the `navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])` API for instant pasting into Figma, Slack, Keynote, or Notion.
+
+---
+
+## 5. Tier-Based Export Capabilities
+
+- **👤 Guest Mode (Unregistered):** 1-Click Clipboard copy is 100% free for quick mockups. ZIP downloads prompt a free Google/GitHub sign-in.
+- **🟢 Free Registered ($0):** Free export of up to 3 screenshots per set for 1 primary device platform in 1 language, standard resolution (1x/2x).
+- **⭐ SnapFrame Pro ($9/mo or $69/yr):** Complete 10-screen multi-platform ZIP package (iOS + iPad + Android + Tablet), batch 40+ language localizations, Fastlane metadata suite, and 4K lossless master resolution.
+

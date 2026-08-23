@@ -176,4 +176,17 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 - **Auto-Centering on Selection:** Active filter tabs trigger smooth programmatic scrolling (`scrollIntoView({ inline: 'center' })`), guaranteeing active chips remain in the user's viewport.
 - **Panel Width & Ergonomics:** Standardized sidebar slide-out width (`w-80` / 320px) calibrated for 2-column card layouts, giving titles 100% horizontal real estate, non-overlapping badge anchors (PRO top-left, screen counts top-right), and structured segmented grid controls across `TemplatesPanel`, `BackgroundPanel`, `BlocksPanel`, `ThemesPanel`, `StickersPanel`, and `LocalizationPanel`.
 
+---
+
+## 7. 3-Tier Monetization & Export Gating Matrix
+
+SnapFrame enforces a conversion-optimized 3-tier architecture:
+
+| Tier | Project Limit | Export Scope | AI Generations | Cloud Sync | Pricing |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **👤 Guest** | 1 Active Session Project | 1-Click Clipboard Copy only (ZIP prompts free sign-in) | 🔒 Locked (Prompts sign-in) | ❌ Local memory | $0 (No sign-in) |
+| **🟢 Free Registered** | Up to 3 Local Projects | Up to 3 screens per set (1 device platform, 1 language) | 3 Complimentary Credits | ❌ LocalStorage | $0 (Google / GitHub) |
+| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless | 500 Credits / Month | ✅ Google Firestore | $9/mo or $69/yr |
+
+
 

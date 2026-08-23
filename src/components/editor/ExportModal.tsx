@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Download, Package, Loader2, CheckCircle2, Apple, Smartphone, Globe, Copy, ShieldCheck, FileText, Check, Film } from "lucide-react";
+import { X, Download, Package, Loader2, CheckCircle2, Apple, Smartphone, Globe, Copy, ShieldCheck, FileText, Check, Film, Lock, Sparkles, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useProjectStore } from "@/lib/store/projectStore";
 import { useLanguageStore, getLang } from "@/lib/store/languageStore";
+import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import type { TextLayer, ShapeLayer, ImageLayer } from "@/lib/types";
 import { renderScreenToCanvas } from "@/lib/renderScreenToCanvas";
@@ -28,12 +29,15 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
   const { screenSets, activeScreenId } = useEditorStore();
   const { projects } = useProjectStore();
   const { projectLanguages, activeLang } = useLanguageStore();
+  const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
+  const isGuest = Boolean(!user || user.isAnonymous);
+
   const project = projects.find((p) => p.id === projectId);
   const appName = project?.name ?? "SnapFrame";
 
   const [scale, setScale] = useState<ScaleOption>(1);
   const [format, setFormat] = useState<FormatOption>("png");
-  const [includeFastlane, setIncludeFastlane] = useState<boolean>(true);
+  const [includeFastlane, setIncludeFastlane] = useState<boolean>(isPro);
   const [selectedSets, setSelectedSets] = useState<Set<string>>(
     new Set(screenSets.map((ss) => ss.id))
   );
@@ -46,12 +50,19 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
   const [done, setDone] = useState(false);
   const [exportedCount, setExportedCount] = useState(0);
 
-  const activeSets = screenSets.filter((ss) => selectedSets.has(ss.id));
-  const activeLangs = Array.from(selectedLangs);
-  const screensPerLang = activeSets.reduce((acc, ss) => acc + ss.screens.length, 0);
+  // Free tier can only export 1 platform and up to 3 screens per set in 1 language
+  const activeSets = isPro ? screenSets.filter((ss) => selectedSets.has(ss.id)) : [screenSets.find((ss) => selectedSets.has(ss.id)) || screenSets[0]].filter(Boolean);
+  const activeLangs = isPro ? Array.from(selectedLangs) : [activeLang || "en"];
+  const maxScreensPerSet = isPro ? 10 : 3;
+  const screensPerLang = activeSets.reduce((acc, ss) => acc + Math.min(ss.screens.length, maxScreensPerSet), 0);
   const totalScreens = screensPerLang * Math.max(activeLangs.length, 1);
 
   const toggleSet = (id: string) => {
+    if (!isPro && screenSets.length > 1) {
+      // Free users can select which single platform to export
+      setSelectedSets(new Set([id]));
+      return;
+    }
     setSelectedSets((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -64,6 +75,10 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
   };
 
   const toggleLang = (code: string) => {
+    if (!isPro) {
+      toast.info("Multi-language batch export requires SnapFrame Pro.");
+      return;
+    }
     setSelectedLangs((prev) => {
       const next = new Set(prev);
       if (next.has(code)) {
@@ -112,6 +127,13 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
 
   const handleExport = async () => {
     if (typeof window === "undefined") return;
+
+    if (isGuest) {
+      setAuthModalOpen(true);
+      toast.info("Sign in with Google or GitHub (100% Free) to download your screenshot ZIP package.");
+      return;
+    }
+
     setIsExporting(true);
     setProgress(0);
     setDone(false);
@@ -144,14 +166,15 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
         : isTablet ? "Android_Tablet" : "Android_Phone";
 
       const platformFolder = zip?.folder(platformFolderLabel);
+      const screensToExport = isPro ? ss.screens : ss.screens.slice(0, 3);
 
       for (const langCode of (activeLangs.length > 0 ? activeLangs : ["en"])) {
         const langFolder = activeLangs.length > 1 ? platformFolder?.folder(langCode.toUpperCase()) : platformFolder;
 
-        for (const screen of ss.screens) {
+        for (const screen of screensToExport) {
           const canvas = document.createElement("canvas");
           await renderScreenToCanvas(canvas, screen, ss, {
-            scale,
+            scale: isPro ? scale : Math.min(scale, 2) as ScaleOption,
             activeLang: langCode,
             isExport: true,
           });
@@ -161,7 +184,8 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
           const quality = format === "jpg" ? 0.92 : 1;
           const screenNum = String(ss.screens.indexOf(screen) + 1).padStart(2, "0");
           const langSuffix = activeLangs.length > 1 ? `_${langCode.toUpperCase()}` : "";
-          const filename = `${appName}_${filePrefix}_${screenNum}${langSuffix}@${scale}x.${format}`;
+          const effectiveScale = isPro ? scale : Math.min(scale, 2);
+          const filename = `${appName}_${filePrefix}_${screenNum}${langSuffix}@${effectiveScale}x.${format}`;
 
           const blob = await new Promise<Blob>((resolve) =>
             canvas.toBlob((b) => resolve(b!), mimeType, quality)
@@ -186,8 +210,8 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
       }
     }
 
-    // ── Include Store Listing & Fastlane Metadata Package ──────────────────
-    if (zip && includeFastlane) {
+    // ── Include Store Listing & Fastlane Metadata Package (Pro Only) ────────
+    if (zip && includeFastlane && isPro) {
       const fastlaneFolder = zip.folder("fastlane")?.folder("metadata");
       const storeListingFolder = zip.folder("store_listing");
       const langsToExport = activeLangs.length > 0 ? activeLangs : ["en"];
@@ -203,30 +227,26 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
           android?: Record<string, string>;
         };
 
-        // iOS Listing
-        const iosData = langListing.ios || {};
-        const iosName = iosData.name || project?.name || appName;
-        const iosSubtitle = iosData.subtitle || "Transform your app screenshots";
-        const iosDescription = iosData.description || `Welcome to ${appName}! Generate stunning high-conversion App Store and Google Play screenshots in seconds.`;
-        const iosPromo = iosData.promotionalText || `Get the latest version of ${appName}!`;
-        const iosWhatsNew = iosData.whatsNew || "Bug fixes and performance improvements.";
-        const iosKeywords = "screenshots, mockup, app store, generator, design, presentation";
+        const iosName = langListing?.ios?.name || project?.name || "";
+        const iosSubtitle = langListing?.ios?.subtitle || "";
+        const iosDescription = langListing?.ios?.description || "";
+        const iosPromo = langListing?.ios?.promotionalText || "";
+        const iosKeywords = (langListing?.ios as { keywords?: string })?.keywords || "";
+        const iosWhatsNew = langListing?.ios?.whatsNew || "";
 
-        // Android Listing
-        const androidData = langListing.android || {};
-        const androidTitle = androidData.title || project?.name || appName;
-        const androidShort = androidData.shortDescription || "Stunning App Store & Play Store screenshots";
-        const androidFull = androidData.fullDescription || `${appName} empowers indie developers and designers to build beautiful store listing screenshots.`;
-        const androidWhatsNew = androidData.whatsNew || "Bug fixes and performance improvements.";
+        const androidTitle = langListing?.android?.title || project?.name || "";
+        const androidShort = langListing?.android?.shortDescription || "";
+        const androidFull = langListing?.android?.fullDescription || "";
+        const androidWhatsNew = langListing?.android?.whatsNew || "";
 
-        fullListingExport[lang] = {
+        fullListingExport[langKey] = {
           ios: {
             name: iosName,
             subtitle: iosSubtitle,
             description: iosDescription,
             promotionalText: iosPromo,
-            whatsNew: iosWhatsNew,
             keywords: iosKeywords,
+            whatsNew: iosWhatsNew,
           },
           android: {
             title: androidTitle,
@@ -236,17 +256,17 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
           },
         };
 
-        // 1. Fastlane iOS folder
-        const iosMeta = fastlaneFolder?.folder("ios")?.folder(langKey);
+        // 1. Fastlane App Store structure
+        const iosMeta = fastlaneFolder?.folder(langUpper);
         iosMeta?.file("name.txt", iosName);
         iosMeta?.file("subtitle.txt", iosSubtitle);
         iosMeta?.file("description.txt", iosDescription);
-        iosMeta?.file("keywords.txt", iosKeywords);
         iosMeta?.file("promotional_text.txt", iosPromo);
+        iosMeta?.file("keywords.txt", iosKeywords);
         iosMeta?.file("release_notes.txt", iosWhatsNew);
 
-        // 2. Fastlane Android folder
-        const androidMeta = fastlaneFolder?.folder("android")?.folder(langKey);
+        // 2. Fastlane Google Play structure
+        const androidMeta = fastlaneFolder?.folder("android")?.folder(langUpper);
         androidMeta?.file("title.txt", androidTitle);
         androidMeta?.file("short_description.txt", androidShort);
         androidMeta?.file("full_description.txt", androidFull);
@@ -381,23 +401,68 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
         </div>
 
         <div className="p-6 space-y-4.5 max-h-[80vh] overflow-y-auto">
-          {/* Submission Guidelines Validator Badge */}
-          <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
-            <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-            <div className="text-xs space-y-0.5">
-              <div className="flex items-center gap-1.5 font-bold text-emerald-300">
-                <span>100% Store Submission Verified</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">PASSED</span>
+          {/* Tier Status Banner */}
+          {isGuest ? (
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+              <Lock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1 flex-1">
+                <div className="flex items-center justify-between font-bold text-amber-300">
+                  <span>Guest Mode (Unregistered)</span>
+                  <button
+                    type="button"
+                    onClick={() => setAuthModalOpen(true)}
+                    className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-bold cursor-pointer transition-colors"
+                  >
+                    Sign In Free
+                  </button>
+                </div>
+                <p className="text-[11px] text-amber-300/80 leading-tight">
+                  Clipboard PNG copy is 100% free. Sign in with Google or GitHub (Free) to download complete ZIP packages.
+                </p>
               </div>
-              <p className="text-[11px] text-emerald-300/80 leading-tight">
-                Exact pixel dimensions for App Store (iPhone & iPad Pro 13&quot;) and Google Play (Phones & Tablets), 0 alpha defects, RGB color profile.
-              </p>
             </div>
-          </div>
+          ) : !isPro ? (
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
+              <Sparkles className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1 flex-1">
+                <div className="flex items-center justify-between font-bold text-indigo-300">
+                  <span>Free Starter Tier (3 Screens / 1 Platform)</span>
+                  <button
+                    type="button"
+                    onClick={() => setUpgradeModalOpen(true)}
+                    className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500 hover:bg-indigo-400 text-white font-bold cursor-pointer transition-colors flex items-center gap-1"
+                  >
+                    <Crown className="w-3 h-3" /> Upgrade Pro
+                  </button>
+                </div>
+                <p className="text-[11px] text-indigo-300/80 leading-tight">
+                  Free plan exports up to 3 screens for 1 device. Upgrade to Pro for all 10 screens, Multi-Platform ZIP (iOS + iPad + Android), 40+ languages &amp; Fastlane package.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+              <Crown className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-0.5">
+                <div className="flex items-center gap-1.5 font-bold text-emerald-300">
+                  <span>SnapFrame Pro Studio (Full Access)</span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">UNLIMITED</span>
+                </div>
+                <p className="text-[11px] text-emerald-300/80 leading-tight">
+                  Full 10-screen multi-platform export, batch 40+ languages, Fastlane suite &amp; 4K lossless master resolution unlocked.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Platform selection */}
           <div>
-            <p className="text-xs font-semibold text-muted-foreground mb-2">Target Platforms & Devices</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-muted-foreground">Target Platforms &amp; Devices</p>
+              {!isPro && screenSets.length > 1 && (
+                <span className="text-[10px] text-muted-foreground">Select 1 platform (Pro for Multi-Platform ZIP)</span>
+              )}
+            </div>
             <div className="space-y-2">
               {screenSets.map((ss) => {
                 const isSelected = selectedSets.has(ss.id);
@@ -441,7 +506,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
                         )}
                       </div>
                       <p className="text-xs opacity-70 font-mono">
-                        {deviceObj?.name || ss.preset?.name} · {ss.preset?.width} × {ss.preset?.height} px ({ss.screens.length} screens)
+                        {deviceObj?.name || ss.preset?.name} · {ss.preset?.width} × {ss.preset?.height} px ({isPro ? ss.screens.length : Math.min(ss.screens.length, 3)} {isPro ? "screens" : "of " + ss.screens.length + " screens"})
                       </p>
                     </div>
                     <div className={cn(
@@ -459,14 +524,19 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
           {/* Language selection */}
           {projectLanguages.length > 1 && (
             <div>
-              <div className="flex items-center gap-1.5 mb-2">
-                <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-                <p className="text-xs font-semibold text-muted-foreground">Export Languages</p>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                  <p className="text-xs font-semibold text-muted-foreground">Export Languages</p>
+                </div>
+                {!isPro && (
+                  <span className="text-[10px] text-muted-foreground">Active language only (Pro for Batch 40+ Languages)</span>
+                )}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {projectLanguages.map((code) => {
                   const lang = getLang(code);
-                  const isSelected = selectedLangs.has(code);
+                  const isSelected = isPro ? selectedLangs.has(code) : code === activeLang;
                   return (
                     <button
                       key={code}
@@ -481,6 +551,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
                     >
                       <span>{lang?.flag ?? "🌐"}</span>
                       <span className="uppercase font-bold">{code}</span>
+                      {!isPro && code !== activeLang && <Crown className="w-2.5 h-2.5 text-amber-400 ml-0.5" />}
                     </button>
                   );
                 })}
@@ -491,23 +562,37 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
           {/* Scale + Format row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs font-semibold text-muted-foreground mb-2">Resolution Scale</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-muted-foreground">Resolution Scale</p>
+                {!isPro && <span className="text-[10px] text-muted-foreground">@3x is Pro</span>}
+              </div>
               <div className="flex gap-1.5">
-                {([1, 2, 3] as ScaleOption[]).map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setScale(s)}
-                    className={cn(
-                      "flex-1 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer",
-                      scale === s
-                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                        : "bg-secondary/60 hover:bg-secondary border-border/40 text-muted-foreground"
-                    )}
-                  >
-                    @{s}x
-                  </button>
-                ))}
+                {([1, 2, 3] as ScaleOption[]).map((s) => {
+                  const isLocked = !isPro && s === 3;
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => {
+                        if (isLocked) {
+                          setUpgradeModalOpen(true);
+                          toast.info("4K Lossless @3x exports require SnapFrame Pro.");
+                          return;
+                        }
+                        setScale(s);
+                      }}
+                      className={cn(
+                        "flex-1 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center justify-center gap-1",
+                        scale === s
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-secondary/60 hover:bg-secondary border-border/40 text-muted-foreground"
+                      )}
+                    >
+                      <span>@{s}x</span>
+                      {isLocked && <Crown className="w-2.5 h-2.5 text-amber-400" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div>
@@ -533,21 +618,41 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
           </div>
 
           {/* Fastlane Package Option */}
-          <label className="flex items-center gap-2.5 p-3 rounded-xl border border-border/50 bg-secondary/30 hover:bg-secondary/50 cursor-pointer transition-colors text-xs">
+          <div
+            onClick={() => {
+              if (!isPro) {
+                setUpgradeModalOpen(true);
+                toast.info("Fastlane & Store Listing metadata export is a SnapFrame Pro feature.");
+                return;
+              }
+              setIncludeFastlane(!includeFastlane);
+            }}
+            className={cn(
+              "flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors text-xs select-none",
+              includeFastlane && isPro ? "border-indigo-500/40 bg-indigo-500/10" : "border-border/50 bg-secondary/30 hover:bg-secondary/50"
+            )}
+          >
             <input
               type="checkbox"
-              checked={includeFastlane}
-              onChange={(e) => setIncludeFastlane(e.target.checked)}
-              className="w-4 h-4 rounded-md accent-primary"
+              checked={includeFastlane && isPro}
+              readOnly
+              className="w-4 h-4 rounded-md accent-primary pointer-events-none"
             />
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 font-semibold text-foreground">
-                <FileText className="w-3.5 h-3.5 text-primary" />
-                <span>Include Store Listing & Fastlane Metadata Package</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                  <FileText className="w-3.5 h-3.5 text-primary" />
+                  <span>Include Store Listing &amp; Fastlane Metadata Package</span>
+                </div>
+                {!isPro && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center gap-1">
+                    <Crown className="w-2.5 h-2.5" /> PRO
+                  </span>
+                )}
               </div>
-              <p className="text-[11px] text-muted-foreground">Generates ready-to-use Title, Subtitle, Descriptions, and What&apos;s New in both Fastlane &amp; human-readable .txt files</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Generates ready-to-use Title, Subtitle, Descriptions, and What&apos;s New in both Fastlane &amp; human-readable .txt files</p>
             </div>
-          </label>
+          </div>
 
           {/* Video / Animated GIF Studio Shortcut */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -555,6 +660,11 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
               <button
                 type="button"
                 onClick={() => {
+                  if (isGuest) {
+                    setAuthModalOpen(true);
+                    toast.info("App Icon Studio requires a free account.");
+                    return;
+                  }
                   onClose();
                   onOpenAssetsStudio();
                 }}
@@ -583,6 +693,11 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
               <button
                 type="button"
                 onClick={() => {
+                  if (isGuest) {
+                    setAuthModalOpen(true);
+                    toast.info("Video Studio requires a free account.");
+                    return;
+                  }
                   onClose();
                   onOpenGifStudio();
                 }}
@@ -618,7 +733,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
                 {((activeSets[0]?.preset?.width ?? 1290) * scale)} × {((activeSets[0]?.preset?.height ?? 2796) * scale)} px
               </span>
             </div>
-            {activeLangs.length > 1 && (
+            {isPro && activeLangs.length > 1 && (
               <p className="text-[11px] text-muted-foreground mt-1.5">
                 {screensPerLang} screens × {activeLangs.length} languages → organized in localized ZIP subfolders
               </p>
@@ -660,14 +775,18 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
               {done ? "Close" : "Cancel"}
             </Button>
             <Button
-              className="flex-1 gap-2"
+              className={cn("flex-1 gap-2", isPro && "bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white")}
               onClick={handleExport}
               disabled={isExporting || totalScreens === 0}
             >
               {isExporting ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Exporting...</>
+              ) : isGuest ? (
+                <><Lock className="w-4 h-4" /> Sign In to Export ZIP</>
+              ) : isPro ? (
+                <><Crown className="w-4 h-4 text-amber-300" /> Export Pro ZIP ({totalScreens})</>
               ) : (
-                <><Package className="w-4 h-4" /> Export ZIP</>
+                <><Package className="w-4 h-4" /> Export Free ZIP ({totalScreens})</>
               )}
             </Button>
           </div>

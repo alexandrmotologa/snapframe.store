@@ -9,34 +9,34 @@ import { toast } from "@/lib/store/toastStore";
 
 const PRO_FEATURES = [
   {
+    icon: Crown,
+    title: "Full 10-Screen Multi-Platform ZIP",
+    desc: "Export all 10 screens per set for iPhone, iPad Pro, Android Phone, and Android Tablet in one click.",
+  },
+  {
     icon: Globe,
-    title: "Unlimited Projects & Multi-Device Cloud Sync",
-    desc: "Create unlimited projects with real-time automatic Firestore cloud backup across your Mac, PC, and iPad.",
+    title: "Batch 40+ Language Localizations",
+    desc: "Generate and export screenshots across 40+ regional languages organized into separate ZIP subfolders.",
+  },
+  {
+    icon: Shield,
+    title: "Fastlane & Store Listing Suite",
+    desc: "Export complete title, subtitle, keywords, and description packages in Fastlane & text formats ready for store submission.",
   },
   {
     icon: Zap,
     title: "500 AI Generations / Month",
-    desc: "Auto-Pilot vision generation, AI copywriting & instant multi-language translation in 40+ languages (Fair Usage).",
+    desc: "Auto-Pilot vision generation, AI copywriting & instant multi-language translation (Fair Usage).",
   },
   {
-    icon: Film,
-    title: "Video & Animated GIF Studio",
-    desc: "Export 60fps MP4/WebM videos and GIF carousels for TikTok, Reels, and App Store preview ads.",
-  },
-  {
-    icon: Crown,
-    title: "4K Lossless Ultra-HD Exports",
-    desc: "Pixel-perfect 3x & 4K master files with no watermarks and 100% App Store / Google Play compliance.",
+    icon: Globe,
+    title: "Unlimited Projects & Cloud Sync",
+    desc: "Create unlimited projects with real-time automatic Firestore cloud backup across your Mac, PC, and iPad.",
   },
   {
     icon: ImageIcon,
-    title: "AI 3D Background Cutout",
-    desc: "Automatically isolate key UI elements to pop out beyond the phone frame in full 3D.",
-  },
-  {
-    icon: Shield,
-    title: "Fastlane & Store Metadata Suite",
-    desc: "Export complete title, subtitle, keywords, and description packages in Fastlane & text formats.",
+    title: "All 6+ Pro Industry Niche Templates",
+    desc: "Access exclusive luxury templates for Fintech, Crypto, SaaS, Fitness, Dating, and Ecommerce.",
   },
 ];
 

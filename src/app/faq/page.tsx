@@ -24,7 +24,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     category: "Account & Sync",
     question: "What is the difference between Guest, Free Registered, and Pro accounts?",
-    answer: "• Guest Mode: Stores 1 project locally in your browser with standard exports (AI tools locked).\n• Free Registered (Google/GitHub): Stores up to 3 projects locally on your current device, gives you 3 complimentary AI credits, and provides 100% free unlimited Video/GIF & Store Icon Studio exports.\n• SnapFrame Pro ($9/mo or $69/yr): Gives you Unlimited Projects, automatic real-time Multi-Device Cloud Sync (Firestore), 500 AI generations/month, 4K lossless exports, and all Pro templates.",
+    answer: "• Guest Mode (Unregistered): 1 session project with 1-click clipboard PNG copying for rapid mockup drafts (ZIP packages require signing in).\n• Free Registered (Google/GitHub): Stores up to 3 projects locally on your device, 3 complimentary AI credits, free ZIP export of up to 3 screens per set (1 platform), and 100% free unlimited Video/GIF & Store Icon Studio exports.\n• SnapFrame Pro ($9/mo or $69/yr): Unlimited projects with real-time Multi-Device Cloud Sync (Firestore), full 10-screen multi-platform ZIP packages (iOS + iPad + Android + Tablet), batch 40+ language localizations, Fastlane metadata suite, 4K lossless exports, and 500 AI generations/month.",
   },
   {
     category: "Account & Sync",
