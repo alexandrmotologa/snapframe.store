@@ -60,13 +60,6 @@ export function AssetsPanel() {
     Array.from(files).filter((f) => f.type.startsWith("image/")).forEach(loadFile);
   };
 
-  // ── Find first screenshot layer in active screen ────────────────────────────
-  const getScreenshotZone = () => {
-    const screen = getActiveScreen();
-    if (!screen) return null;
-    return screen.layers.find((l) => l.type === "screenshot") as ScreenshotLayer | undefined;
-  };
-
   // ── Add/replace screenshot in current screen ────────────────────────────────
   const assignToScreen = useCallback((asset: UploadedAsset) => {
     const set = getActiveSet();

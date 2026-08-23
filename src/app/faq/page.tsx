@@ -4,20 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   HelpCircle,
-  Sparkles,
-  ShieldCheck,
-  Cloud,
-  Layers,
   ArrowLeft,
   ChevronDown,
-  Lock,
-  Zap,
-  Globe,
-  Film,
-  Crown,
-  Smartphone,
-  CreditCard,
-  CheckCircle2,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";

@@ -10,6 +10,7 @@ import { TextLayer } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Globe, Sparkles, Copy, Check, Plus, X, ChevronDown, Lock } from "lucide-react";
 import { AICaptionsModal } from "@/components/editor/AICaptionsModal";
+import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 
 export function LocalizationPanel() {
   const { getActiveSet, getActiveScreen, updateLayerLocalization, clearLayerLocalization } =
@@ -133,7 +134,7 @@ export function LocalizationPanel() {
         </div>
         
         {/* Language Tabs */}
-        <div className="flex gap-1 overflow-x-auto scrollbar-none pb-1">
+        <HorizontalScrollRail className="pb-1">
           {projectLanguages.map((code) => {
             const lang = getLang(code);
             const isActive = activeLang === code;
@@ -143,9 +144,9 @@ export function LocalizationPanel() {
                   type="button"
                   onClick={() => setActiveLang(code)}
                   className={cn(
-                    "flex items-center gap-1 h-6 px-2 rounded-md text-[11px] font-medium transition-all",
+                    "flex items-center gap-1 h-6 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer",
                     isActive
-                      ? "bg-indigo-500 text-white shadow-sm"
+                      ? "bg-indigo-500 text-white shadow-xs font-semibold"
                       : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
                   )}
                 >
@@ -159,7 +160,7 @@ export function LocalizationPanel() {
                       removeLanguage(code);
                       if (activeLang === code) setActiveLang("en");
                     }}
-                    className="w-4 h-6 -ml-0.5 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
+                    className="w-4 h-6 -ml-0.5 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
                     title={`Remove ${lang?.name}`}
                   >
                     <X className="w-3 h-3" />
@@ -168,7 +169,7 @@ export function LocalizationPanel() {
               </div>
             );
           })}
-        </div>
+        </HorizontalScrollRail>
       </div>
 
       {(!set || !screen) ? (

@@ -315,7 +315,7 @@ export const EditorSidebar = memo(function EditorSidebar({
 
       {/* Slide-out panel */}
       {activePanel && (
-        <div className="w-72 border-r border-border/50 bg-card/95 backdrop-blur-md flex flex-col h-full shadow-2xl">
+        <div className="w-80 border-r border-border/50 bg-card/95 backdrop-blur-md flex flex-col h-full shadow-2xl">
           {/* Panel header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/40 shrink-0">
             <h3 className="text-sm font-semibold tracking-tight text-foreground">

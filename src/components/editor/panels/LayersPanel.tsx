@@ -220,7 +220,7 @@ export function LayersPanel() {
     overIds.current = next;
   };
 
-  const handleDrop = (_targetId: string) => {
+  const handleDrop = () => {
     if (!dragId.current) return;
     reorderLayers(set.id, screen.id, overIds.current);
     dragId.current = null;

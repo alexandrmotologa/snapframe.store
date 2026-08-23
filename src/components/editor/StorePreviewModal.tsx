@@ -50,7 +50,6 @@ export function StorePreviewModal({ open, onOpenChange, appName: initialAppName 
   const [developerName, setDeveloperName] = useState("NextGen Studio LLC");
   const [ratingScore, setRatingScore] = useState("4.9");
   const [ratingCount, setRatingCount] = useState("128K");
-  const [priceTag, setPriceTag] = useState("GET");
   const [iconUrl, setIconUrl] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -393,7 +392,7 @@ export function StorePreviewModal({ open, onOpenChange, appName: initialAppName 
                         type="button"
                         className="px-6 py-1.5 rounded-full bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold transition-all uppercase tracking-wide cursor-pointer shadow-sm"
                       >
-                        {priceTag}
+                        GET
                       </button>
                       <span className={cn("text-[9px]", storeTheme === "dark" ? "text-zinc-500" : "text-zinc-400")}>
                         In-App Purchases

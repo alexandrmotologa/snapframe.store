@@ -170,3 +170,10 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
   - Template popularity algorithms, search filtering, and multi-field sorting (`templatePopularity.test.ts`).
   - AI string limit truncation, word boundary preservation, and provider key discovery (`aiService.test.ts`).
 
+### 6.5 Responsive Sidebar & Horizontal Scroll Rail Architecture (`HorizontalScrollRail`)
+- **Cross-Platform Mouse Wheel Conversion:** The `HorizontalScrollRail` primitive automatically maps vertical mouse wheel deltas (`deltaY`) to horizontal scroll offsets (`scrollLeft`), ensuring desktop mice seamlessly navigate wide category chip bars without requiring horizontal scroll gestures or Shift keys.
+- **Directional Chevrons & Gradient Masks:** Interactive Left (`<`) and Right (`>`) scroll buttons automatically appear/disappear based on track scroll bounds and dynamic `ResizeObserver` measurements, with subtle gradient fade overlays preventing visual clipping.
+- **Auto-Centering on Selection:** Active filter tabs trigger smooth programmatic scrolling (`scrollIntoView({ inline: 'center' })`), guaranteeing active chips remain in the user's viewport.
+- **Panel Width & Ergonomics:** Standardized sidebar slide-out width (`w-80` / 320px) calibrated for 2-column card layouts, giving titles 100% horizontal real estate, non-overlapping badge anchors (PRO top-left, screen counts top-right), and structured segmented grid controls across `TemplatesPanel`, `BackgroundPanel`, `BlocksPanel`, `ThemesPanel`, `StickersPanel`, and `LocalizationPanel`.
+
+

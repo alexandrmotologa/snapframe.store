@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   Smartphone, Palette, Type, Copy, Trash2, Plus, Minus,
-  Sparkles, Check, ChevronRight, Layers, ArrowRight, Grid
+  Check
 } from "lucide-react";
 import {
   Popover,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { useEditorStore } from "@/lib/store/editorStore";
-import { Screen, ScreenSet, ScreenshotLayer, TextLayer, Background, GradientDirection } from "@/lib/types";
+import { Screen, ScreenSet, ScreenshotLayer, TextLayer, GradientDirection } from "@/lib/types";
 import { nanoid, cn } from "@/lib/utils";
 import { ColorInput } from "@/components/ui/color-input";
 
@@ -410,14 +410,6 @@ export function ScreenVerticalMenu({ screen, screenSet }: ScreenVerticalMenuProp
     }
     const nextCount = (Math.max(1, mockupCount - 1)) as 1 | 2 | 3;
     applyMockupLayout(nextCount);
-  };
-
-  const handleSetSolidBg = (color: string) => {
-    updateScreenBackground(screenSet.id, screen.id, {
-      type: "solid",
-      color,
-    });
-    useEditorStore.getState().recordHistory();
   };
 
   // ── Add Text Layer ─────────────────────────────────────────────────────────

@@ -2,16 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ShieldCheck,
-  Lock,
-  Eye,
-  Server,
   Sparkles,
   ArrowLeft,
   CheckCircle2,
-  FileText,
-  Globe,
-  Database,
-  Cpu,
   Mail,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";

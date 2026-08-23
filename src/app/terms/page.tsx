@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  FileText,
   ShieldCheck,
   Sparkles,
   ArrowLeft,
   CheckCircle2,
-  Lock,
-  Scale,
-  Smartphone,
-  AlertTriangle,
   Mail,
+  Scale,
+  Lock,
   CreditCard,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";

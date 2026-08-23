@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { cn } from "@/lib/utils";
+import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 
 // ── Built-in emoji sticker packs ──────────────────────────────────────────────
 const STICKER_CATEGORIES = [
@@ -110,22 +111,27 @@ export function StickersPanel() {
       </div>
 
       {/* Category tabs */}
-      <div className="flex gap-1 px-3 py-2 overflow-x-auto shrink-0 border-b border-border/30">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setActiveCategory(cat)}
-            className={cn(
-              "shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all",
-              activeCategory === cat
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
-            )}
-          >
-            {cat}
-          </button>
-        ))}
+      <div className="border-b border-border/30 px-2 py-1 bg-card/40">
+        <HorizontalScrollRail>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={(e) => {
+                setActiveCategory(cat);
+                e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+              }}
+              className={cn(
+                "shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] font-medium transition-all cursor-pointer whitespace-nowrap",
+                activeCategory === cat
+                  ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+        </HorizontalScrollRail>
       </div>
 
       {/* No active screen warning */}

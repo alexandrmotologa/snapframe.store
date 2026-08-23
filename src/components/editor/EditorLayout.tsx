@@ -3,13 +3,22 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  ArrowLeft, Undo2, Redo2, Download,
-  Share2, ZoomIn, ZoomOut, Upload, Sparkles, Film,
-  Copy, Keyboard, Check, ChevronDown, Eye, Lock, Palette, Trash2,
+  ArrowLeft,
+  Undo2,
+  Redo2,
+  Sparkles,
+  Film,
+  Keyboard,
+  ZoomIn,
+  ZoomOut,
+  ChevronDown,
+  Copy,
+  Download,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { KeyboardShortcutsModal } from "@/components/editor/KeyboardShortcutsModal";
 import { StorePreviewModal } from "@/components/editor/StorePreviewModal";
+import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { toast } from "@/lib/store/toastStore";
 import { Separator } from "@/components/ui/separator";
 import { useEditorStore } from "@/lib/store/editorStore";
@@ -28,10 +37,8 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
-import { ScreenshotLayer } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, drawBackgroundToCanvas } from "@/lib/utils";
 
 interface EditorLayoutProps {
   projectId: string;
@@ -74,8 +81,9 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
   const isGuest = Boolean(user && user.isAnonymous);
   const {
     zoom, setZoom, undo, redo, canUndo, canRedo,
-    activeLayerId, activeSetId, activeScreenId,
-    setActiveLayer, deleteLayer, duplicateLayer, updateLayer, getActiveSet, getActiveScreen, getActiveLayer,
+    activeSetId, activeScreenId, activeLayerId, getActiveSet,
+    getActiveScreen, getActiveLayer, deleteLayer, duplicateLayer,
+    updateLayer, setActiveLayer,
   } = useEditorStore();
   const saveProjectThumbnail = useProjectStore((s) => s.saveProjectThumbnail);
   const screenSets = useEditorStore((s) => s.screenSets);
@@ -102,40 +110,9 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.scale(SCALE, SCALE);
-    // Draw solid / gradient background
+    // Draw solid / gradient / mesh background
     const bg = firstScreen.background;
-    if (bg.type === "solid" && bg.color) {
-      ctx.fillStyle = bg.color;
-      ctx.fillRect(0, 0, firstScreen.width, firstScreen.height);
-    } else if (bg.type === "gradient" && bg.gradient) {
-      const grd = ctx.createLinearGradient(0, 0, 0, firstScreen.height);
-      for (const s of bg.gradient.stops) grd.addColorStop(s.position / 100, s.color);
-      ctx.fillStyle = grd;
-      ctx.fillRect(0, 0, firstScreen.width, firstScreen.height);
-    } else if (bg.type === "mesh" && bg.mesh) {
-      const { topLeft: tl, topRight: tr, bottomLeft: bl, bottomRight: br } = bg.mesh;
-      const hw = firstScreen.width;
-      const hh = firstScreen.height;
-      
-      const g1 = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.hypot(hw, hh));
-      g1.addColorStop(0, tl + "cc"); g1.addColorStop(1, tl + "00");
-      ctx.fillStyle = g1; ctx.fillRect(0, 0, hw, hh);
-      
-      const g2 = ctx.createRadialGradient(hw, 0, 0, hw, 0, Math.hypot(hw, hh));
-      g2.addColorStop(0, tr + "cc"); g2.addColorStop(1, tr + "00");
-      ctx.fillStyle = g2; ctx.fillRect(0, 0, hw, hh);
-      
-      const g3 = ctx.createRadialGradient(0, hh, 0, 0, hh, Math.hypot(hw, hh));
-      g3.addColorStop(0, bl + "cc"); g3.addColorStop(1, bl + "00");
-      ctx.fillStyle = g3; ctx.fillRect(0, 0, hw, hh);
-      
-      const g4 = ctx.createRadialGradient(hw, hh, 0, hw, hh, Math.hypot(hw, hh));
-      g4.addColorStop(0, br + "cc"); g4.addColorStop(1, br + "00");
-      ctx.fillStyle = g4; ctx.fillRect(0, 0, hw, hh);
-    } else {
-      ctx.fillStyle = "#1a1a2e";
-      ctx.fillRect(0, 0, firstScreen.width, firstScreen.height);
-    }
+    drawBackgroundToCanvas(ctx, bg, firstScreen.width, firstScreen.height);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
     saveProjectThumbnail(projectId, dataUrl);
   }, [screenSets, projectId, saveProjectThumbnail]);

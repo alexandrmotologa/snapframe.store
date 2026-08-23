@@ -2,16 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ShieldCheck,
-  RefreshCw,
   Sparkles,
   ArrowLeft,
   CheckCircle2,
-  Lock,
   Mail,
-  HelpCircle,
   CreditCard,
-  FileText,
-  AlertCircle,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";

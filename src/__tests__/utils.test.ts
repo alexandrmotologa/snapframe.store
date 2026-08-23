@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn, nanoid, formatDate, backgroundToCSS } from "@/lib/utils";
+import { cn, nanoid, formatDate, backgroundToCSS, drawBackgroundToCanvas } from "@/lib/utils";
 import type { Background } from "@/lib/types";
 
 describe("utils", () => {
@@ -90,6 +90,28 @@ describe("utils", () => {
     it("falls back to default dark color for unconfigured backgrounds", () => {
       const empty = {} as Background;
       expect(backgroundToCSS(empty)).toBe("#1e1b4b");
+    });
+  });
+
+  describe("drawBackgroundToCanvas", () => {
+    it("draws solid background by setting fillStyle and fillRect", () => {
+      const mockCtx = {
+        fillStyle: "",
+        fillRect: (x: number, y: number, w: number, h: number) => {
+          mockCtx._calls.push({ x, y, w, h, fillStyle: mockCtx.fillStyle });
+        },
+        createLinearGradient: () => ({ addColorStop: () => {} }),
+        createRadialGradient: () => ({ addColorStop: () => {} }),
+        drawImage: () => {},
+        _calls: [] as any[],
+      } as any;
+
+      const bg: Background = { type: "solid", color: "#6366f1" };
+      drawBackgroundToCanvas(mockCtx, bg, 1290, 2796);
+
+      expect(mockCtx.fillStyle).toBe("#6366f1");
+      expect(mockCtx._calls).toHaveLength(1);
+      expect(mockCtx._calls[0]).toEqual({ x: 0, y: 0, w: 1290, h: 2796, fillStyle: "#6366f1" });
     });
   });
 });

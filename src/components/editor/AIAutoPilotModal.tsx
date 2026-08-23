@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, X, Loader2, CheckCircle2, Wand2, Palette, Type, Layers, ArrowRight, Lock, ShieldAlert } from "lucide-react";
+import { Sparkles, X, Loader2, Wand2, Palette, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/lib/store/editorStore";
-import { useProjectStore } from "@/lib/store/projectStore";
 import { useLanguageStore } from "@/lib/store/languageStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
-import { TextLayer, ScreenshotLayer, ImageLayer, Screen, Layer } from "@/lib/types";
-import { nanoid } from "nanoid";
+import { TextLayer, ScreenshotLayer, ImageLayer } from "@/lib/types";
 
 interface AIAutoPilotModalProps {
   open: boolean;
@@ -17,9 +15,9 @@ interface AIAutoPilotModalProps {
 }
 
 export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) {
-  const { screenSets, activeSetId, updateScreenBackground, addLayer, updateLayer, deleteLayer } = useEditorStore();
+  const { screenSets, activeSetId, updateScreenBackground, addLayer, updateLayer } = useEditorStore();
   const { activeLang } = useLanguageStore();
-  const { user, isPro, aiCredits, consumeAiCredit, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
+  const { user, isPro, aiCredits, consumeAiCredit, setAuthModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const activeSet = screenSets.find((s) => s.id === activeSetId) || screenSets[0];

@@ -32,19 +32,7 @@ export function ScreenThumbnailCanvas({
     const aspectRatio = H / W;
     const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
 
-    let computedW = 44;
-    let computedH = Math.round(44 * aspectRatio);
-
-    if (width && height) {
-      computedW = width;
-      computedH = height;
-    } else if (width && !height) {
-      computedW = width;
-      computedH = Math.round(width * aspectRatio);
-    } else if (!width && height) {
-      computedH = height;
-      computedW = Math.round(height / aspectRatio);
-    }
+    const computedW = width || (height ? Math.round(height / aspectRatio) : 44);
 
     const scale = computedW / W;
 

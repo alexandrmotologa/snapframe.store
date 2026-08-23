@@ -45,7 +45,7 @@ let googleProvider: GoogleAuthProvider | null = null;
 let githubProvider: GithubAuthProvider | null = null;
 let initPromise: Promise<Auth | null> | null = null;
 
-function setupProviders(instanceAuth: Auth) {
+function setupProviders(_instanceAuth?: Auth) {
   googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
   githubProvider = new GithubAuthProvider();

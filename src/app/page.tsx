@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Plus, Layers, ArrowRight, Sparkles,
-  Zap, Globe, LayoutGrid, Smartphone, ShieldCheck,
-  CheckCircle2, Palette, Download, Wand2
+  Plus,
+  ArrowRight,
+  Zap,
+  Globe,
+  LayoutGrid,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import { GithubIcon } from "@/components/ui/GithubIcon";
 
 export default function LandingPage() {
   const router = useRouter();
-  const { user, isInitialized, setAuthModalOpen } = useAuthStore();
+  const { user, setAuthModalOpen } = useAuthStore();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

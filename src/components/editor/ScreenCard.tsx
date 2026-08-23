@@ -8,7 +8,7 @@ import {
   ImageLayer, ScreenshotLayer, FlagLayer, Layer
 } from "@/lib/types";
 import { ALL_DEVICES, IOS_DEVICES, ANDROID_DEVICES, COLOR_HEX_MAP, isTabletDevice } from "@/lib/devices";
-import { cn, loadGoogleFont } from "@/lib/utils";
+import { cn, loadGoogleFont, drawBackgroundToCanvas } from "@/lib/utils";
 import { getTextGradientPreset } from "@/lib/textPresets";
 import { Draggable } from "@hello-pangea/dnd";
 import { ScreenVerticalMenu } from "@/components/editor/ScreenVerticalMenu";
@@ -47,64 +47,6 @@ function parseColorStr(ctx: CanvasRenderingContext2D, fill: string | undefined, 
     return g;
   }
   return fill;
-}
-
-function drawAppleLogo(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.translate(cx, cy);
-  const s = size / 36;
-  ctx.scale(s, s);
-
-  // Leaf
-  ctx.beginPath();
-  ctx.moveTo(1, -12);
-  ctx.bezierCurveTo(2.2, -13.5, 3.5, -15.5, 3.2, -17.5);
-  ctx.bezierCurveTo(1.5, -17.4, -0.4, -16.3, -1.6, -14.8);
-  ctx.bezierCurveTo(-2.7, -13.4, -3.6, -11.4, -3.3, -9.4);
-  ctx.bezierCurveTo(-1.4, -9.3, 0.5, -10.5, 1, -12);
-  ctx.closePath();
-  ctx.fill();
-
-  // Apple Body
-  ctx.beginPath();
-  ctx.moveTo(3.3, -8.3);
-  ctx.bezierCurveTo(0.3, -8.3, -1.6, -6.6, -3.8, -6.6);
-  ctx.bezierCurveTo(-6.1, -6.6, -8.4, -8.3, -10.9, -8.3);
-  ctx.bezierCurveTo(-15.5, -8.3, -19.5, -4.3, -19.5, 3.8);
-  ctx.bezierCurveTo(-19.5, 8.8, -17.6, 13.9, -15.1, 17.5);
-  ctx.bezierCurveTo(-13.3, 20.2, -11.1, 23.2, -8.2, 23.1);
-  ctx.bezierCurveTo(-5.4, 23, -4.4, 21.2, -1.1, 21.2);
-  ctx.bezierCurveTo(2.1, 21.2, 3.1, 23, 6, 23.1);
-  ctx.bezierCurveTo(9, 23.2, 11, 20.4, 12.8, 17.7);
-  ctx.bezierCurveTo(14.9, 14.6, 15.7, 11.6, 15.8, 11.4);
-  ctx.bezierCurveTo(15.6, 11.3, 10.3, 9.3, 10.2, 3.2);
-  ctx.bezierCurveTo(10.1, -2, 14.4, -4.5, 14.6, -4.6);
-  ctx.bezierCurveTo(12.2, -8.1, 8.5, -8.3, 3.3, -8.3);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawGooglePlayLogo(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  const s = size / 32;
-  ctx.scale(s, s);
-
-  ctx.beginPath();
-  ctx.moveTo(-10, -14);
-  ctx.lineTo(14, 0);
-  ctx.lineTo(-10, 14);
-  ctx.closePath();
-
-  const g = ctx.createLinearGradient(-10, -14, 14, 14);
-  g.addColorStop(0, "#00C3FF");
-  g.addColorStop(0.5, "#00E676");
-  g.addColorStop(1, "#FFD600");
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.restore();
 }
 
 export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, hideScreenshots }: ScreenCardProps) {
@@ -157,7 +99,7 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
 
   const {
     activeSetId, activeScreenId, activeLayerId, selectedLayerIds,
-    setActiveSet, setActiveScreen, setActiveLayer, toggleSelectLayer, clearSelection,
+    setActiveLayer, toggleSelectLayer, clearSelection,
     deleteScreen, deleteLayer, duplicateLayer, updateLayer, updateScreen,
     lockLayer, bringForward, sendBackward, zoom,
   } = useEditorStore();
@@ -213,57 +155,15 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
 
     // ── Background ────────────────────────────────────────────────────────────
     const bg = screen.background;
-    if (bg.type === "solid" && bg.color) {
-      ctx.fillStyle = bg.color;
-      ctx.fillRect(0, 0, W, H);
-    } else if (bg.type === "gradient" && bg.gradient) {
-      const dirs: Record<string, [number, number, number, number]> = {
-        "to-b":  [0, 0, 0, H], "to-r":  [0, 0, W, 0],
-        "to-br": [0, 0, W, H], "to-bl": [W, 0, 0, H],
-        "to-tr": [0, H, W, 0], "to-tl": [W, H, 0, 0],
-      };
-      const [x0, y0, x1, y1] = dirs[bg.gradient.direction] ?? [0, 0, 0, H];
-      const grad = ctx.createLinearGradient(x0, y0, x1, y1);
-      for (const stop of bg.gradient.stops) {
-        grad.addColorStop(stop.position / 100, stop.color);
-      }
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-    } else if (bg.type === "mesh" && bg.mesh) {
-      // 4-corner mesh gradient using 4 radial gradients blended together
-      const { topLeft: tl, topRight: tr, bottomLeft: bl, bottomRight: br } = bg.mesh;
-      // Layer: top-left radial
-      const g1 = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.hypot(W, H));
-      g1.addColorStop(0, tl + "cc"); g1.addColorStop(1, tl + "00");
-      ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H);
-      // top-right radial
-      const g2 = ctx.createRadialGradient(W, 0, 0, W, 0, Math.hypot(W, H));
-      g2.addColorStop(0, tr + "cc"); g2.addColorStop(1, tr + "00");
-      ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
-      // bottom-left radial
-      const g3 = ctx.createRadialGradient(0, H, 0, 0, H, Math.hypot(W, H));
-      g3.addColorStop(0, bl + "cc"); g3.addColorStop(1, bl + "00");
-      ctx.fillStyle = g3; ctx.fillRect(0, 0, W, H);
-      // bottom-right radial
-      const g4 = ctx.createRadialGradient(W, H, 0, W, H, Math.hypot(W, H));
-      g4.addColorStop(0, br + "cc"); g4.addColorStop(1, br + "00");
-      ctx.fillStyle = g4; ctx.fillRect(0, 0, W, H);
-    } else if (bg.type === "image" && bg.imageUrl) {
+    let bgImg: HTMLImageElement | null = null;
+    if (bg.type === "image" && bg.imageUrl) {
       try {
-        const bgImg = await loadImage(bg.imageUrl);
-        if (bg.imageSlice) {
-          const { x, y, width, height } = bg.imageSlice;
-          ctx.drawImage(bgImg, x, y, width, height, 0, 0, W, H);
-        } else {
-          ctx.drawImage(bgImg, 0, 0, W, H);
-        }
+        bgImg = await loadImage(bg.imageUrl);
       } catch (err) {
-        console.error("Failed to load background image:", err);
+        console.warn("[ScreenCard] Failed to load background image:", err);
       }
-    } else {
-      ctx.fillStyle = "#1a1a2e";
-      ctx.fillRect(0, 0, W, H);
     }
+    drawBackgroundToCanvas(ctx, bg, W, H, bgImg);
 
     // ── Pattern overlay ────────────────────────────────────────────────────────
     if (bg.pattern) {

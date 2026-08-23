@@ -9,15 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import {
   Sparkles,
-  Crown,
   Download,
-  Layers,
   Smartphone,
-  Image as ImageIcon,
   Share2,
   Sliders,
   Check,
-  RefreshCw,
   FolderArchive,
   Palette,
   SunMedium,
@@ -29,7 +25,6 @@ import {
 } from "lucide-react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useProjectStore } from "@/lib/store/projectStore";
-import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import {
   IconStyleConfig,
@@ -54,10 +49,8 @@ interface Props {
 }
 
 export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
-  const { screenSets, getActiveSet, getActiveScreen } = useEditorStore();
+  const { screenSets } = useEditorStore();
   const { getProject, projects } = useProjectStore();
-  const { user, isPro, setUpgradeModalOpen } = useAuthStore();
-  const isGuest = Boolean(!user || user.isAnonymous);
 
   const project = projectId ? getProject(projectId) : projects[0];
   const appName = project?.name || "My App";

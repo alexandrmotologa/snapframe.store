@@ -169,7 +169,7 @@ export async function renderFeatureGraphicToCanvas(
       await renderDualPhoneLayout(ctx, config, W, H, iconImg, screenImg1, screenImg2);
       break;
     case "panorama-glow":
-      await renderPanoramaGlowLayout(ctx, config, W, H, iconImg, screenImg1);
+      await renderPanoramaGlowLayout(ctx, config, W, H, iconImg);
       break;
     case "minimalist":
     default:
@@ -321,8 +321,7 @@ async function renderPanoramaGlowLayout(
   config: FeatureGraphicConfig,
   W: number,
   H: number,
-  iconImg: HTMLImageElement | null,
-  _screenImg: HTMLImageElement | null
+  iconImg: HTMLImageElement | null
 ) {
   // Center App Icon with Ambient Glow
   const iconSize = H * 0.24;

@@ -9,9 +9,17 @@ import { Label } from "@/components/ui/label";
 import { GradientDirection } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ColorInput } from "@/components/ui/color-input";
-import { Upload, Sparkles, Wand2, Layers, Image as ImageIcon } from "lucide-react";
+import { Upload, Sparkles, Paintbrush, Blend, Grid3X3, Link2 } from "lucide-react";
 
 type Tab = "color" | "gradient" | "mesh" | "panoramic" | "ai_magic";
+
+const BG_TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
+  { id: "color", label: "Solid", icon: Paintbrush },
+  { id: "gradient", label: "Gradient", icon: Blend },
+  { id: "mesh", label: "Mesh", icon: Grid3X3 },
+  { id: "panoramic", label: "Panorama", icon: Link2 },
+  { id: "ai_magic", label: "AI Magic", icon: Sparkles },
+];
 
 const AI_THEMES_LIST = [
   {
@@ -286,19 +294,28 @@ export const BackgroundPanel = memo(function BackgroundPanel() {
         )}
 
         {/* Tab switcher */}
-        <div className="flex rounded-xl bg-secondary p-1 gap-1">
-          {(["ai_magic", "gradient", "panoramic", "mesh", "color"] as Tab[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={cn(
-                "flex-1 py-1.5 rounded-lg text-[11px] font-medium capitalize transition-all cursor-pointer",
-                tab === t ? "bg-background text-foreground shadow-xs font-semibold" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {t === "ai_magic" ? "✨ AI Magic" : t === "panoramic" ? "🔗 Panoramic" : t === "mesh" ? "✦ Mesh" : t === "gradient" ? "Gradient" : "Solid"}
-            </button>
-          ))}
+        <div className="grid grid-cols-5 gap-1 p-1 bg-secondary/80 rounded-xl border border-border/40">
+          {BG_TABS.map((t) => {
+            const Icon = t.icon;
+            const isActive = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center py-2 px-1 rounded-lg text-[10.5px] font-medium transition-all gap-1 cursor-pointer min-w-0 select-none",
+                  isActive
+                    ? "bg-background text-foreground shadow-xs font-semibold ring-1 ring-border/50 scale-[1.02]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/70 active:scale-95"
+                )}
+                title={t.label}
+              >
+                <Icon className={cn("w-3.5 h-3.5 shrink-0", isActive ? "text-primary" : "text-muted-foreground/90")} />
+                <span className="truncate w-full text-center leading-none tracking-tight">{t.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {tab === "color" && (

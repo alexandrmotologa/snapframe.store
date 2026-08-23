@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { CHARACTERS, Character, getCharacterSvgString } from "@/lib/characters";
 import { CharacterLayer } from "@/lib/types";
@@ -8,7 +8,7 @@ import { nanoid } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/lib/store/toastStore";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 
 const CATEGORY_LABELS: Record<string, string> = {
   all: "All",
@@ -20,87 +20,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   sitting: "🪑 Sitting",
   standing: "🧍 Standing",
 };
-
-/** Horizontal scroll container with mouse-wheel support and chevron navigation */
-function HorizontalScrollRow({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const checkScroll = () => {
-    const el = containerRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 2);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
-  };
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
-  }, []);
-
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    const el = containerRef.current;
-    if (!el) return;
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      el.scrollLeft += e.deltaY;
-      checkScroll();
-    }
-  };
-
-  const scrollByAmount = (amount: number) => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.scrollBy({ left: amount, behavior: "smooth" });
-    setTimeout(checkScroll, 200);
-  };
-
-  return (
-    <div className={cn("relative group/scroll flex items-center", className)}>
-      {/* Scroll Left Button */}
-      {canScrollLeft && (
-        <button
-          type="button"
-          onClick={() => scrollByAmount(-140)}
-          aria-label="Scroll Left"
-          className="absolute left-0.5 z-10 w-6 h-6 rounded-full bg-background/90 border border-border/80 shadow-md flex items-center justify-center text-foreground hover:bg-secondary transition-all cursor-pointer"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-        </button>
-      )}
-
-      {/* Scrollable track */}
-      <div
-        ref={containerRef}
-        onWheel={handleWheel}
-        onScroll={checkScroll}
-        className="w-full flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1 px-1.5 scroll-smooth"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {children}
-      </div>
-
-      {/* Scroll Right Button */}
-      {canScrollRight && (
-        <button
-          type="button"
-          onClick={() => scrollByAmount(140)}
-          aria-label="Scroll Right"
-          className="absolute right-0.5 z-10 w-6 h-6 rounded-full bg-background/90 border border-border/80 shadow-md flex items-center justify-center text-foreground hover:bg-secondary transition-all cursor-pointer"
-        >
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
-      )}
-    </div>
-  );
-}
 
 const ORDERED_LIBRARIES = [
   "3D Mascots & Robots",
@@ -174,48 +93,52 @@ export function CharactersPanel() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Library horizontal scroll tabs */}
-      <div className="px-2 py-1.5 border-b border-border/40 bg-secondary/20 shrink-0">
-        <HorizontalScrollRow>
+      <div className="px-2 py-1 border-b border-border/40 bg-secondary/20 shrink-0">
+        <HorizontalScrollRail>
           {libraries.map((lib) => (
             <button
               key={lib}
               type="button"
-              onClick={() => {
+              onClick={(e) => {
                 setActiveLibrary(lib);
                 setFilter("all");
+                e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
               }}
               className={cn(
                 "shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border shadow-2xs",
                 activeLibrary === lib
-                  ? "bg-primary text-primary-foreground border-primary/60 shadow-xs"
+                  ? "bg-primary text-primary-foreground border-primary/60 shadow-xs font-semibold"
                   : "bg-secondary/70 text-muted-foreground hover:text-foreground hover:bg-secondary border-border/40"
               )}
             >
               {lib}
             </button>
           ))}
-        </HorizontalScrollRow>
+        </HorizontalScrollRail>
       </div>
 
       {/* Category filter — horizontal scroll */}
-      <div className="px-2 py-1.5 border-b border-border/40 shrink-0">
-        <HorizontalScrollRow>
+      <div className="px-2 py-1 border-b border-border/40 shrink-0 bg-card/40">
+        <HorizontalScrollRail>
           {categories.map((cat) => (
             <button
               key={cat}
               type="button"
-              onClick={() => setFilter(cat)}
+              onClick={(e) => {
+                setFilter(cat);
+                e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+              }}
               className={cn(
                 "shrink-0 whitespace-nowrap px-2.5 py-1 rounded-lg text-[10.5px] font-medium transition-all cursor-pointer border",
                 filter === cat
                   ? "bg-indigo-600 text-white border-indigo-500 font-semibold shadow-xs"
-                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary border-border/30"
+                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary border-border/30 active:scale-95"
               )}
             >
               {CATEGORY_LABELS[cat] ?? cat}
             </button>
           ))}
-        </HorizontalScrollRow>
+        </HorizontalScrollRail>
       </div>
 
       {/* Character grid */}

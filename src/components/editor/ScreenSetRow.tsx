@@ -1,13 +1,12 @@
 "use client";
 
-import { useRef, useState, memo } from "react";
+import { useState, memo } from "react";
 import {
-  Plus, ChevronDown, Smartphone, Square, Circle,
-  Sun, Moon, Link2, Upload, EyeOff, Eye, CopyCheck,
+  Plus, ChevronDown, Smartphone, EyeOff, Eye, CopyCheck,
 } from "lucide-react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { toast } from "@/lib/store/toastStore";
-import { ScreenSet, ScreenshotLayer } from "@/lib/types";
+import { ScreenSet } from "@/lib/types";
 import { ScreenCard } from "@/components/editor/ScreenCard";
 import { IOS_DEVICES, ANDROID_DEVICES, COLOR_HEX_MAP, isTabletDevice } from "@/lib/devices";
 import { cn } from "@/lib/utils";
@@ -64,7 +63,7 @@ interface ScreenSetRowProps {
 export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging = false }: ScreenSetRowProps) {
   const {
     activeSetId, setActiveSet, setActiveScreen, addScreen, zoom,
-    updateDevice, updateMockup, screenSets, updateLayer, 
+    updateDevice, updateMockup, screenSets,
     updateScreen,
   } = useEditorStore();
 
@@ -86,7 +85,6 @@ export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging =
   const getHex = (name: string) => COLOR_HEX_MAP[name.toLowerCase()] ?? "#888";
 
   const isFrameOn = screenSet.mockup?.showFrame !== false;
-  const isShadowOn = screenSet.mockup?.showShadow === true;
   const isSquircle = screenSet.mockup?.squircle === true;
   const isShowingScreenshots = screenSet.mockup?.showScreenshots !== false;
 

@@ -7,17 +7,11 @@ import {
   X,
   Sparkles,
   Crown,
-  Zap,
   Shield,
-  Film,
-  Globe,
-  Image as ImageIcon,
   ArrowLeft,
   ArrowRight,
   HelpCircle,
   CreditCard,
-  RefreshCw,
-  Award,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";

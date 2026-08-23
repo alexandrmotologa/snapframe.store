@@ -9,6 +9,7 @@ import { BASE_TEMPLATES, getAllTemplates } from "@/lib/templates";
 import { recordTemplateSelection } from "@/lib/templatePopularity";
 import { cn } from "@/lib/utils";
 import type { Template } from "@/lib/types";
+import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 
 // ── Category definitions ────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -37,8 +38,6 @@ function TemplateCard({
   isApplied: boolean;
   onApply: () => void;
 }) {
-  const [hovered, setHovered] = useState(false);
-
   // Preview gradient colors from template
   const [c1, c2] = template.previewGradient ?? [template.previewColor ?? "#1a1a2e", "#6366f1"];
   const gradientStyle = {
@@ -51,8 +50,6 @@ function TemplateCard({
     <button
       type="button"
       onClick={onApply}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       className={cn(
         "group relative w-full text-left rounded-xl overflow-hidden border transition-all duration-200 shadow-xs",
         isApplied
@@ -89,22 +86,24 @@ function TemplateCard({
         </div>
 
         {/* Screen count & Pro badges */}
-        <div className="absolute top-2 left-2 flex items-center gap-1.5">
-          {(template.id.startsWith("niche-") || template.id.includes("pro") || screenCount >= 6) && (
-            <div className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 text-[9px] font-black tracking-wide shadow-md flex items-center gap-1 border border-amber-300/40">
-              <Sparkles className="w-2.5 h-2.5 text-zinc-950 fill-zinc-950" />
-              <span>PRO</span>
-            </div>
-          )}
-          <div className="px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9.5px] font-semibold text-white/95 border border-white/15 flex items-center gap-1">
-            <Layers className="w-2.5 h-2.5" />
-            <span>{screenCount} screens</span>
+        <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none z-10 gap-1">
+          <div>
+            {(template.id.startsWith("niche-") || template.id.includes("pro") || screenCount >= 6) && (
+              <div className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 text-[9px] font-black tracking-wide shadow-xs flex items-center gap-1 border border-amber-300/40">
+                <Sparkles className="w-2.5 h-2.5 text-zinc-950 fill-zinc-950" />
+                <span>PRO</span>
+              </div>
+            )}
+          </div>
+          <div className="px-1.5 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-[9px] font-medium text-white/95 border border-white/15 flex items-center gap-1 whitespace-nowrap shadow-xs ml-auto">
+            <Layers className="w-2.5 h-2.5 shrink-0 opacity-80" />
+            <span>{screenCount} {screenCount === 1 ? "screen" : "screens"}</span>
           </div>
         </div>
 
         {/* Applied checkmark overlay */}
         {isApplied && (
-          <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center">
+          <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center z-20">
             <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
               <Check className="w-5 h-5" />
             </div>
@@ -113,12 +112,18 @@ function TemplateCard({
       </div>
 
       {/* Info */}
-      <div className="px-3 py-2 bg-card/90 dark:bg-secondary/40 border-t border-border/40">
-        <div className="flex items-center justify-between gap-1">
-          <p className="text-xs font-semibold text-foreground truncate">{template.name}</p>
-          <span className="text-[9px] font-mono uppercase text-muted-foreground shrink-0">{template.category}</span>
+      <div className="px-2.5 py-2 bg-card/90 dark:bg-secondary/40 border-t border-border/40 flex flex-col justify-center min-w-0">
+        <p className="text-xs font-semibold text-foreground truncate leading-tight" title={template.name}>
+          {template.name}
+        </p>
+        <div className="flex items-center gap-1.5 mt-1 min-w-0">
+          <span className="text-[8.5px] font-mono uppercase font-semibold text-muted-foreground/90 px-1 py-0.2 rounded bg-secondary/80 shrink-0 border border-border/30">
+            {template.category}
+          </span>
+          <p className="text-[10px] text-muted-foreground truncate flex-1" title={template.description}>
+            {template.description}
+          </p>
         </div>
-        <p className="text-[10px] text-muted-foreground truncate mt-0.5">{template.description}</p>
       </div>
     </button>
   );
@@ -186,59 +191,71 @@ export function TemplatesPanel() {
           <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           <input
             type="text"
-            placeholder="Search templates (e.g. Minimal, Dark, Fintech, 10 Screens)..."
+            placeholder="Search templates or styles..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-xs outline-none text-foreground placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent text-xs outline-none text-foreground placeholder:text-muted-foreground min-w-0"
           />
         </div>
       </div>
 
       {/* Category tabs */}
-      <div className="flex gap-1.5 px-3 py-2 overflow-x-auto shrink-0 border-b border-border/30 scrollbar-none">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setCategory(cat)}
-            className={cn(
-              "shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] font-medium transition-all cursor-pointer",
-              category === cat
-                ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
-            )}
-          >
-            {cat}
-          </button>
-        ))}
+      <div className="border-b border-border/30 px-2 py-1 bg-card/40">
+        <HorizontalScrollRail>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={(e) => {
+                setCategory(cat);
+                e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+              }}
+              className={cn(
+                "shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] font-medium transition-all cursor-pointer whitespace-nowrap",
+                category === cat
+                  ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+        </HorizontalScrollRail>
       </div>
 
       {/* Scope Selector: All platforms vs Active */}
       {screenSets.length > 1 && (
-        <div className="flex items-center justify-between px-3 py-1.5 bg-secondary/30 border-b border-border/30 text-[10.5px]">
-          <span className="text-muted-foreground font-medium">Apply To:</span>
-          <div className="flex items-center gap-1 bg-background/80 p-0.5 rounded-lg border border-border/40">
+        <div className="px-3 py-2 bg-secondary/25 border-b border-border/30 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-muted-foreground font-medium">Apply To:</span>
+            <span className="text-[10px] text-muted-foreground/80 font-mono">
+              {screenSets.length} sets
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-1 bg-background/80 p-0.5 rounded-lg border border-border/40 text-[11px]">
             <button
               type="button"
               onClick={() => setApplyScope("all")}
               className={cn(
-                "px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer",
+                "py-1 px-1.5 rounded-md font-medium text-center transition-all cursor-pointer truncate",
                 applyScope === "all"
-                  ? "bg-primary text-primary-foreground shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
               )}
+              title="Apply to all platforms (iOS & Android)"
             >
-              All Platforms (iOS & Android)
+              All Platforms
             </button>
             <button
               type="button"
               onClick={() => setApplyScope("active")}
               className={cn(
-                "px-2 py-0.5 rounded-md font-semibold transition-all cursor-pointer",
+                "py-1 px-1.5 rounded-md font-medium text-center transition-all cursor-pointer truncate",
                 applyScope === "active"
-                  ? "bg-primary text-primary-foreground shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
               )}
+              title={`Apply to active ${activeSet?.store === "android" ? "Android" : "iOS"} set only`}
             >
               {activeSet?.store === "android" ? "Android" : "iOS"} Only
             </button>

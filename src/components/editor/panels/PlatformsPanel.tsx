@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo, memo } from "react";
+import { useState, memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { ALL_DEVICES, isTabletDevice, IOS_DEVICES, ANDROID_DEVICES } from "@/lib/devices";
-import { AppleStoreIcon, GooglePlayIcon, APP_STORE_LABEL, GOOGLE_PLAY_LABEL } from "@/components/icons/StoreIcons";
+import { AppleStoreIcon, GooglePlayIcon } from "@/components/icons/StoreIcons";
 import {
   CheckCircle2, AlertTriangle, XCircle, ShieldCheck,
   Smartphone, Tablet, Info, ChevronDown, ChevronUp, Eye, Trash2, Plus, Sparkles, Lock
@@ -42,8 +42,6 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
     removeScreenSet,
     updateMockup,
     updateDevice,
-    setActiveSet,
-    setActiveScreen,
     generateDualThemeSet,
   } = useEditorStore();
 

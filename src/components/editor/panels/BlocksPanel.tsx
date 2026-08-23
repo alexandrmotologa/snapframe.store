@@ -19,12 +19,12 @@ import {
   Tag,
   MessageSquare,
   X,
-  Sliders,
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "@/lib/store/toastStore";
 import { nanoid } from "@/lib/utils";
 import { Layer } from "@/lib/types";
+import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 
 interface BlockPreset {
   id: string;
@@ -1551,24 +1551,27 @@ export function BlocksPanel() {
         </div>
 
         {/* Category Filter Chips */}
-        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
+        <HorizontalScrollRail className="py-0.5">
           {FILTER_CHIPS.map((chip) => {
             const isActive = selectedCategory === chip.id;
             return (
               <button
                 key={chip.id}
-                onClick={() => setSelectedCategory(chip.id)}
-                className={`text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                onClick={(e) => {
+                  setSelectedCategory(chip.id);
+                  e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                }}
+                className={`text-[10.5px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/30"
+                    ? "bg-primary text-primary-foreground shadow-xs scale-100"
+                    : "bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/30 active:scale-95"
                 }`}
               >
                 {chip.label}
               </button>
             );
           })}
-        </div>
+        </HorizontalScrollRail>
       </div>
 
       {/* Main Presets Scrollable Area */}

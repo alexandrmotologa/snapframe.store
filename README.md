@@ -30,6 +30,8 @@
 ### 🎨 Design & Canvas Capabilities
 - **Continuous Panoramic Flow:** Connect seamless backgrounds, waves, gradients, or custom uploaded ultra-wide panoramas across multiple screens.
 - **30+ Drag-and-Drop Block Elements:** Dynamic Islands, Live Activity workouts, iOS Toggle switches, Push Notification banners, Editors' Choice laurels, 30-Day Guarantee seals, Growth stats (+142%), and Before/After comparison cards.
+- **Responsive & Adaptable Studio UI:** Built-in horizontal scroll rails with interactive chevrons, vertical-to-horizontal mouse wheel conversion, and automatic tab centering across all category filters (Templates, Block Elements, Color Themes, Stickers, Languages).
+- **Ergonomic Template Cards & Controls:** Full-width titles with tooltip support, cleanly separated PRO and Screen-count indicators, responsive 2-column platform scope selectors ("All Platforms" vs "Active Only"), and a 5-column icon+label background switcher.
 - **20+ Google Fonts:** Inter, Montserrat, Poppins, Outfit, Space Grotesk, Syne, Playfair Display, and more.
 - **Lossless 2D Canvas Engine:** 100% visual parity between the real-time editor, Live Store Simulator, PNG clipboard copy, and production 4K ZIP export.
 
@@ -168,7 +170,7 @@ snapframe.store/
 │   │   │   └── StorePreviewModal.tsx
 │   │   ├── dashboard/         # Project cards, creation modal, rename modal & footer
 │   │   ├── auth/              # Google & GitHub OAuth modal, User Menu & account linking
-│   │   └── ui/                # UI primitives (buttons, dropdowns, inputs, dialogs)
+│   │   └── ui/                # UI primitives (HorizontalScrollRail, buttons, dropdowns, inputs, dialogs)
 │   └── lib/
 │       ├── ai/                # Unified server-side AI provider service
 │       ├── canvasBackgrounds.ts # 8 workspace background patterns (Square Grid, Dots, Blueprint, Isometric, etc.)

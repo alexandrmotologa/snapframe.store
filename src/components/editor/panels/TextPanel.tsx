@@ -593,7 +593,7 @@ function AICopywriterWidget() {
       </div>
 
       {/* Tone Chips */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+      <div className="grid grid-cols-5 gap-1">
         {[
           { id: "high-energy", label: "🚀 Energy" },
           { id: "minimalist", label: "✨ Minimal" },
@@ -606,11 +606,12 @@ function AICopywriterWidget() {
             type="button"
             onClick={() => setTone(t.id as any)}
             className={cn(
-              "px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-tight shrink-0 transition-all border cursor-pointer",
+              "py-1 px-0.5 rounded-md text-[9.5px] font-semibold tracking-tight text-center truncate transition-all border cursor-pointer select-none",
               tone === t.id
                 ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-xs"
-                : "bg-secondary/60 text-muted-foreground hover:text-foreground border-border/40 hover:bg-secondary"
+                : "bg-secondary/60 text-muted-foreground hover:text-foreground border-border/40 hover:bg-secondary active:scale-95"
             )}
+            title={t.label}
           >
             {t.label}
           </button>

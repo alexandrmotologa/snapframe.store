@@ -12,6 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ColorInput } from "@/components/ui/color-input";
 import { toast } from "@/lib/store/toastStore";
+import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 
 const POPULAR_PALETTES = [
   { name: "iOS Indigo", bg: "#4F46E5", fg: "#FFFFFF" },
@@ -214,17 +215,20 @@ export function ThemesPanel() {
             </div>
 
             {/* Category horizontal scroll rail */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <HorizontalScrollRail className="pb-0.5">
               {THEME_CATEGORIES.map((cat) => {
                 const isSelected = selectedCategory === cat.id;
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
+                    onClick={(e) => {
+                      setSelectedCategory(cat.id);
+                      e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                    }}
                     className={cn(
-                      "px-2.5 py-1 rounded-full text-[11px] whitespace-nowrap transition-colors shrink-0 font-medium",
+                      "px-2.5 py-1 rounded-full text-[11px] whitespace-nowrap transition-colors shrink-0 font-medium cursor-pointer",
                       isSelected
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "bg-primary text-primary-foreground shadow-xs font-semibold"
                         : "bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -232,7 +236,7 @@ export function ThemesPanel() {
                   </button>
                 );
               })}
-            </div>
+            </HorizontalScrollRail>
           </div>
 
           {/* Presets Grid */}
