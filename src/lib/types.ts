@@ -340,6 +340,8 @@ export interface MockupSettings {
   /** Clean Status Bar (9:41 AM · 100% Battery · 5G) overlay */
   cleanStatusBar?: boolean;
   statusBarTheme?: "light" | "dark";
+  /** Pro feature: Mockup Frame scaling factor (0.4 to 2.0) */
+  scale?: number;
 }
 
 // Store-specific size presets

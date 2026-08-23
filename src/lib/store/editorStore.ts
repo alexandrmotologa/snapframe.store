@@ -756,8 +756,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       const existingIndex = state.screenSets.findIndex(
         (ss) =>
           ss.id !== sourceSet.id &&
-          (ss.name.toLowerCase() === newSetName.toLowerCase() ||
-            (ss.store === sourceSet.store && ss.name.toLowerCase().includes(`(${isDark ? "dark" : "light"})`)))
+          ((ss.name || "").toLowerCase() === newSetName.toLowerCase() ||
+            (ss.store === sourceSet.store && (ss.name || "").toLowerCase().includes(`(${isDark ? "dark" : "light"})`)))
       );
 
       if (existingIndex >= 0) {
