@@ -227,7 +227,7 @@ export default function TermsOfServicePage() {
               <ul className="list-disc pl-5 space-y-1 text-muted-foreground pt-1">
                 <li><strong>Recurring Billing:</strong> Pro subscriptions are billed on a recurring basis (Monthly at $9/month or Annually at $69/year) until canceled.</li>
                 <li><strong>Cancellation:</strong> You can cancel your subscription at any time via your account settings or the Paddle customer portal. Upon cancellation, you retain access until the end of your prepaid billing period.</li>
-                <li><strong>Refunds:</strong> We provide a 14-day money-back guarantee on unutilized accounts. As detailed in our <Link href="/refunds" className="text-primary font-semibold hover:underline">Refund Policy</Link>, once an account actively consumes AI generation credits or utilizes multi-device Firestore cloud storage, non-recoverable third-party server and compute expenses have been incurred, and retrospective refunds are no longer available.</li>
+                <li><strong>Refunds:</strong> We provide a 14-day money-back guarantee on unutilized accounts. As detailed in our <Link href="/refunds" className="text-primary font-semibold hover:underline">Refund Policy</Link>, once an account actively consumes AI generation credits, exports Pro 10-screen asset packages, or utilizes multi-device Firestore cloud storage, non-recoverable third-party server, compute, and delivery expenses have been incurred, and retrospective refunds are no longer available.</li>
               </ul>
             </div>
           </section>

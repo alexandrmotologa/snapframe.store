@@ -50,20 +50,20 @@ export default function RefundPolicyPage() {
       <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-12">
         {/* Title Header */}
         <div className="space-y-4 pb-10 border-b border-border/50">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-500 text-xs font-semibold">
             <ShieldCheck className="w-3.5 h-3.5" />
-            14-Day Money-Back Guarantee
+            14-Day Money-Back Guarantee (Fair Policy)
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
             Refund &amp; Cancellation Policy
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
-            We want you to be 100% satisfied with SnapFrame Pro. If our software does not meet your expectations, we offer a straightforward, no-hassle refund process.
+            We want you to be 100% satisfied with SnapFrame Pro. We offer a 14-day money-back guarantee on unutilized accounts, risk-free testing with our free tier, and 1-click instant cancellation anytime.
           </p>
           <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-muted-foreground font-mono">
             <span>Last Updated: {lastUpdated}</span>
             <span>•</span>
-            <span>Version: 2.4</span>
+            <span>Version: 2.5</span>
             <span>•</span>
             <span>Merchant of Record: Paddle.com</span>
           </div>
@@ -72,15 +72,15 @@ export default function RefundPolicyPage() {
         {/* Highlight Guarantee Card */}
         <div className="my-10 p-6 rounded-2xl bg-card border border-border/70 shadow-sm space-y-4">
           <h2 className="text-base font-bold flex items-center gap-2 text-foreground">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
             Our Guarantee at a Glance
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/40 flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-foreground">14-Day Full Refund Window:</span>
-                <p className="text-muted-foreground mt-0.5">Request a full refund within 14 days of your initial purchase, no questions asked.</p>
+                <span className="font-semibold text-foreground">14-Day Unutilized Full Refund:</span>
+                <p className="text-muted-foreground mt-0.5">Request a 100% refund within 14 days if you have not consumed AI generation credits or exported Pro asset packages.</p>
               </div>
             </div>
             <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/40 flex items-start gap-2.5">
@@ -116,7 +116,7 @@ export default function RefundPolicyPage() {
               14-Day Money-Back Guarantee
             </h2>
             <p>
-              All first-time purchases of SnapFrame Pro (both Monthly and Annual plans) are backed by our 14-day money-back guarantee for unutilized accounts. If you decide that SnapFrame is not the right tool for your workflow within 14 calendar days from the transaction date and have not actively consumed computational or cloud resources, you are entitled to a 100% full refund.
+              All first-time purchases of SnapFrame Pro (both Monthly and Annual plans) are backed by our 14-day money-back guarantee for unutilized accounts. If you decide that SnapFrame is not the right tool for your workflow within 14 calendar days from the transaction date and have not actively consumed computational AI resources or downloaded Pro asset packages, you are entitled to a 100% full refund.
             </p>
           </section>
 
@@ -131,10 +131,10 @@ export default function RefundPolicyPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Unutilized Accounts (Full 100% Refund):</strong> If you purchase SnapFrame Pro and request a refund within 14 days without having consumed AI compute credits on your Pro subscription and without having synced projects to multi-device Firestore cloud storage, you will receive an unconditional 100% refund.
+                <strong>Unutilized Accounts (Full 100% Refund):</strong> If you purchase SnapFrame Pro and request a refund within 14 days without having consumed AI compute credits on your Pro subscription, without downloading Pro 10-screen ZIP exports, and without having synced projects to multi-device Firestore cloud storage, you will receive an unconditional 100% refund.
               </li>
               <li>
-                <strong>Actively Utilized Accounts (Non-Refundable):</strong> Once a Pro subscriber actively utilizes the paid infrastructure — specifically by <em>performing at least one (1) AI generation (such as AI Vision Auto-Pilot, AI Background Cutout, or AI Translation)</em> or by <em>synchronizing project data to our dedicated Multi-Device Cloud Storage (Firestore)</em> — non-recoverable third-party server, database, and API expenses are permanently incurred on your behalf. Consequently, once these resources are actively consumed, the subscription is considered fulfilled and is no longer eligible for a retrospective refund.
+                <strong>Actively Utilized Accounts (Non-Refundable):</strong> Once a Pro subscriber actively utilizes the paid infrastructure — specifically by <em>performing AI generations (such as AI Vision Auto-Pilot, AI Background Cutout, or AI Translation)</em>, by <em>exporting Pro multi-platform 10-screen ZIP archives / Fastlane metadata</em>, or by <em>synchronizing project data to our dedicated Multi-Device Cloud Storage (Firestore)</em> — non-recoverable third-party server, database, and API expenses are permanently incurred on your behalf. Consequently, once these resources are actively consumed, the subscription is considered fulfilled and is no longer eligible for a retrospective refund.
               </li>
               <li>
                 <strong>Cancel Anytime:</strong> If your account has been utilized and you wish to discontinue, you can cancel your subscription with 1 click. You will retain full Pro access until the conclusion of your billing cycle and will never be charged again.

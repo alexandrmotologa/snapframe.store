@@ -200,7 +200,7 @@ export function UpgradeModal() {
             <div className="flex items-center gap-3">
               <span>💳 Apple Pay, Google Pay, Cards &amp; PayPal</span>
               <span>•</span>
-              <span>100% Satisfaction Guarantee</span>
+              <span>14-Day Fair Refund Guarantee</span>
             </div>
           </div>
         </div>

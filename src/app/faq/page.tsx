@@ -59,7 +59,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     category: "Pricing & Refunds",
     question: "What is your Refund Policy for SnapFrame Pro?",
-    answer: "We offer a 14-day money-back guarantee for unutilized accounts. If you subscribe to SnapFrame Pro and request a cancellation within 14 calendar days without having consumed AI generation credits and without having synced projects to multi-device Firestore cloud storage, you will receive a 100% full refund through Paddle. Once AI compute or cloud storage infrastructure is actively utilized, third-party server and model costs are permanently incurred on your behalf and the service is considered fulfilled.",
+    answer: "We offer a 14-day money-back guarantee for unutilized accounts. If you subscribe to SnapFrame Pro and request a cancellation within 14 calendar days without having consumed AI generation credits, without exporting Pro 10-screen asset packages, and without having synced projects to multi-device Firestore cloud storage, you will receive a 100% full refund through Paddle. Once AI compute, Pro exports, or cloud storage infrastructure is actively utilized, third-party server, delivery, and model costs are permanently incurred on your behalf and the service is considered fulfilled.",
   },
   {
     category: "Pricing & Refunds",

@@ -329,9 +329,9 @@ export default function PricingPage() {
               <Shield className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-foreground">14-Day Money-Back Guarantee</h4>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Try SnapFrame Pro risk-free. If you are not completely satisfied, get a full refund within 14 days.
+              <h4 className="text-sm font-bold text-foreground">14-Day Money-Back Guarantee (Fair Policy)</h4>
+              <p className="text-xs text-muted-foreground mt-0.5 max-w-xl">
+                Try SnapFrame Pro with confidence. 100% full refund within 14 days for unutilized accounts. Once AI generations or Pro exports are consumed, cancel anytime in 1-click with zero lock-in.
               </p>
             </div>
           </div>
