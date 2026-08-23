@@ -368,6 +368,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                   )}
                   onClick={() => {
                     if (isProTpl && !isPro) {
+                      onClose();
                       if (isGuest) {
                         setAuthModalOpen(true);
                         toast.info("Pro Suite Templates require SnapFrame Pro. Sign in with Google or GitHub to upgrade.");
