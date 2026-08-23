@@ -29,14 +29,14 @@ const PRO_FEATURES = [
     desc: "Auto-Pilot vision generation, AI copywriting & instant multi-language translation (Fair Usage).",
   },
   {
-    icon: Globe,
-    title: "Unlimited Projects & Cloud Sync",
-    desc: "Create unlimited projects with real-time automatic Firestore cloud backup across your Mac, PC, and iPad.",
+    icon: Sparkles,
+    title: "Dual Theme & Tablet Simulator",
+    desc: "1-Click matching Light & Dark sets, iPad Pro 13\" / Tablet live store preview, and luxury 3D mockup frames.",
   },
   {
     icon: ImageIcon,
-    title: "All 6+ Pro Industry Niche Templates",
-    desc: "Access exclusive luxury templates for Fintech, Crypto, SaaS, Fitness, Dating, and Ecommerce.",
+    title: "Pro Niches & Cloud Sync",
+    desc: "Unlimited cloud projects (Firestore) and exclusive templates for Fintech, Crypto, SaaS, Fitness, Dating, and Ecommerce.",
   },
 ];
 

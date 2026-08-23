@@ -32,6 +32,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { AppleStoreIcon, GooglePlayIcon, APP_STORE_LABEL, GOOGLE_PLAY_LABEL } from "@/components/icons/StoreIcons";
 
+import { useAuthStore } from "@/lib/store/authStore";
+
 export type FullBorderStyle =
   | "3D Realistic"
   | "Titanium Precision"
@@ -42,6 +44,8 @@ export type FullBorderStyle =
   | "Flat Frame"
   | "Minimal"
   | "Borderless";
+
+export const PRO_FRAME_STYLES = new Set(["Clay Matte", "Liquid Glass", "Neon Glow", "Minimal Wireframe"]);
 
 export const FRAME_STYLES_LIST: { id: FullBorderStyle; label: string; desc: string }[] = [
   { id: "3D Realistic", label: "3D Realistic", desc: "Metallic bezel with buttons" },
@@ -67,6 +71,7 @@ export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging =
     updateScreen,
   } = useEditorStore();
 
+  const { isPro, setUpgradeModalOpen } = useAuthStore();
   const [showSyncConfirm, setShowSyncConfirm] = useState(false);
 
   const isActive = activeSetId === screenSet.id;
@@ -107,6 +112,11 @@ export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging =
     : isSquircle ? "Minimal" : "Borderless";
     
   const setBorderStyle = (style: FullBorderStyle) => {
+    if (PRO_FRAME_STYLES.has(style) && !isPro) {
+      toast.info(`${style} frame style requires SnapFrame Pro. Upgrade to unlock luxury mockup styles.`);
+      setUpgradeModalOpen(true);
+      return;
+    }
     if (style === "Borderless") updateMockup(screenSet.id, { showFrame: false, squircle: false });
     else if (style === "Minimal") updateMockup(screenSet.id, { showFrame: false, squircle: true });
     else if (style === "Flat Frame") updateMockup(screenSet.id, { showFrame: true, squircle: false, frameType: "2d" });
@@ -322,7 +332,12 @@ export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging =
                   onClick={() => setBorderStyle(styleItem.id)}
                 >
                   <div className="flex flex-col min-w-0">
-                    <span className="truncate">{styleItem.label}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate">{styleItem.label}</span>
+                      {PRO_FRAME_STYLES.has(styleItem.id) && !isPro && (
+                        <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">PRO</span>
+                      )}
+                    </div>
                     <span className="text-[10px] text-muted-foreground font-normal truncate">{styleItem.desc}</span>
                   </div>
                   {borderStyle === styleItem.id && <span className="text-primary shrink-0 ml-2">✓</span>}

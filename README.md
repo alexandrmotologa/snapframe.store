@@ -56,15 +56,17 @@
 | **Cloud Synchronization** | ❌ Local Browser Only | ❌ Local Browser Only | **☁️ Multi-Device Real-Time Cloud Sync** (Google Firestore) |
 | **Upgrade Migration** | N/A | Local projects automatically migrate to Cloud on Pro upgrade | Instant multi-device sync across Mac, PC, iPad |
 | **AI Generations** | 🔒 Sign in required | **3 Complimentary AI Credits** | **500 AI Generations / Month** (Fair Usage) |
-| **1-Click Clipboard Copy** | ✅ Included (1 screen) | ✅ Included (1 screen) | ✅ Included (1 screen lossless) |
+| **1-Click Clipboard Copy** | ✅ Included (Screens 1–3) | ✅ Included (Screens 1–3) | **✅ Lossless Copy on all 10 screens** |
 | **Screenshot Export (ZIP)** | 🔒 Sign in required | **Up to 3 screens per set (1 platform)** | **All 10 screens per set (All platforms)** |
 | **Multi-Platform Batch** | 🔒 Sign in required | 1 Platform (e.g. iPhone only) | **Full Multi-Platform ZIP (iOS + iPad + Android + Tablet)** |
 | **Multi-Language Batch** | 🔒 Sign in required | 1 Active Language | **Batch 40+ Languages in organized folders** |
 | **Fastlane & ASO Package** | 🔒 Sign in required | ❌ Not included (raw images only) | **✅ Complete Fastlane (`.txt`, `.json`) suite** |
+| **Dual Theme Generator** | 🔒 Sign in required | ❌ Not included | **✅ 1-Click matching Light & Dark sets** |
+| **Live Store Simulator** | 🔒 Sign in required | **Phone Simulator (iPhone & Android)** | **Phone & Tablet Simulator (iPad Pro 13" & Tabs)** |
+| **Mockup Frame Styles** | 2D & Titanium standard | 2D & Titanium standard | **All Luxury 3D Frames (Clay, Glass, Neon, Wireframe)** |
 | **Video & Animated GIF Studio** | 🔒 Sign in required | **100% Free & Unlimited** (60fps MP4/WebM/GIF) | **100% Free & Unlimited** |
 | **Store App Icon & Dev Packs** | 🔒 Sign in required | **100% Free & Unlimited** (Xcode & Android zips) | **100% Free & Unlimited** |
-| **Live Store Simulator** | 🔒 Sign in required | **100% Free & Unlocked** | **100% Free with Multi-Language Switcher** |
-| **4K Lossless Master Exports** | ❌ Standard 1x/2x | Standard 1x/2x | **✅ 4K Ultra-HD Lossless Exports** |
+| **4K Lossless Master Exports** | ❌ Standard 1x/2x | Standard 1x/2x | **✅ 4K Ultra-HD Lossless Exports (@3x)** |
 | **Templates** | Standard templates | Standard templates | **All 6+ Pro Industry Niche Templates** |
 | **Commercial License** | ✅ Included | ✅ Included | ✅ Included |
 

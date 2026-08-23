@@ -77,8 +77,8 @@ function IconBtn({
 export function EditorLayout({ projectId }: EditorLayoutProps) {
   const router = useRouter();
   const project = useProjectStore((s) => s.getProject(projectId));
-  const { user, setAuthModalOpen } = useAuthStore();
-  const isGuest = Boolean(user && user.isAnonymous);
+  const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
+  const isGuest = Boolean(!user || user.isAnonymous);
   const {
     zoom, setZoom, undo, redo, canUndo, canRedo,
     activeSetId, activeScreenId, activeLayerId, getActiveSet,
@@ -137,13 +137,25 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
       const targetScreen = targetSet?.screens.find((s) => s.id === activeScreenId) || targetSet?.screens[0];
 
       if (targetSet && targetScreen) {
+        const targetIndex = targetSet.screens.findIndex((s) => s.id === targetScreen.id);
+        if (targetIndex >= 3 && !isPro) {
+          if (isGuest) {
+            setAuthModalOpen(true);
+            toast.info("Free tier can copy or export up to 3 screens. Sign in to upgrade to Pro for all 10 screens!");
+          } else {
+            setUpgradeModalOpen(true);
+            toast.info("Copying screens beyond screen 3 requires SnapFrame Pro. Upgrade to unlock all 10 screens & master exports!");
+          }
+          return;
+        }
+
         const offscreenCanvas = document.createElement("canvas");
         const { renderScreenToCanvas } = await import("@/lib/renderScreenToCanvas");
         const { useLanguageStore } = await import("@/lib/store/languageStore");
         const activeLang = useLanguageStore.getState().activeLang || "en";
 
         await renderScreenToCanvas(offscreenCanvas, targetScreen, targetSet, {
-          scale: 1,
+          scale: isPro ? 2 : 1,
           activeLang,
           isExport: true,
         });
@@ -156,7 +168,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
           await navigator.clipboard.write([
             new ClipboardItem({ "image/png": blob }),
           ]);
-          toast.success("Active screen copied to clipboard as lossless 4K PNG!");
+          toast.success("Active screen copied to clipboard as PNG!");
           return;
         }
       }

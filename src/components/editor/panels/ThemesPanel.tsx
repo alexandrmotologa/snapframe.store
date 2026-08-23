@@ -34,8 +34,11 @@ const GRADIENT_DIRECTIONS: { id: GradientDirection; label: string; arrow: string
   { id: "to-bl", label: "Diag Left", arrow: "↙" },
 ];
 
+import { useAuthStore } from "@/lib/store/authStore";
+
 export function ThemesPanel() {
   const { themeId, applyThemeToProject, applyCustomThemeToProject, getActiveSet, generateDualThemeSet } = useEditorStore();
+  const { isPro, setUpgradeModalOpen } = useAuthStore();
   const activeSet = getActiveSet();
   const [activeTab, setActiveTab] = useState<"presets" | "custom">("presets");
   const [searchQuery, setSearchQuery] = useState("");
@@ -182,13 +185,21 @@ export function ThemesPanel() {
               <button
                 type="button"
                 onClick={() => {
+                  if (!isPro) {
+                    toast.info("Dual Theme Generation (Light & Dark matching sets) is a SnapFrame Pro feature.");
+                    setUpgradeModalOpen(true);
+                    return;
+                  }
                   const isDark = (activeSet?.name || "").toLowerCase().includes("dark");
                   const targetMode = isDark ? "light" : "dark";
                   generateDualThemeSet(activeSet.id, targetMode);
-                  toast.success(`✨ Created ${targetMode === "dark" ? "Dark" : "Light"} Mode screen set!`);
+                  toast.success(`✨ Generated matching ${targetMode === "dark" ? "Dark" : "Light"} Mode screen set!`);
                 }}
                 className="px-2 py-1 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary text-[10.5px] font-bold border border-primary/30 flex items-center gap-1 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
               >
+                {!isPro && (
+                  <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                )}
                 <span>{(activeSet?.name || "").toLowerCase().includes("dark") ? "☀️ Make Light Set" : "🌙 Make Dark Set"}</span>
               </button>
             </div>

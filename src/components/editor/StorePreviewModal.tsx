@@ -19,6 +19,7 @@ import { ScreenThumbnailCanvas } from "@/components/editor/ScreenThumbnailCanvas
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/lib/store/authStore";
+import { toast } from "@/lib/store/toastStore";
 
 import { isTabletDevice } from "@/lib/devices";
 
@@ -29,7 +30,7 @@ interface StorePreviewModalProps {
 }
 
 export function StorePreviewModal({ open, onOpenChange, appName: initialAppName = "My Awesome App" }: StorePreviewModalProps) {
-  const { user, setAuthModalOpen } = useAuthStore();
+  const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const { screenSets, activeSetId } = useEditorStore();
@@ -38,7 +39,7 @@ export function StorePreviewModal({ open, onOpenChange, appName: initialAppName 
   const currentSet = screenSets.find((s) => s.id === activeSetId) || screenSets[0];
   const [platform, setPlatform] = useState<"ios" | "android">(currentSet?.store || "ios");
   const [deviceType, setDeviceType] = useState<"phone" | "tablet">(
-    currentSet && isTabletDevice(currentSet.deviceId || currentSet.mockup?.device) ? "tablet" : "phone"
+    currentSet && isTabletDevice(currentSet.deviceId || currentSet.mockup?.device) && isPro ? "tablet" : "phone"
   );
   const [storeTheme, setStoreTheme] = useState<"dark" | "light">("dark");
   const [selectedLang, setSelectedLang] = useState<string>(activeLang || "en");
@@ -231,17 +232,27 @@ export function StorePreviewModal({ open, onOpenChange, appName: initialAppName 
               </button>
               <button
                 type="button"
-                onClick={() => setDeviceType("tablet")}
+                onClick={() => {
+                  if (!isPro) {
+                    toast.info("iPad Pro & Android Tablet store simulation is a SnapFrame Pro feature. Upgrade to unlock tablet layouts!");
+                    setUpgradeModalOpen(true);
+                    return;
+                  }
+                  setDeviceType("tablet");
+                }}
                 className={cn(
                   "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
                   deviceType === "tablet"
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 )}
-                title="iPad / Tablet Layout"
+                title={isPro ? "iPad / Tablet Layout" : "iPad / Tablet Layout (SnapFrame Pro)"}
               >
                 <Tablet className="w-3.5 h-3.5" />
                 <span>Tablet</span>
+                {!isPro && (
+                  <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                )}
               </button>
             </div>
 

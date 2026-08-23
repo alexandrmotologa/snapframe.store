@@ -182,15 +182,19 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Up to 3 Projects (Stored locally on your device)</span>
+                  <span>Up to 3 Projects (Stored locally in browser)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Export up to 3 screens per set (1 device platform)</span>
+                  <span>Export up to 3 screens per set (1 platform, 1 language)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Live Store Simulator &amp; App Icon Studio</span>
+                  <span>1-Click Clipboard PNG copy (Screens 1 to 3)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Phone Live Store Simulator &amp; App Icon Studio</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -203,6 +207,10 @@ export default function PricingPage() {
                 <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
+                  <X className="w-4 h-4 shrink-0" />
+                  <span>Dual Theme Generator (Light &amp; Dark matching sets)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-muted-foreground opacity-60">
                   <X className="w-4 h-4 shrink-0" />
@@ -256,11 +264,27 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>1-Click Clipboard PNG copy on all 10 screens</strong></span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>Batch 40+ Language Localization Export</strong> in organized folders</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>Fastlane &amp; Store Listing Metadata Suite</strong> (.txt, .json)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Dual Theme Generator</strong> (1-Click Light &amp; Dark matching sets)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>iPad Pro &amp; Tablet Store Simulator</strong></span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Luxury Mockup Frames</strong> (Clay, Liquid Glass, Neon Glow, Wireframe)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />

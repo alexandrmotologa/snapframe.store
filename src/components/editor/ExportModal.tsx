@@ -101,9 +101,21 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
         return;
       }
 
+      const targetIndex = targetSet.screens.findIndex((s) => s.id === targetScreen.id);
+      if (targetIndex >= 3 && !isPro) {
+        if (isGuest) {
+          setAuthModalOpen(true);
+          toast.info("Free accounts can copy or export up to 3 screens. Sign in with Google or GitHub to upgrade to Pro for all 10 screens!");
+        } else {
+          setUpgradeModalOpen(true);
+          toast.info("Copying screens beyond screen 3 requires SnapFrame Pro. Upgrade to unlock all 10 screens & master exports!");
+        }
+        return;
+      }
+
       const canvas = document.createElement("canvas");
       await renderScreenToCanvas(canvas, targetScreen, targetSet, {
-        scale: 1,
+        scale: isPro ? 2 : 1,
         activeLang: activeLang || "en",
         isExport: true,
       });
@@ -117,7 +129,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
       await navigator.clipboard.write([
         new ClipboardItem({ "image/png": blob }),
       ]);
-      toast.success("Lossless 4K PNG copied to clipboard!");
+      toast.success("Active screen PNG copied to clipboard!");
     } catch (err) {
       toast.error("Clipboard permission not granted by browser.");
     } finally {

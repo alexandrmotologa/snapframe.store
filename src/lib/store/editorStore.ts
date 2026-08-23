@@ -752,6 +752,34 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         };
       });
 
+      const existingIndex = state.screenSets.findIndex(
+        (ss) =>
+          ss.id !== sourceSet.id &&
+          (ss.name.toLowerCase() === newSetName.toLowerCase() ||
+            (ss.store === sourceSet.store && ss.name.toLowerCase().includes(`(${isDark ? "dark" : "light"})`)))
+      );
+
+      if (existingIndex >= 0) {
+        const existingSet = state.screenSets[existingIndex];
+        const updatedSet: import("@/lib/types").ScreenSet = {
+          ...existingSet,
+          name: newSetName,
+          screens: newScreens,
+          mockup: {
+            ...existingSet.mockup,
+            color: isDark ? "black" : "silver",
+          },
+        };
+        const updatedList = [...state.screenSets];
+        updatedList[existingIndex] = updatedSet;
+
+        return {
+          screenSets: updatedList,
+          activeSetId: existingSet.id,
+          activeScreenId: newScreens[0]?.id ?? null,
+        };
+      }
+
       const newScreenSet: import("@/lib/types").ScreenSet = {
         ...clone(sourceSet),
         id: newSetId,

@@ -34,6 +34,9 @@ export const SHADOW_PRESETS_LIST = [
   { id: "none", label: "None (Flat)", desc: "Zero shadow" },
 ];
 
+const PRO_FRAME_STYLES = new Set(["Clay Matte", "Liquid Glass", "Neon Glow", "Minimal Wireframe"]);
+const PRO_SHADOW_PRESETS = new Set(["floating-studio", "hard-isometric", "neon-glow"]);
+
 export const PlatformsPanel = memo(function PlatformsPanel() {
   const {
     screenSets,
@@ -45,7 +48,7 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
     generateDualThemeSet,
   } = useEditorStore();
 
-  const { user, setAuthModalOpen } = useAuthStore();
+  const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
   const [showSimulator, setShowSimulator] = useState(false);
   const [expandedSets, setExpandedSets] = useState<Record<string, boolean>>({});
@@ -151,6 +154,11 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
   };
 
   const handleFrameStyleChange = (setId: string, style: FullBorderStyle) => {
+    if (PRO_FRAME_STYLES.has(style) && !isPro) {
+      toast.info(`${style} frame style requires SnapFrame Pro. Upgrade to unlock luxury mockup styles.`);
+      setUpgradeModalOpen(true);
+      return;
+    }
     if (style === "Borderless") updateMockup(setId, { showFrame: false, squircle: false });
     else if (style === "Minimal") updateMockup(setId, { showFrame: false, squircle: true });
     else if (style === "Flat Frame") updateMockup(setId, { showFrame: true, squircle: false, frameType: "2d" });
@@ -519,7 +527,12 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                                     onClick={() => handleFrameStyleChange(ss.id, item.id)}
                                   >
                                     <div className="flex flex-col min-w-0">
-                                      <span className="font-medium truncate">{item.label}</span>
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="font-medium truncate">{item.label}</span>
+                                        {PRO_FRAME_STYLES.has(item.id) && !isPro && (
+                                          <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">PRO</span>
+                                        )}
+                                      </div>
                                       <span className="text-[9.5px] text-muted-foreground font-normal truncate">{item.desc}</span>
                                     </div>
                                     {activeFrameStyle === item.id && <span className="text-primary text-xs font-bold ml-2">✓</span>}
@@ -550,6 +563,11 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                                     key={item.id}
                                     className="text-xs cursor-pointer flex items-center justify-between py-1.5"
                                     onClick={() => {
+                                      if (PRO_SHADOW_PRESETS.has(item.id) && !isPro) {
+                                        toast.info(`${item.label} requires SnapFrame Pro. Upgrade to unlock deep studio shadows.`);
+                                        setUpgradeModalOpen(true);
+                                        return;
+                                      }
                                       if (item.id === "none") {
                                         updateMockup(ss.id, { showShadow: false, shadowPreset: "none" });
                                       } else {
@@ -559,7 +577,12 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                                     }}
                                   >
                                     <div className="flex flex-col min-w-0">
-                                      <span className="font-medium">{item.label}</span>
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="font-medium">{item.label}</span>
+                                        {PRO_SHADOW_PRESETS.has(item.id) && !isPro && (
+                                          <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">PRO</span>
+                                        )}
+                                      </div>
                                       <span className="text-[9.5px] text-muted-foreground">{item.desc}</span>
                                     </div>
                                     {currentShadowPresetId === item.id && (
@@ -632,13 +655,21 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                           <button
                             type="button"
                             onClick={() => {
+                              if (!isPro) {
+                                toast.info("Dual Theme Generation (Light & Dark matching sets) is a SnapFrame Pro feature.");
+                                setUpgradeModalOpen(true);
+                                return;
+                              }
                               const isDark = (ss.name || "").toLowerCase().includes("dark");
                               const targetMode = isDark ? "light" : "dark";
                               generateDualThemeSet(ss.id, targetMode);
-                              toast.success(`✨ Created ${targetMode === "dark" ? "Dark" : "Light"} Mode dual screen set!`);
+                              toast.success(`✨ Generated matching ${targetMode === "dark" ? "Dark" : "Light"} Mode dual screen set!`);
                             }}
                             className="px-2.5 py-1 rounded-lg bg-secondary/80 hover:bg-secondary text-foreground text-[11px] font-semibold border border-border/60 hover:border-primary/40 flex items-center gap-1 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
                           >
+                            {!isPro && (
+                              <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                            )}
                             <span>{(ss.name || "").toLowerCase().includes("dark") ? "☀️ Create Light Set" : "🌙 Create Dark Set"}</span>
                           </button>
                         </div>
