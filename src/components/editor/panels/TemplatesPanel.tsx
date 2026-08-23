@@ -16,10 +16,9 @@ const CATEGORIES = [
   "All",
   "Pro Niches",
   "10 Screens",
+  "8 Screens",
   "6 Screens",
   "5 Screens",
-  "3 Screens",
-  "1 Screen",
   "Community",
   "Modern",
   "Minimal",
@@ -151,10 +150,9 @@ export function TemplatesPanel() {
       if (category === "All") matchCat = true;
       else if (category === "Pro Niches") matchCat = t.id.startsWith("niche-") || t.tags.some(tag => ["fintech", "crypto", "fitness", "saas", "social", "ecommerce", "meditation"].includes(tag.toLowerCase()));
       else if (category === "10 Screens") matchCat = count === 10;
+      else if (category === "8 Screens") matchCat = count === 8;
       else if (category === "6 Screens") matchCat = count === 6;
       else if (category === "5 Screens") matchCat = count === 5;
-      else if (category === "3 Screens") matchCat = count === 3;
-      else if (category === "1 Screen") matchCat = count === 1;
       else matchCat = t.category.toLowerCase() === category.toLowerCase() || t.tags.some(tag => tag.toLowerCase() === category.toLowerCase());
 
       const q = query.toLowerCase();
