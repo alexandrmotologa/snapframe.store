@@ -30,13 +30,13 @@ const PRO_FEATURES = [
   },
   {
     icon: Sparkles,
-    title: "Dual Theme & Tablet Simulator",
-    desc: "1-Click matching Light & Dark sets, iPad Pro 13\" / Tablet live store preview, and luxury 3D mockup frames.",
+    title: "Custom Canvas, Presets & Mockup Sizing",
+    desc: "Freeform Width × Height canvas sizing, Product Hunt / Twitter / Instagram presets, and custom mockup frame scaling (50%–150%).",
   },
   {
     icon: ImageIcon,
     title: "Pro Niches & Cloud Sync",
-    desc: "Unlimited cloud projects (Firestore) and exclusive templates for Fintech, Crypto, SaaS, Fitness, Dating, and Ecommerce.",
+    desc: "Unlimited cloud projects (Firestore), dual themes, and exclusive templates for Fintech, Crypto, SaaS, Fitness, Dating, and Ecommerce.",
   },
 ];
 

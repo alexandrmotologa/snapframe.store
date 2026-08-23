@@ -61,6 +61,8 @@
 | **Multi-Platform Batch** | 🔒 Sign in required | 1 Platform (e.g. iPhone only) | **Full Multi-Platform ZIP (iOS + iPad + Android + Tablet)** |
 | **Multi-Language Batch** | 🔒 Sign in required | 1 Active Language | **Batch 40+ Languages in organized folders** |
 | **Fastlane & ASO Package** | 🔒 Sign in required | ❌ Not included (raw images only) | **✅ Complete Fastlane (`.txt`, `.json`) suite** |
+| **Custom Canvas & Social Presets** | ❌ Standard store sizes only | Standard store sizes only | **✅ Freeform W × H + Product Hunt / Twitter / IG / Web Presets** |
+| **Mockup Frame Scaling** | 100% Fixed Scale | 100% Fixed Scale | **✅ Custom Mockup Scaling (50% to 150%)** |
 | **Dual Theme Generator** | 🔒 Sign in required | ❌ Not included | **✅ 1-Click matching Light & Dark sets** |
 | **Live Store Simulator** | 🔒 Sign in required | **Phone Simulator (iPhone & Android)** | **Phone & Tablet Simulator (iPad Pro 13" & Tabs)** |
 | **Mockup Frame Styles** | 2D & Titanium standard | 2D & Titanium standard | **All Luxury 3D Frames (Clay, Glass, Neon, Wireframe)** |

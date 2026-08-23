@@ -8,7 +8,7 @@ import { ALL_DEVICES, isTabletDevice, IOS_DEVICES, ANDROID_DEVICES } from "@/lib
 import { AppleStoreIcon, GooglePlayIcon } from "@/components/icons/StoreIcons";
 import {
   CheckCircle2, AlertTriangle, XCircle, ShieldCheck,
-  Smartphone, Tablet, Info, ChevronDown, ChevronUp, Eye, Trash2, Plus, Sparkles, Lock
+  Smartphone, Tablet, Info, ChevronDown, ChevronUp, Eye, Trash2, Plus, Sparkles, Lock, Unlock, Maximize2, Ratio, Sliders
 } from "lucide-react";
 import { Screen, ScreenshotLayer, ImageLayer, ScreenSet } from "@/lib/types";
 import {
@@ -34,6 +34,36 @@ export const SHADOW_PRESETS_LIST = [
   { id: "none", label: "None (Flat)", desc: "Zero shadow" },
 ];
 
+export interface CanvasDimensionPreset {
+  id: string;
+  label: string;
+  desc: string;
+  width: number;
+  height: number;
+  category: "appstore" | "marketing" | "social";
+  isPro?: boolean;
+}
+
+export const CANVAS_PRESETS: CanvasDimensionPreset[] = [
+  // App Store Standards (Free)
+  { id: "iphone-69", label: 'iPhone 6.9"', desc: "1320 × 2868 (iPhone 16/17 Pro Max)", width: 1320, height: 2868, category: "appstore" },
+  { id: "iphone-65", label: 'iPhone 6.5"', desc: "1284 × 2778 (iPhone 14 Plus, 11 Pro Max)", width: 1284, height: 2778, category: "appstore" },
+  { id: "iphone-55", label: 'iPhone 5.5"', desc: "1242 × 2208 (iPhone 8 Plus)", width: 1242, height: 2208, category: "appstore" },
+  { id: "ipad-13", label: 'iPad Pro 13"', desc: "2048 × 2732 (M4 / 12.9\")", width: 2048, height: 2732, category: "appstore" },
+  { id: "android-phone", label: "Android Phone", desc: "1080 × 2400 (Google Play 9:16)", width: 1080, height: 2400, category: "appstore" },
+  { id: "android-tablet", label: "Android Tablet 10\"", desc: "1920 × 1200 (Google Play 16:10)", width: 1920, height: 1200, category: "appstore" },
+
+  // Marketing & Social Media Presets (PRO)
+  { id: "product-hunt", label: "Product Hunt Gallery", desc: "1270 × 760 (Optimal gallery ratio)", width: 1270, height: 760, category: "marketing", isPro: true },
+  { id: "twitter-post", label: "Twitter / X Post", desc: "1200 × 675 (16:9 Landscape)", width: 1200, height: 675, category: "social", isPro: true },
+  { id: "instagram-square", label: "Instagram Post (1:1)", desc: "1080 × 1080 (Square feed)", width: 1080, height: 1080, category: "social", isPro: true },
+  { id: "instagram-portrait", label: "Instagram Portrait (4:5)", desc: "1080 × 1350 (Vertical post)", width: 1080, height: 1350, category: "social", isPro: true },
+  { id: "story-tiktok", label: "Story / TikTok / Reels", desc: "1080 × 1920 (9:16 Vertical)", width: 1080, height: 1920, category: "social", isPro: true },
+  { id: "linkedin-banner", label: "LinkedIn Post", desc: "1200 × 627 (1.91:1 Feed)", width: 1200, height: 627, category: "social", isPro: true },
+  { id: "web-hero", label: "Web Hero (16:9 HD)", desc: "1920 × 1080 (Landing page hero)", width: 1920, height: 1080, category: "marketing", isPro: true },
+  { id: "4k-ultra-wide", label: "4K Ultra-HD Banner", desc: "3840 × 2160 (Lossless 4K)", width: 3840, height: 2160, category: "marketing", isPro: true },
+];
+
 const PRO_FRAME_STYLES = new Set(["Clay Matte", "Liquid Glass", "Neon Glow", "Minimal Wireframe"]);
 const PRO_SHADOW_PRESETS = new Set(["floating-studio", "hard-isometric", "neon-glow"]);
 
@@ -45,6 +75,8 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
     removeScreenSet,
     updateMockup,
     updateDevice,
+    setCustomScreenDimensions,
+    setMockupScale,
     generateDualThemeSet,
   } = useEditorStore();
 
@@ -52,6 +84,7 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
   const isGuest = Boolean(!user || user.isAnonymous);
   const [showSimulator, setShowSimulator] = useState(false);
   const [expandedSets, setExpandedSets] = useState<Record<string, boolean>>({});
+  const [customSizes, setCustomSizes] = useState<Record<string, { width: number; height: number; lock: boolean }>>({});
 
   const toggleExpand = (id: string) => {
     setExpandedSets((prev) => ({
@@ -169,6 +202,52 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
     else if (style === "Neon Glow") updateMockup(setId, { showFrame: true, squircle: false, frameType: "neon" });
     else if (style === "Minimal Wireframe") updateMockup(setId, { showFrame: true, squircle: false, frameType: "wireframe" });
     useEditorStore.getState().recordHistory();
+  };
+
+  const handleCustomWidthChange = (setId: string, val: number, currentW: number, currentH: number) => {
+    const isLocked = customSizes[setId]?.lock ?? true;
+    const ratio = currentH / (currentW || 1);
+    const newW = val;
+    const newH = isLocked ? Math.round(newW * ratio) : (customSizes[setId]?.height ?? currentH);
+    setCustomSizes((prev) => ({
+      ...prev,
+      [setId]: { width: newW, height: newH, lock: isLocked },
+    }));
+  };
+
+  const handleCustomHeightChange = (setId: string, val: number, currentW: number, currentH: number) => {
+    const isLocked = customSizes[setId]?.lock ?? true;
+    const ratio = currentW / (currentH || 1);
+    const newH = val;
+    const newW = isLocked ? Math.round(newH * ratio) : (customSizes[setId]?.width ?? currentW);
+    setCustomSizes((prev) => ({
+      ...prev,
+      [setId]: { width: newW, height: newH, lock: isLocked },
+    }));
+  };
+
+  const toggleRatioLock = (setId: string, currentW: number, currentH: number) => {
+    const currentLock = customSizes[setId]?.lock ?? true;
+    setCustomSizes((prev) => ({
+      ...prev,
+      [setId]: {
+        width: prev[setId]?.width ?? currentW,
+        height: prev[setId]?.height ?? currentH,
+        lock: !currentLock,
+      },
+    }));
+  };
+
+  const handleApplyCustomDimensions = (setId: string, currentW: number, currentH: number) => {
+    if (!isPro) {
+      toast.info("Custom Canvas Dimensions (Freeform Width × Height) is a SnapFrame Pro feature. Upgrade to unlock custom canvas sizes!");
+      setUpgradeModalOpen(true);
+      return;
+    }
+    const targetW = customSizes[setId]?.width ?? currentW;
+    const targetH = customSizes[setId]?.height ?? currentH;
+    setCustomScreenDimensions(setId, targetW, targetH);
+    toast.success(`✨ Applied custom canvas resolution: ${targetW} × ${targetH} px`);
   };
 
   return (
@@ -505,6 +584,138 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                           </DropdownMenu>
                         </div>
 
+                        {/* Canvas Resolution & Preset Selector */}
+                        <div className="flex items-center justify-between pt-1.5 text-[11px]">
+                          <span className="text-muted-foreground flex items-center gap-1.5">
+                            <Ratio className="w-3 h-3 text-muted-foreground shrink-0" />
+                            Canvas Resolution
+                          </span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="flex items-center gap-1 px-2 py-0.5 rounded-lg border border-border/60 bg-secondary/60 hover:bg-secondary text-[11px] font-medium text-foreground transition-colors outline-none cursor-pointer max-w-44">
+                              <span className="truncate">{ss.preset?.name || `${ss.preset?.width} × ${ss.preset?.height}`}</span>
+                              <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-64 max-h-80 overflow-y-auto">
+                              <DropdownMenuGroup>
+                                <DropdownMenuLabel className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                                  App Store Standards (Free)
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {CANVAS_PRESETS.filter((p) => p.category === "appstore").map((p) => (
+                                  <DropdownMenuItem
+                                    key={p.id}
+                                    className={cn("text-xs cursor-pointer", ss.preset?.width === p.width && ss.preset?.height === p.height && "text-primary font-bold bg-primary/5")}
+                                    onClick={() => {
+                                      setCustomScreenDimensions(ss.id, p.width, p.height, p.label);
+                                      toast.success(`Applied ${p.label} (${p.width} × ${p.height})`);
+                                    }}
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-medium truncate">{p.label}</p>
+                                      <p className="text-[10px] text-muted-foreground font-mono">{p.width} × {p.height}</p>
+                                    </div>
+                                    {ss.preset?.width === p.width && ss.preset?.height === p.height && <span className="text-primary ml-1">✓</span>}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuGroup>
+
+                              <DropdownMenuSeparator className="my-1.5" />
+
+                              <DropdownMenuGroup>
+                                <div className="flex items-center justify-between px-2 py-1.5">
+                                  <DropdownMenuLabel className="text-[10px] text-indigo-400 uppercase font-bold tracking-wider p-0">
+                                    Social &amp; Marketing Presets
+                                  </DropdownMenuLabel>
+                                  <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                                </div>
+                                <DropdownMenuSeparator />
+                                {CANVAS_PRESETS.filter((p) => p.category === "social" || p.category === "marketing").map((p) => (
+                                  <DropdownMenuItem
+                                    key={p.id}
+                                    className={cn("text-xs cursor-pointer flex items-center justify-between", ss.preset?.width === p.width && ss.preset?.height === p.height && "text-primary font-bold bg-primary/5")}
+                                    onClick={() => {
+                                      if (!isPro) {
+                                        toast.info(`${p.label} requires SnapFrame Pro. Upgrade to unlock social media presets & custom canvas sizing!`);
+                                        setUpgradeModalOpen(true);
+                                        return;
+                                      }
+                                      setCustomScreenDimensions(ss.id, p.width, p.height, p.label);
+                                      toast.success(`Applied ${p.label} (${p.width} × ${p.height})`);
+                                    }}
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1.5">
+                                        <p className="font-medium truncate">{p.label}</p>
+                                        {!isPro && <span className="text-[8.5px] px-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>}
+                                      </div>
+                                      <p className="text-[10px] text-muted-foreground font-mono">{p.width} × {p.height}</p>
+                                    </div>
+                                    {ss.preset?.width === p.width && ss.preset?.height === p.height && <span className="text-primary ml-1">✓</span>}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        {/* Custom Freeform Width & Height Input Box (PRO) */}
+                        <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/50 space-y-2 mt-1">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold text-foreground flex items-center gap-1.5">
+                              <Maximize2 className="w-3 h-3 text-primary" />
+                              <span>Custom Size (W × H)</span>
+                            </span>
+                            {!isPro && (
+                              <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-5 gap-1.5 items-center text-xs">
+                            <div className="col-span-2 space-y-0.5">
+                              <label className="text-[9.5px] text-muted-foreground font-mono">Width</label>
+                              <input
+                                type="number"
+                                min={400}
+                                max={6000}
+                                value={customSizes[ss.id]?.width ?? ss.preset?.width ?? 1290}
+                                onChange={(e) => handleCustomWidthChange(ss.id, parseInt(e.target.value) || 1290, ss.preset?.width || 1290, ss.preset?.height || 2796)}
+                                className="w-full px-2 py-1 rounded-lg bg-background border border-border/60 text-foreground text-xs font-mono focus:border-primary focus:outline-none"
+                              />
+                            </div>
+                            <div className="col-span-1 flex flex-col items-center justify-end pb-0.5">
+                              <button
+                                type="button"
+                                onClick={() => toggleRatioLock(ss.id, ss.preset?.width || 1290, ss.preset?.height || 2796)}
+                                className={cn(
+                                  "w-6 h-6 rounded-md flex items-center justify-center border transition-colors cursor-pointer",
+                                  (customSizes[ss.id]?.lock ?? true) ? "bg-primary/10 border-primary text-primary" : "bg-background border-border/60 text-muted-foreground"
+                                )}
+                                title={(customSizes[ss.id]?.lock ?? true) ? "Aspect ratio locked" : "Aspect ratio unlocked"}
+                              >
+                                {(customSizes[ss.id]?.lock ?? true) ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                              </button>
+                            </div>
+                            <div className="col-span-2 space-y-0.5">
+                              <label className="text-[9.5px] text-muted-foreground font-mono">Height</label>
+                              <input
+                                type="number"
+                                min={400}
+                                max={6000}
+                                value={customSizes[ss.id]?.height ?? ss.preset?.height ?? 2796}
+                                onChange={(e) => handleCustomHeightChange(ss.id, parseInt(e.target.value) || 2796, ss.preset?.width || 1290, ss.preset?.height || 2796)}
+                                className="w-full px-2 py-1 rounded-lg bg-background border border-border/60 text-foreground text-xs font-mono focus:border-primary focus:outline-none"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleApplyCustomDimensions(ss.id, ss.preset?.width || 1290, ss.preset?.height || 2796)}
+                            className="w-full py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95"
+                          >
+                            {!isPro && <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>}
+                            <span>Apply Custom Dimensions</span>
+                          </button>
+                        </div>
+
                         {/* Frame Style Control */}
                         <div className="flex items-center justify-between pt-1.5 text-[11px]">
                           <span className="text-muted-foreground flex items-center gap-1.5">
@@ -541,6 +752,41 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                               </DropdownMenuGroup>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                        </div>
+
+                        {/* Mockup Frame Scaling Slider (PRO) */}
+                        <div className="space-y-1 pt-1.5 border-t border-border/40">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                              <Sliders className="w-3 h-3 text-muted-foreground shrink-0" />
+                              Mockup Frame Scale
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-foreground font-mono font-medium text-[10.5px]">
+                                {Math.round((ss.mockup?.scale || 1) * 100)}%
+                              </span>
+                              {!isPro && (
+                                <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                              )}
+                            </div>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.5"
+                            max="1.5"
+                            step="0.05"
+                            value={ss.mockup?.scale || 1}
+                            onChange={(e) => {
+                              if (!isPro) {
+                                toast.info("Custom Mockup Scaling (50%–150%) is a SnapFrame Pro feature.");
+                                setUpgradeModalOpen(true);
+                                return;
+                              }
+                              const scaleVal = parseFloat(e.target.value);
+                              setMockupScale(ss.id, scaleVal);
+                            }}
+                            className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+                          />
                         </div>
 
                         {/* Device Shadow Dropdown */}

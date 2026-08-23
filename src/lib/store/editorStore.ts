@@ -86,10 +86,11 @@ interface EditorStore {
   updateLayerLocalization: (setId: string, screenId: string, layerId: string, langCode: string, content: string) => void;
   clearLayerLocalization: (setId: string, screenId: string, layerId: string, langCode: string) => void;
 
-  // Actions: mockup
+  // Actions: mockup & device
   updateMockup: (setId: string, updates: Partial<MockupSettings>) => void;
-  // Actions: device
   updateDevice: (setId: string, deviceId: string) => void;
+  setCustomScreenDimensions: (setId: string, width: number, height: number, label?: string) => void;
+  setMockupScale: (setId: string, scale: number) => void;
   setThemeId: (themeId: ThemeId) => void;
   applyThemeToProject: (themeId: ThemeId) => void;
   applyCustomThemeToProject: (palette: { bg: string; fg: string; gradient?: Background["gradient"] }) => void;
@@ -935,6 +936,119 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       }),
     }));
 
+    get().recordHistory();
+  },
+
+  setCustomScreenDimensions: (setId, width, height, label) => {
+    const clampedW = Math.max(400, Math.min(6000, Math.round(width)));
+    const clampedH = Math.max(400, Math.min(6000, Math.round(height)));
+
+    set((state) => ({
+      screenSets: state.screenSets.map((ss) => {
+        if (ss.id !== setId) return ss;
+        const oldW = ss.preset.width || 1290;
+        const oldH = ss.preset.height || 2796;
+        const newW = clampedW;
+        const newH = clampedH;
+
+        if (oldW === newW && oldH === newH) return ss;
+
+        const scaleX = newW / oldW;
+        const scaleY = newH / oldH;
+        const scaleAvg = (scaleX + scaleY) / 2;
+
+        const updatedScreens: Screen[] = ss.screens.map((screen) => {
+          return {
+            ...screen,
+            width: newW,
+            height: newH,
+            layers: screen.layers.map((layer) => {
+              const base = {
+                ...layer,
+                x: Math.round(layer.x * scaleX),
+                y: Math.round(layer.y * scaleY),
+                width: Math.round(layer.width * scaleX),
+                height: Math.round(layer.height * scaleY),
+              };
+              if (layer.type === "text") {
+                return { ...base, fontSize: Math.round((layer.fontSize || 56) * scaleAvg) } as Layer;
+              }
+              if (layer.type === "shape") {
+                return {
+                  ...base,
+                  cornerRadius: layer.cornerRadius !== undefined ? Math.round(layer.cornerRadius * scaleAvg) : undefined,
+                  strokeWidth: layer.strokeWidth !== undefined ? Math.round(layer.strokeWidth * scaleAvg) : undefined,
+                } as Layer;
+              }
+              if (layer.type === "image") {
+                return {
+                  ...base,
+                  cornerRadius: Math.round((layer.cornerRadius || 0) * scaleAvg),
+                } as Layer;
+              }
+              return base as Layer;
+            }),
+          };
+        });
+
+        const customName = label || `Custom (${newW} × ${newH})`;
+
+        return {
+          ...ss,
+          preset: {
+            ...ss.preset,
+            width: newW,
+            height: newH,
+            name: customName,
+          },
+          screens: updatedScreens,
+        };
+      }),
+    }));
+
+    get().recordHistory();
+  },
+
+  setMockupScale: (setId, scale) => {
+    const clampedScale = Math.max(0.4, Math.min(2.0, Number(scale.toFixed(2))));
+    set((state) => ({
+      screenSets: state.screenSets.map((ss) => {
+        if (ss.id !== setId) return ss;
+        const currentScale = ss.mockup?.scale || 1;
+        if (currentScale === clampedScale) return ss;
+
+        const ratio = clampedScale / currentScale;
+
+        const updatedScreens = ss.screens.map((screen) => ({
+          ...screen,
+          layers: screen.layers.map((l) => {
+            if (l.type === "screenshot") {
+              const cx = l.x + l.width / 2;
+              const cy = l.y + l.height / 2;
+              const nw = Math.round(l.width * ratio);
+              const nh = Math.round(l.height * ratio);
+              return {
+                ...l,
+                width: nw,
+                height: nh,
+                x: Math.round(cx - nw / 2),
+                y: Math.round(cy - nh / 2),
+              };
+            }
+            return l;
+          }),
+        }));
+
+        return {
+          ...ss,
+          mockup: {
+            ...ss.mockup,
+            scale: clampedScale,
+          },
+          screens: updatedScreens,
+        };
+      }),
+    }));
     get().recordHistory();
   },
 

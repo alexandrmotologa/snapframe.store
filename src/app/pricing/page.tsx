@@ -264,6 +264,18 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Custom Canvas Dimensions &amp; Freeform W × H</strong></span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Social Media Presets</strong> (Product Hunt, Twitter, Instagram 1:1, Web Hero)</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span><strong>Mockup Frame Scaling (50%–150%)</strong> &amp; Luxury 3D Frames</span>
+                </div>
+                <div className="flex items-center gap-2.5 text-foreground font-medium">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>1-Click Clipboard PNG copy on all 10 screens</strong></span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
@@ -284,10 +296,6 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>Luxury Mockup Frames</strong> (Clay, Liquid Glass, Neon Glow, Wireframe)</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>Unlimited Projects &amp; Multi-Device Cloud Sync</strong> (Firestore)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
@@ -297,10 +305,6 @@ export default function PricingPage() {
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span><strong>4K Lossless Ultra-HD Master Exports</strong> (Pixel-perfect 3x/4K)</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span><strong>All 6+ Pro Industry Niche Templates &amp; Metallic Presets</strong></span>
                 </div>
               </div>
             </div>
