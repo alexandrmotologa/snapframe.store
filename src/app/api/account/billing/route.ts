@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, isAdminConfigured } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/serverAuth";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 
 export interface CreditLogEntry {
   id: string;
@@ -14,6 +15,12 @@ export interface CreditLogEntry {
 
 export async function GET(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateLimit = checkRateLimit(`billing:${ip}`, { limit: 60, windowMs: 60000, keyPrefix: "billing" });
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+    }
+
     const authResult = await verifyAuth(req);
     if (!authResult.success) {
       return authResult.response;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runAIWithFallbacks, GeneratedScreenStory } from "@/lib/ai/aiService";
+import { parseAIJson } from "@/lib/ai/parseAIJson";
 import { authorizeAIRequest } from "@/lib/serverAuth";
 
 export async function POST(req: NextRequest) {
@@ -14,6 +15,10 @@ export async function POST(req: NextRequest) {
 
     if (!screens || !Array.isArray(screens) || screens.length === 0) {
       return NextResponse.json({ error: "Screens array is required" }, { status: 400 });
+    }
+
+    if (screens.length > 10) {
+      return NextResponse.json({ error: "Cannot process more than 10 screens at once" }, { status: 400 });
     }
 
     // Convert images if provided as base64
@@ -55,17 +60,7 @@ Return a JSON object with this exact structure:
 
     const rawResponse = await runAIWithFallbacks(prompt, imagesBase64.length > 0 ? imagesBase64 : undefined, true);
     
-    let parsed: { screens: GeneratedScreenStory[] };
-    try {
-      parsed = JSON.parse(rawResponse);
-    } catch {
-      const match = rawResponse.match(/\{[\s\S]*\}/);
-      if (match) {
-        parsed = JSON.parse(match[0]);
-      } else {
-        throw new Error("Could not parse AI response as JSON");
-      }
-    }
+    const parsed = parseAIJson<{ screens: GeneratedScreenStory[] }>(rawResponse, { screens: [] });
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runAIWithFallbacks, trimToLimit } from "@/lib/ai/aiService";
+import { parseAIJson } from "@/lib/ai/parseAIJson";
 import { authorizeAIRequest } from "@/lib/serverAuth";
 
 export async function POST(req: NextRequest) {
@@ -66,20 +67,10 @@ Return a valid JSON object matching this structure:
 
     const rawResponse = await runAIWithFallbacks(prompt, undefined, true);
     
-    let parsed: {
+    const parsed = parseAIJson<{
       ios?: Record<string, string>;
       android?: Record<string, string>;
-    };
-    try {
-      parsed = JSON.parse(rawResponse);
-    } catch {
-      const match = rawResponse.match(/\{[\s\S]*\}/);
-      if (match) {
-        parsed = JSON.parse(match[0]);
-      } else {
-        throw new Error("Could not parse AI response as JSON");
-      }
-    }
+    }>(rawResponse, {});
 
     // Apply strict character limits
     if (parsed.ios) {

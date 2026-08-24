@@ -16,6 +16,7 @@ import { getFirebaseAuth } from "@/lib/firebase";
 import { toast } from "@/lib/store/toastStore";
 import { verifyAndSyncUserEnvironment } from "@/lib/authEnvironment";
 import { syncProjectsOnLogin, stopCloudSync } from "@/lib/cloudProjectSync";
+import { DEFAULT_FREE_AI_CREDITS } from "@/lib/constants";
 
 interface AuthState {
   user: User | any | null;
@@ -42,6 +43,95 @@ interface AuthState {
   signOutUser: () => Promise<void>;
   consumeAiCredit: (feature?: string) => Promise<{ allowed: boolean; remaining: number; isPro: boolean }>;
   setProStatus: (isPro: boolean, plan?: string) => void;
+}
+
+async function handleProviderAuth(
+  providerName: "google" | "github",
+  mode: "signIn" | "link",
+  set: any,
+  get: any
+): Promise<User | null> {
+  try {
+    set({ isLoading: true, authError: null });
+    const { auth, googleProvider, githubProvider } = await getFirebaseAuth();
+    const provider = providerName === "google" ? googleProvider : githubProvider;
+
+    if (!auth || !provider) {
+      const errMsg = "Firebase Auth credentials not found. Please check .env configuration.";
+      set({ authError: errMsg, isLoading: false });
+      toast.error(errMsg);
+      return null;
+    }
+
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch {}
+
+    const currentUser = auth.currentUser;
+    const isLinking = mode === "link" && currentUser && currentUser.isAnonymous;
+
+    try {
+      const result = isLinking
+        ? await linkWithPopup(currentUser, provider)
+        : await signInWithPopup(auth, provider);
+
+      const verification = await verifyAndSyncUserEnvironment(result.user);
+      if (!verification.allowed) {
+        await signOut(auth);
+        const err = verification.error || "This account is not allowed on this environment.";
+        set({ user: null, isAuthModalOpen: true, isLoading: false, authError: err });
+        toast.error(err);
+        return null;
+      }
+
+      set({
+        user: result.user,
+        isAuthModalOpen: false,
+        isLoading: false,
+        authError: null,
+        isPro: Boolean(verification.isPro),
+        plan: verification.plan || null,
+        subscriptionStatus: verification.subscriptionStatus || null,
+        aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : DEFAULT_FREE_AI_CREDITS,
+        usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
+      });
+
+      const welcomeName = result.user.displayName || result.user.email || (providerName === "github" ? "Developer" : "Creator");
+      toast.success(isLinking ? `Account linked! Welcome, ${welcomeName}!` : `Welcome, ${welcomeName}!`);
+      return result.user;
+    } catch (popupErr: any) {
+      if (popupErr.code === "auth/credential-already-in-use" && isLinking) {
+        return await handleProviderAuth(providerName, "signIn", set, get);
+      }
+      if (popupErr.code === "auth/popup-blocked") {
+        if (isLinking) {
+          await linkWithRedirect(currentUser, provider);
+        } else {
+          await signInWithRedirect(auth, provider);
+        }
+        return null;
+      }
+      throw popupErr;
+    }
+  } catch (error: any) {
+    if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
+      set({ isLoading: false, isAuthModalOpen: false, authError: null });
+      return null;
+    }
+
+    let message = error.message || `Failed to authenticate with ${providerName === "google" ? "Google" : "GitHub"}`;
+    if (error.code === "auth/account-exists-with-different-credential") {
+      message = "An account already exists with this email address.";
+    } else if (error.code === "auth/configuration-not-found" || error.code === "auth/operation-not-allowed") {
+      message = `${providerName === "google" ? "Google" : "GitHub"} Sign-In is not enabled yet in Firebase Console.`;
+    } else if (error.code === "auth/unauthorized-domain") {
+      message = "This domain is not authorized in Firebase Console.";
+    }
+
+    set({ authError: message, isLoading: false });
+    toast.error(message);
+    return null;
+  }
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {
@@ -246,154 +336,11 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     signInWithGoogle: async () => {
-      try {
-        set({ isLoading: true, authError: null });
-        const { auth, googleProvider } = await getFirebaseAuth();
-
-        if (!auth || !googleProvider) {
-          const errMsg = "Firebase Auth credentials not found. Please check .env configuration.";
-          set({ authError: errMsg, isLoading: false });
-          toast.error(errMsg);
-          return null;
-        }
-
-        try {
-          await setPersistence(auth, browserLocalPersistence);
-        } catch {}
-
-        try {
-          console.log("[Auth] Starting Google authentication...");
-          const result = await signInWithPopup(auth, googleProvider);
-          console.log("[Auth] Google Sign-in Success:", result.user);
-
-          // Environment validation & automatic user registration in Firestore
-          const verification = await verifyAndSyncUserEnvironment(result.user);
-          if (!verification.allowed) {
-            await signOut(auth);
-            const err = verification.error || "This account is not allowed on this environment.";
-            set({ user: null, isAuthModalOpen: true, isLoading: false, authError: err });
-            toast.error(err);
-            return null;
-          }
-
-          set({
-            user: result.user,
-            isAuthModalOpen: false,
-            isLoading: false,
-            authError: null,
-            isPro: Boolean(verification.isPro),
-            plan: verification.plan || null,
-            subscriptionStatus: verification.subscriptionStatus || null,
-            aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : 3,
-            usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
-          });
-          toast.success(`Welcome, ${result.user.displayName || result.user.email || "Creator"}!`);
-          return result.user;
-        } catch (popupErr: any) {
-          // If popup is blocked by browser, seamlessly fallback to redirect
-          if (popupErr.code === "auth/popup-blocked") {
-            console.log("[Auth] Popup blocked, falling back to redirect...");
-            await signInWithRedirect(auth, googleProvider);
-            return null;
-          }
-          throw popupErr;
-        }
-      } catch (error: any) {
-        console.error("Google Sign-In Error details:", error);
-
-        // When popup is closed by user, smoothly reset state
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          set({ isLoading: false, isAuthModalOpen: false, authError: null });
-          return null;
-        }
-
-        let message = error.message || "Failed to sign in with Google";
-        if (error.code === "auth/account-exists-with-different-credential") {
-          message = "An account already exists with this email address.";
-        } else if (error.code === "auth/configuration-not-found" || error.code === "auth/operation-not-allowed") {
-          message = "Google Sign-In is not enabled yet in Firebase Console.";
-        } else if (error.code === "auth/unauthorized-domain") {
-          message = "This domain is not authorized in Firebase Console.";
-        }
-
-        set({ authError: message, isLoading: false });
-        toast.error(message);
-        return null;
-      }
+      return await handleProviderAuth("google", "signIn", set, get);
     },
 
     signInWithGithub: async () => {
-      try {
-        set({ isLoading: true, authError: null });
-        const { auth, githubProvider } = await getFirebaseAuth();
-
-        if (!auth || !githubProvider) {
-          const errMsg = "Firebase Auth credentials not found. Please check .env configuration.";
-          set({ authError: errMsg, isLoading: false });
-          toast.error(errMsg);
-          return null;
-        }
-
-        try {
-          await setPersistence(auth, browserLocalPersistence);
-        } catch {}
-
-        try {
-          console.log("[Auth] Starting GitHub authentication...");
-          const result = await signInWithPopup(auth, githubProvider);
-          console.log("[Auth] GitHub Sign-in Success:", result.user);
-
-          // Environment validation & automatic user registration in Firestore
-          const verification = await verifyAndSyncUserEnvironment(result.user);
-          if (!verification.allowed) {
-            await signOut(auth);
-            const err = verification.error || "This account is not allowed on this environment.";
-            set({ user: null, isAuthModalOpen: true, isLoading: false, authError: err });
-            toast.error(err);
-            return null;
-          }
-
-          set({
-            user: result.user,
-            isAuthModalOpen: false,
-            isLoading: false,
-            authError: null,
-            isPro: Boolean(verification.isPro),
-            plan: verification.plan || null,
-            subscriptionStatus: verification.subscriptionStatus || null,
-            aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : 3,
-            usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
-          });
-          toast.success(`Welcome, ${result.user.displayName || "Developer"}!`);
-          return result.user;
-        } catch (popupErr: any) {
-          // If popup is blocked by browser, seamlessly fallback to redirect
-          if (popupErr.code === "auth/popup-blocked") {
-            console.log("[Auth] Popup blocked, falling back to redirect...");
-            await signInWithRedirect(auth, githubProvider);
-            return null;
-          }
-          throw popupErr;
-        }
-      } catch (error: any) {
-        console.error("GitHub Sign-In Error details:", error);
-
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          set({ isLoading: false, isAuthModalOpen: false, authError: null });
-          return null;
-        }
-
-        let message = error.message || "Failed to sign in with GitHub";
-        if (error.code === "auth/configuration-not-found" || error.code === "auth/operation-not-allowed") {
-          message = "GitHub Sign-In is not enabled yet in Firebase Console.";
-        } else if (error.code === "auth/unauthorized-domain") {
-          message = "This domain is not authorized in Firebase Console.";
-        }
-
-        set({ authError: message, isLoading: false });
-        toast.error(message);
-        return null;
-      }
+      return await handleProviderAuth("github", "signIn", set, get);
     },
 
     signInAnonymous: async () => {
@@ -440,123 +387,11 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     linkWithGoogle: async () => {
-      try {
-        set({ isLoading: true, authError: null });
-        const { auth, googleProvider } = await getFirebaseAuth();
-        if (!auth || !googleProvider) {
-          const errMsg = "Firebase Auth credentials not found.";
-          set({ authError: errMsg, isLoading: false });
-          toast.error(errMsg);
-          return null;
-        }
-
-        if (auth.currentUser && auth.currentUser.isAnonymous) {
-          try {
-            const result = await linkWithPopup(auth.currentUser, googleProvider);
-            const verification = await verifyAndSyncUserEnvironment(result.user);
-            if (!verification.allowed) {
-              await signOut(auth);
-              const err = verification.error || "Account environment mismatch.";
-              set({ user: null, isAuthModalOpen: true, isLoading: false, authError: err });
-              toast.error(err);
-              return null;
-            }
-            set({
-              user: result.user,
-              isAuthModalOpen: false,
-              isLoading: false,
-              authError: null,
-              isPro: Boolean(verification.isPro),
-              plan: verification.plan || null,
-              subscriptionStatus: verification.subscriptionStatus || null,
-              aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : 3,
-              usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
-            });
-            toast.success(`Account linked! Welcome, ${result.user.displayName || "Creator"}!`);
-            return result.user;
-          } catch (linkErr: any) {
-            if (linkErr.code === "auth/credential-already-in-use") {
-              // Account exists -> sign in directly
-              return await get().signInWithGoogle();
-            }
-            if (linkErr.code === "auth/popup-blocked") {
-              await linkWithRedirect(auth.currentUser, googleProvider);
-              return null;
-            }
-            throw linkErr;
-          }
-        }
-        return await get().signInWithGoogle();
-      } catch (error: any) {
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          set({ isLoading: false, isAuthModalOpen: false, authError: null });
-          return null;
-        }
-        const message = error.message || "Failed to link Google account";
-        set({ authError: message, isLoading: false });
-        toast.error(message);
-        return null;
-      }
+      return await handleProviderAuth("google", "link", set, get);
     },
 
     linkWithGithub: async () => {
-      try {
-        set({ isLoading: true, authError: null });
-        const { auth, githubProvider } = await getFirebaseAuth();
-        if (!auth || !githubProvider) {
-          const errMsg = "Firebase Auth credentials not found.";
-          set({ authError: errMsg, isLoading: false });
-          toast.error(errMsg);
-          return null;
-        }
-
-        if (auth.currentUser && auth.currentUser.isAnonymous) {
-          try {
-            const result = await linkWithPopup(auth.currentUser, githubProvider);
-            const verification = await verifyAndSyncUserEnvironment(result.user);
-            if (!verification.allowed) {
-              await signOut(auth);
-              const err = verification.error || "Account environment mismatch.";
-              set({ user: null, isAuthModalOpen: true, isLoading: false, authError: err });
-              toast.error(err);
-              return null;
-            }
-            set({
-              user: result.user,
-              isAuthModalOpen: false,
-              isLoading: false,
-              authError: null,
-              isPro: Boolean(verification.isPro),
-              plan: verification.plan || null,
-              subscriptionStatus: verification.subscriptionStatus || null,
-              aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : 3,
-              usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
-            });
-            toast.success(`Account linked! Welcome, ${result.user.displayName || "Developer"}!`);
-            return result.user;
-          } catch (linkErr: any) {
-            if (linkErr.code === "auth/credential-already-in-use") {
-              // Account exists -> sign in directly
-              return await get().signInWithGithub();
-            }
-            if (linkErr.code === "auth/popup-blocked") {
-              await linkWithRedirect(auth.currentUser, githubProvider);
-              return null;
-            }
-            throw linkErr;
-          }
-        }
-        return await get().signInWithGithub();
-      } catch (error: any) {
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          set({ isLoading: false, isAuthModalOpen: false, authError: null });
-          return null;
-        }
-        const message = error.message || "Failed to link GitHub account";
-        set({ authError: message, isLoading: false });
-        toast.error(message);
-        return null;
-      }
+      return await handleProviderAuth("github", "link", set, get);
     },
 
     signOutUser: async () => {

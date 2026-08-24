@@ -6,6 +6,49 @@ import { BASE_TEMPLATES, BLANK_TEMPLATE } from "@/lib/templates";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { saveProjectToCloud, saveProjectToCloudDebounced, deleteProjectFromCloud } from "@/lib/cloudProjectSync";
+import { FREE_MAX_PROJECTS } from "@/lib/constants";
+
+/** Enforces project limits based on user auth tier */
+function enforceProjectLimit(currentCount: number) {
+  const { isPro, user, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore.getState();
+  const isGuest = Boolean(!user || user.isAnonymous);
+
+  if (isGuest && currentCount >= 1) {
+    setAuthModalOpen(true);
+    toast.info("Guest mode is limited to 1 active project. Sign in free with Google or GitHub to create up to 3 projects!");
+    throw new Error("Guest project limit reached (1 max).");
+  }
+
+  if (!isPro && currentCount >= FREE_MAX_PROJECTS) {
+    setUpgradeModalOpen(true);
+    toast.info(`Free plan includes up to ${FREE_MAX_PROJECTS} local projects. Upgrade to SnapFrame Pro for unlimited projects & multi-device cloud sync!`);
+    throw new Error(`Free project limit reached (${FREE_MAX_PROJECTS} max).`);
+  }
+}
+
+/** Syncs a project to cloud if the user is an active Pro subscriber */
+function syncProjectIfPro(project: Project, debounced = false) {
+  try {
+    const { isPro, user } = useAuthStore.getState();
+    if (isPro && user?.uid) {
+      if (debounced) {
+        saveProjectToCloudDebounced(user.uid, project);
+      } else {
+        saveProjectToCloud(user.uid, project);
+      }
+    }
+  } catch {}
+}
+
+/** Deletes a project from cloud if the user is an active Pro subscriber */
+function deleteProjectIfPro(projectId: string) {
+  try {
+    const { isPro, user } = useAuthStore.getState();
+    if (isPro && user?.uid) {
+      deleteProjectFromCloud(user.uid, projectId);
+    }
+  } catch {}
+}
 
 interface ProjectStore {
   projects: Project[];
@@ -135,24 +178,8 @@ export const useProjectStore = create<ProjectStore>()(
           });
         }
 
-        // Project limit check: 1 for Guest, 3 for Free Registered, Unlimited for Pro
-        try {
-          const { isPro, user, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore.getState();
-          const isGuest = Boolean(!user || user.isAnonymous);
-          if (isGuest && get().projects.length >= 1) {
-            setAuthModalOpen(true);
-            toast.info("Guest mode is limited to 1 active project. Sign in free with Google or GitHub to create up to 3 projects!");
-            throw new Error("Guest project limit reached (1 max).");
-          }
-          if (!isPro && get().projects.length >= 3) {
-            setUpgradeModalOpen(true);
-            toast.info("Free plan includes up to 3 local projects. Upgrade to SnapFrame Pro for unlimited projects & multi-device cloud sync!");
-            throw new Error("Free project limit reached (3 max).");
-          }
-        } catch (e: unknown) {
-          const err = e as Error;
-          if (err.message?.includes("project limit reached")) throw err;
-        }
+        // Enforce plan project limits
+        enforceProjectLimit(get().projects.length);
 
         const project: Project = {
           id: nanoid(),
@@ -164,14 +191,7 @@ export const useProjectStore = create<ProjectStore>()(
         };
 
         set((state) => ({ projects: [project, ...state.projects] }));
-
-        // Cloud sync if Pro subscriber
-        try {
-          const { isPro, user } = useAuthStore.getState();
-          if (isPro && user?.uid) {
-            saveProjectToCloud(user.uid, project);
-          }
-        } catch {}
+        syncProjectIfPro(project, false);
 
         return project;
       },
@@ -189,50 +209,20 @@ export const useProjectStore = create<ProjectStore>()(
           return { projects: updatedList };
         });
 
-        // Cloud sync if Pro subscriber (debounced)
-        try {
-          if (modifiedProject) {
-            const { isPro, user } = useAuthStore.getState();
-            if (isPro && user?.uid) {
-              saveProjectToCloudDebounced(user.uid, modifiedProject);
-            }
-          }
-        } catch {}
+        if (modifiedProject) {
+          syncProjectIfPro(modifiedProject, true);
+        }
       },
 
       deleteProject: (id) => {
         set((state) => ({
           projects: state.projects.filter((p) => p.id !== id),
         }));
-
-        // Cloud sync if Pro subscriber
-        try {
-          const { isPro, user } = useAuthStore.getState();
-          if (isPro && user?.uid) {
-            deleteProjectFromCloud(user.uid, id);
-          }
-        } catch {}
+        deleteProjectIfPro(id);
       },
 
       duplicateProject: (id) => {
-        // Project limit check: 1 for Guest, 3 for Free Registered, Unlimited for Pro
-        try {
-          const { isPro, user, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore.getState();
-          const isGuest = Boolean(!user || user.isAnonymous);
-          if (isGuest && get().projects.length >= 1) {
-            setAuthModalOpen(true);
-            toast.info("Guest mode is limited to 1 active project. Sign in free with Google or GitHub to create up to 3 projects!");
-            throw new Error("Guest project limit reached (1 max).");
-          }
-          if (!isPro && get().projects.length >= 3) {
-            setUpgradeModalOpen(true);
-            toast.info("Free plan includes up to 3 local projects. Upgrade to SnapFrame Pro for unlimited projects & multi-device cloud sync!");
-            throw new Error("Free project limit reached (3 max).");
-          }
-        } catch (e: unknown) {
-          const err = e as Error;
-          if (err.message?.includes("project limit reached")) throw err;
-        }
+        enforceProjectLimit(get().projects.length);
 
         const project = get().projects.find((p) => p.id === id);
         if (!project) throw new Error("Project not found");
@@ -258,14 +248,7 @@ export const useProjectStore = create<ProjectStore>()(
           projects: [duplicate, ...state.projects],
         }));
 
-        // Cloud sync if Pro subscriber
-        try {
-          const { isPro, user } = useAuthStore.getState();
-          if (isPro && user?.uid) {
-            saveProjectToCloud(user.uid, duplicate);
-          }
-        } catch {}
-
+        syncProjectIfPro(duplicate, false);
         return duplicate;
       },
 
@@ -284,15 +267,9 @@ export const useProjectStore = create<ProjectStore>()(
           return { projects: updatedList };
         });
 
-        // Cloud sync if Pro subscriber
-        try {
-          if (modifiedProject) {
-            const { isPro, user } = useAuthStore.getState();
-            if (isPro && user?.uid) {
-              saveProjectToCloud(user.uid, modifiedProject);
-            }
-          }
-        } catch {}
+        if (modifiedProject) {
+          syncProjectIfPro(modifiedProject, false);
+        }
       },
     }),
     {

@@ -399,6 +399,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   addLayer: (setId, screenId, layer) => {
+    get().recordHistory(true);
     const newLayer = { ...layer, id: nanoid() } as Layer;
     set((state: any) => ({
       screenSets: state.screenSets.map((ss: any) =>
@@ -415,10 +416,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       ),
       activeLayerId: newLayer.id,
     }));
-    get().recordHistory();
   },
 
   addLayers: (setId, screenId, layers) => {
+    get().recordHistory(true);
     const newLayers = layers.map((l) => ({ ...l, id: l.id || nanoid() })) as Layer[];
     set((state: any) => ({
       screenSets: state.screenSets.map((ss: any) =>
@@ -435,7 +436,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       ),
       activeLayerId: newLayers[newLayers.length - 1]?.id ?? null,
     }));
-    get().recordHistory();
   },
 
   updateLayer: (setId, screenId, layerId, updates) => {
@@ -461,6 +461,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   deleteLayer: (setId, screenId, layerId) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -477,10 +478,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       activeLayerId:
         state.activeLayerId === layerId ? null : state.activeLayerId,
     }));
-    get().recordHistory();
   },
 
   reorderLayers: (setId, screenId, layerIds) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -497,10 +498,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             }
       ),
     }));
-    get().recordHistory();
   },
 
   duplicateLayer: (setId, screenId, layerId) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -519,12 +520,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         };
       }),
     }));
-    get().recordHistory();
   },
 
   deleteSelectedLayers: () => {
     const { activeSetId, activeScreenId, selectedLayerIds } = get();
     if (!activeSetId || !activeScreenId || selectedLayerIds.length === 0) return;
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== activeSetId ? ss : {
@@ -540,7 +541,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       activeLayerId: null,
       selectedLayerIds: [],
     }));
-    get().recordHistory();
   },
 
   lockLayer: (setId, screenId, layerId, locked) => {
@@ -563,6 +563,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   bringForward: (setId, screenId, layerId) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId ? ss : {
@@ -578,10 +579,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       ),
     }));
-    get().recordHistory();
   },
 
   sendBackward: (setId, screenId, layerId) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId ? ss : {
@@ -597,10 +598,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       ),
     }));
-    get().recordHistory();
   },
 
   syncTextToScreens: (setId, srcScreenId, layerIndex) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -622,10 +623,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         };
       }),
     }));
-    get().recordHistory();
   },
 
   syncTypographyToAllScreens: (setId, sourceLayerId) => {
+    get().recordHistory(true);
     set((state) => {
       const targetSet = state.screenSets.find((ss) => ss.id === setId);
       if (!targetSet) return state;
@@ -683,10 +684,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }),
       };
     });
-    get().recordHistory();
   },
 
   generateDualThemeSet: (sourceSetId, targetMode) => {
+    get().recordHistory(true);
     set((state) => {
       const sourceSet = state.screenSets.find((ss) => ss.id === sourceSetId);
       if (!sourceSet) return state;
@@ -797,7 +798,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         activeScreenId: newScreens[0]?.id ?? null,
       };
     });
-    get().recordHistory();
   },
 
   updateLayerLocalization: (setId, screenId, layerId, langCode, content) => {
@@ -848,6 +848,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   updateMockup: (setId, updates) => {
+    get().recordHistory(true);
     const DEFAULT_MOCKUP: MockupSettings = {
       device: "iphone-16-pro",
       color: "black",
@@ -866,10 +867,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             }
       ),
     }));
-    get().recordHistory();
   },
 
   updateDevice: (setId, deviceId) => {
+    get().recordHistory(true);
     const newDevice = ALL_DEVICES.find((d) => d.id === deviceId);
 
     set((state) => ({
@@ -942,6 +943,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const clampedW = Math.max(400, Math.min(6000, Math.round(width)));
     const clampedH = Math.max(400, Math.min(6000, Math.round(height)));
 
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -1004,12 +1006,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         };
       }),
     }));
-
-    get().recordHistory();
   },
 
   setMockupScale: (setId, scale) => {
     const clampedScale = Math.max(0.4, Math.min(2.0, Number(scale.toFixed(2))));
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -1048,12 +1049,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         };
       }),
     }));
-    get().recordHistory();
   },
 
   setThemeId: (themeId) => set({ themeId }),
 
   applyThemeToProject: (themeId) => {
+    get().recordHistory(true);
     const theme = themeById(themeId);
     set((state) => ({
       themeId,
@@ -1081,10 +1082,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }))
       }))
     }));
-    get().recordHistory();
   },
 
   applyCustomThemeToProject: (palette) => {
+    get().recordHistory(true);
     set((state) => ({
       themeId: "custom",
       screenSets: state.screenSets.map(ss => ({
@@ -1111,7 +1112,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }))
       }))
     }));
-    get().recordHistory();
   },
 
   // UI
@@ -1537,11 +1537,26 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   updateScreenSet: (setId, updates) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
-        ss.id === setId ? { ...ss, ...updates } : ss
+        ss.id !== setId ? { ...ss, ...updates } : ss
       ),
     }));
-    get().recordHistory();
   },
 }));
+
+// ── Pure Standalone Selectors (for memoized & efficient React subscriptions) ──
+export const selectActiveSet = (state: EditorStore): ScreenSet | undefined => {
+  return state.screenSets.find((s) => s.id === state.activeSetId) || state.screenSets[0];
+};
+
+export const selectActiveScreen = (state: EditorStore): Screen | undefined => {
+  const set = selectActiveSet(state);
+  return set?.screens.find((s) => s.id === state.activeScreenId) || set?.screens[0];
+};
+
+export const selectActiveLayer = (state: EditorStore): Layer | undefined => {
+  const screen = selectActiveScreen(state);
+  return screen?.layers.find((l) => l.id === state.activeLayerId);
+};

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runAIWithFallbacks, trimToLimit } from "@/lib/ai/aiService";
+import { parseAIJson } from "@/lib/ai/parseAIJson";
 import { authorizeAIRequest } from "@/lib/serverAuth";
 
 export async function POST(req: NextRequest) {
@@ -49,17 +50,7 @@ Return a JSON object with:
 
     const rawResponse = await runAIWithFallbacks(prompt, undefined, true);
     
-    let parsed: { translations?: string[] };
-    try {
-      parsed = JSON.parse(rawResponse);
-    } catch {
-      const match = rawResponse.match(/\{[\s\S]*\}/);
-      if (match) {
-        parsed = JSON.parse(match[0]);
-      } else {
-        throw new Error("Could not parse AI response as JSON");
-      }
-    }
+    const parsed = parseAIJson<{ translations?: string[] }>(rawResponse, {});
 
     let finalTranslations: string[] = (parsed.translations || []).map((t: string) => trimToLimit(t, maxLength));
 

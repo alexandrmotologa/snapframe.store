@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, isAdminConfigured } from "@/lib/firebaseAdmin";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 import type { DecodedIdToken } from "firebase-admin/auth";
 
 export interface AuthResult {
@@ -111,7 +112,6 @@ export async function authorizeAIRequest(
   | { success: true; user: AuthResult }
   | { success: false; response: NextResponse }
 > {
-  const { checkRateLimit, getClientIp } = await import("@/lib/rateLimiter");
   const ip = getClientIp(req);
   const rateLimit = checkRateLimit(`ai:${ip}`, { limit: 30, windowMs: 60000, keyPrefix: "ai" });
 
