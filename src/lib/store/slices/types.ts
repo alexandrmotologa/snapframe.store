@@ -1,4 +1,4 @@
-import { Layer, Screen, ScreenSet, Background, MockupSettings, ThemeId, UploadedAsset } from "@/lib/types";
+import { Layer, Screen, ScreenSet, Background, MockupSettings, ThemeId, UploadedAsset, Template } from "@/lib/types";
 import { CanvasBackgroundId } from "@/lib/canvasBackgrounds";
 
 export interface HistoryEntry {
@@ -70,8 +70,8 @@ export interface ContentSlice {
   applyPanoramicBackground: (setId: string, imageUrl: string, naturalWidth: number, naturalHeight: number) => void;
   autoFillScreenshots: (setId: string, urls: string[]) => void;
 
-  addLayer: (setId: string, screenId: string, layer: any) => void;
-  addLayers: (setId: string, screenId: string, layers: any[]) => void;
+  addLayer: (setId: string, screenId: string, layer: Omit<Layer, "id"> | Layer) => void;
+  addLayers: (setId: string, screenId: string, layers: (Omit<Layer, "id"> | Layer)[]) => void;
   updateLayer: (setId: string, screenId: string, layerId: string, updates: Partial<Layer>) => void;
   deleteLayer: (setId: string, screenId: string, layerId: string) => void;
   deleteSelectedLayers: () => void;
@@ -95,7 +95,7 @@ export interface ContentSlice {
   applyThemeToProject: (themeOrPalette: ThemeId | { bg: string; fg: string; gradient?: Background["gradient"] }) => void;
   applyCustomThemeToProject: (palette: { bg: string; fg: string; gradient?: Background["gradient"] }) => void;
 
-  applyTemplate: (setId: string | "all", template: any) => void;
+  applyTemplate: (setId: string | "all", template: Template) => void;
 
   addScreenSet: (store: "ios" | "android") => void;
   addTabletSet: (store?: "ios" | "android") => void;

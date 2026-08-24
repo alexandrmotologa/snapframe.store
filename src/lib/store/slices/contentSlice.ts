@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand";
 import { EditorStore, ContentSlice } from "./types";
-import { Layer, Screen, ScreenSet, MockupSettings, UploadedAsset } from "@/lib/types";
+import { Layer, Screen, ScreenSet, MockupSettings, UploadedAsset, Template } from "@/lib/types";
 import { themeById } from "@/lib/themes";
 import { nanoid } from "@/lib/utils";
 import { ALL_DEVICES, isTabletDevice } from "@/lib/devices";

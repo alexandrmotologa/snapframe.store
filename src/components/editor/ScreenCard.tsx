@@ -1021,7 +1021,7 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
           ctx.closePath();
           ctx.fill(); applyStroke();
 
-        } else if (sl.shape === "arrow-right" || (sl.shape as any) === "arrowRight") {
+        } else if (sl.shape === "arrow-right" || sl.shape === "arrowRight") {
           const aw = sl.width;
           const ah = sl.height;
           const arrowHead = aw * 0.4;
