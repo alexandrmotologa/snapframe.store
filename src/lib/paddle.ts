@@ -38,29 +38,29 @@ export function getPaddleConfig() {
     environment === "sandbox"
       ? process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN ||
         process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
-        "test_4ec755383baa68f463e76e253a5"
+        ""
       : process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
         process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN ||
-        "test_4ec755383baa68f463e76e253a5";
+        "";
 
   // Resolve Price IDs
   const monthlyPriceId =
     environment === "sandbox"
       ? process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY ||
         process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY ||
-        "pri_01m0gcefx09erjdmn8z988bjgh"
+        ""
       : process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY ||
         process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY ||
-        "pri_01m0gcefx09erjdmn8z988bjgh";
+        "";
 
   const annualPriceId =
     environment === "sandbox"
       ? process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL ||
         process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL ||
-        "pri_01m0gcg2egwg8vvcmvc4rwqjm9"
+        ""
       : process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL ||
         process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL ||
-        "pri_01m0gcg2egwg8vvcmvc4rwqjm9";
+        "";
 
   return {
     environment,
@@ -82,6 +82,7 @@ export async function initializePaddle(): Promise<boolean> {
   if (typeof window === "undefined") return false;
 
   const config = getPaddleConfig();
+  if (!config.clientToken) return false;
 
   if (paddleInitialized && window.Paddle) {
     return true;
@@ -150,30 +151,33 @@ export async function openPaddleCheckout({
   const config = getPaddleConfig();
   const priceId = plan === "annual" ? config.prices.annual : config.prices.monthly;
 
-  // Fallback demo simulation if Paddle keys have not yet been provided in environment
-  if (
-    config.clientToken === "test_token" ||
+  // Fallback demo simulation if Paddle keys have not yet been configured in environment
+  const isDummyOrMissing =
     !config.clientToken ||
+    !priceId ||
+    config.clientToken.startsWith("test_0123") ||
+    config.clientToken.startsWith("test_4ec75") ||
+    priceId.startsWith("pri_0123") ||
+    priceId.startsWith("pri_01m0g") ||
     priceId.startsWith("pri_monthly_snapframe_pro") ||
-    priceId.startsWith("pri_annual_snapframe_pro")
-  ) {
+    priceId.startsWith("pri_annual_snapframe_pro");
+
+  if (isDummyOrMissing) {
     console.log(`[Paddle] Simulation mode (${config.environment}) for:`, {
       plan,
-      priceId,
       userEmail,
       userId,
-      config,
     });
     toast.info(
-      `Opening test checkout (${config.environment.toUpperCase()}) for SnapFrame Pro (${
+      `Demo Mode: Paddle API keys not configured. Simulating Pro Upgrade for testing (${
         plan === "annual" ? "$69/year" : "$9/month"
       })...`
     );
 
     setTimeout(() => {
-      toast.success("🎉 Payment simulated successfully! Welcome to SnapFrame Pro.");
+      toast.success("🎉 Welcome to SnapFrame Pro! (Test Upgrade Active)");
       onSuccess?.();
-    }, 1200);
+    }, 800);
     return;
   }
 
