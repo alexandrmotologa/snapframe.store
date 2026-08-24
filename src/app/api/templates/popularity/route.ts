@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { adminDb, FieldValue, isAdminConfigured } from "@/lib/firebaseAdmin";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 
 export async function GET() {
   if (!isAdminConfigured || !adminDb) {
@@ -24,8 +25,22 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit(`template-popularity:${clientIp}`, {
+      limit: 60,
+      windowMs: 60000,
+      keyPrefix: "tpl_pop",
+    });
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { success: false, error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { templateId } = await req.json();
     if (!templateId || typeof templateId !== "string") {
       return NextResponse.json({ success: false, error: "Invalid templateId" }, { status: 400 });

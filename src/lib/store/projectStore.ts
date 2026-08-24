@@ -5,7 +5,7 @@ import { nanoid } from "@/lib/utils";
 import { BASE_TEMPLATES, BLANK_TEMPLATE } from "@/lib/templates";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
-import { saveProjectToCloud, deleteProjectFromCloud } from "@/lib/cloudProjectSync";
+import { saveProjectToCloud, saveProjectToCloudDebounced, deleteProjectFromCloud } from "@/lib/cloudProjectSync";
 
 interface ProjectStore {
   projects: Project[];
@@ -189,12 +189,12 @@ export const useProjectStore = create<ProjectStore>()(
           return { projects: updatedList };
         });
 
-        // Cloud sync if Pro subscriber
+        // Cloud sync if Pro subscriber (debounced)
         try {
           if (modifiedProject) {
             const { isPro, user } = useAuthStore.getState();
             if (isPro && user?.uid) {
-              saveProjectToCloud(user.uid, modifiedProject);
+              saveProjectToCloudDebounced(user.uid, modifiedProject);
             }
           }
         } catch {}

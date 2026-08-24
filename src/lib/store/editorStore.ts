@@ -188,7 +188,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       const isIOS = ss.store === "ios";
       const isTab = isTabletDevice(ss.deviceId || ss.mockup?.device);
       const defaultDev = isTab
-        ? (isIOS ? "ipad-pro-13" : "galaxy-tab-s9-ultra")
+        ? (isIOS ? "ipad-pro-13" : "samsung-tab-s10-ultra")
         : (isIOS ? "iphone-17-pro-max" : "pixel-10-pro-xl");
       const effectiveDeviceId = ss.deviceId || ss.mockup?.device || defaultDev;
 
@@ -329,6 +329,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   deleteScreen: (setId, screenId) => {
+    get().recordHistory();
     set((state) => {
       const sets = state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -347,7 +348,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             : state.activeScreenId,
       };
     });
-    get().recordHistory();
   },
 
   updateScreen: (setId, screenId, updates) => {
@@ -1518,12 +1518,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   removeScreenSet: (setId) => {
+    get().recordHistory();
     const { screenSets, hiddenScreenSets, activeSetId } = get();
     if (screenSets.length <= 1) return; // keep at least one set
     const setToHide = screenSets.find((s) => s.id === setId);
     if (!setToHide) return;
     const newSets = screenSets.filter((ss) => ss.id !== setId);
-    const newHidden = [...hiddenScreenSets.filter((s) => s.store !== setToHide.store), setToHide];
+    const newHidden = [...hiddenScreenSets.filter((s) => s.id !== setToHide.id), setToHide];
     const newActiveSet = activeSetId === setId ? newSets[0] : newSets.find((ss) => ss.id === activeSetId);
     set({
       screenSets: newSets,
@@ -1531,7 +1532,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       activeSetId: newActiveSet?.id ?? null,
       activeScreenId: newActiveSet?.screens[0]?.id ?? null,
     });
-    get().recordHistory();
   },
 
   updateScreenSet: (setId, updates) => {

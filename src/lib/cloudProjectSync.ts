@@ -113,8 +113,10 @@ export async function syncProjectsOnLogin(uid: string): Promise<void> {
   }
 }
 
+const cloudSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
 /**
- * Saves or updates a project in Firestore under users/{uid}/projects/{projectId}
+ * Saves or updates a project in Firestore under users/{uid}/projects/{projectId} (Immediate)
  * Only executed for Pro subscribers.
  */
 export async function saveProjectToCloud(uid: string, project: Project): Promise<void> {
@@ -122,17 +124,45 @@ export async function saveProjectToCloud(uid: string, project: Project): Promise
   const isPro = useAuthStore.getState().isPro;
   if (!isPro) return;
 
+  // Clear any pending debounced timers for this project to avoid duplicate writes
+  const existingTimer = cloudSaveTimers.get(project.id);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+    cloudSaveTimers.delete(project.id);
+  }
+
   try {
     const db = await getFirebaseDb();
     if (!db) return;
     const projectRef = doc(db, "users", uid, "projects", project.id);
     await setDoc(projectRef, {
       ...project,
-      updatedAt: project.updatedAt || new Date().toISOString(),
+      updatedAt: project.updatedAt || Date.now(),
     }, { merge: true });
   } catch (err) {
     console.warn("Failed to save project to cloud:", err);
   }
+}
+
+/**
+ * Debounced project save for Firestore to prevent high-frequency write operations during editing.
+ */
+export function saveProjectToCloudDebounced(uid: string, project: Project, delayMs = 1200): void {
+  if (!uid || !project?.id) return;
+  const isPro = useAuthStore.getState().isPro;
+  if (!isPro) return;
+
+  const existingTimer = cloudSaveTimers.get(project.id);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+  }
+
+  const timer = setTimeout(() => {
+    cloudSaveTimers.delete(project.id);
+    saveProjectToCloud(uid, project);
+  }, delayMs);
+
+  cloudSaveTimers.set(project.id, timer);
 }
 
 /**

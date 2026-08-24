@@ -118,7 +118,7 @@ export function UpgradeModal() {
               >
                 Annual Billing
                 <span className="ml-1.5 px-1.5 py-0.2 text-[10px] rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  Save 37%
+                  Save 36%
                 </span>
               </button>
               <button

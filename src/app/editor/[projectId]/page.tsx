@@ -119,10 +119,13 @@ export default function EditorPage({ params }: EditorPageProps) {
     }
   }, [projectLanguages, projectId, editorProjectId, updateProject]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-save screenSets back to project store whenever they change
+  // Auto-save screenSets back to project store (debounced — fires 1s after last change)
   useEffect(() => {
     if (screenSets.length > 0 && editorProjectId === projectId) {
-      updateProject(projectId, { screenSets, hiddenScreenSets, themeId });
+      const timer = setTimeout(() => {
+        updateProject(projectId, { screenSets, hiddenScreenSets, themeId });
+      }, 1000);
+      return () => clearTimeout(timer);
     }
   }, [screenSets, hiddenScreenSets, themeId, projectId, editorProjectId, updateProject]); // eslint-disable-line react-hooks/exhaustive-deps
 
