@@ -382,8 +382,10 @@ export function StorePreviewModal({ open, onOpenChange, appName: initialAppName 
                   {/* App Icon */}
                   <div className="w-24 h-24 rounded-[22px] bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-md overflow-hidden shrink-0 flex items-center justify-center text-white font-black text-2xl tracking-tighter">
                     {iconUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={iconUrl} alt="App Icon" className="w-full h-full object-cover" />
                     ) : (
+
                       <Sparkles className="w-10 h-10 text-white" />
                     )}
                   </div>
@@ -540,8 +542,10 @@ export function StorePreviewModal({ open, onOpenChange, appName: initialAppName 
                 <div className="flex gap-4 items-start">
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-md overflow-hidden shrink-0 flex items-center justify-center text-white">
                     {iconUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={iconUrl} alt="App Icon" className="w-full h-full object-cover" />
                     ) : (
+
                       <Sparkles className="w-9 h-9" />
                     )}
                   </div>

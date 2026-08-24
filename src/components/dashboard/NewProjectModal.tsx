@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { X, Search, Check, Sparkles, ArrowRight, Monitor, Plus, Flame, ArrowUpDown, Tag, ShieldAlert, Lock, Crown } from "lucide-react";
+import { X, Search, Check, Sparkles, ArrowRight, Plus, Flame, ArrowUpDown, Lock, Crown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BASE_TEMPLATES, getAllTemplates, TEMPLATE_CATEGORIES, LAYOUT_META, isProTemplate } from "@/lib/templates";
+import { BASE_TEMPLATES, getAllTemplates, isProTemplate } from "@/lib/templates";
 import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
@@ -18,6 +18,7 @@ import {
 } from "@/lib/templatePopularity";
 import { cn } from "@/lib/utils";
 import { Template } from "@/lib/types";
+
 
 interface NewProjectModalProps {
   open: boolean;
@@ -150,7 +151,6 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
   // Search and sort state
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<TemplateSortOption>("popularity");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [globalCounts, setGlobalCounts] = useState<Record<string, number>>({});
 
   const handleClose = () => {
@@ -179,23 +179,12 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
       .catch(() => {});
   }, [open]);
 
-  // Categories list
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    templates.forEach((t) => {
-      if (t.id !== "blank" && t.category) set.add(t.category);
-    });
-    return ["All", ...Array.from(set)];
-  }, [templates]);
-
   // Filtered & Sorted Themes
   const themes = useMemo(() => {
-    let base = templates.filter((t) => t.id !== "blank");
-    if (selectedCategory !== "All") {
-      base = base.filter((t) => t.category === selectedCategory);
-    }
+    const base = templates.filter((t) => t.id !== "blank");
     return sortAndFilterTemplates(base, searchQuery, sortBy, globalCounts);
-  }, [templates, searchQuery, sortBy, selectedCategory, globalCounts]);
+  }, [templates, searchQuery, sortBy, globalCounts]);
+
 
   // Identify top 3 popular templates for 🔥 Popular badge
   const topPopularIds = useMemo(() => {

@@ -1,22 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Check, LayoutGrid, CircleDot, Grid3X3, Square, Compass } from "lucide-react";
+import { Check, LayoutGrid } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEditorStore } from "@/lib/store/editorStore";
 import {
   CANVAS_BACKGROUNDS,
-  CanvasBackgroundId,
   getCanvasBackground,
 } from "@/lib/canvasBackgrounds";
 import { cn } from "@/lib/utils";
 
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  dots: CircleDot,
-  grid: Grid3X3,
-  creative: Compass,
-  clean: Square,
-};
 
 export function CanvasBackgroundSelector() {
   const { canvasBackground, setCanvasBackground } = useEditorStore();

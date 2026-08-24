@@ -9,15 +9,13 @@ import {
   LayoutGrid,
   Sparkles,
   Smartphone,
-  ShieldCheck,
   Maximize2,
   Crown,
   CheckCircle2,
-  Layers,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { useAuthStore } from "@/lib/store/authStore";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";

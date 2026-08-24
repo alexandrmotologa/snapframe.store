@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   getTemplateScore,
   sortAndFilterTemplates,
-  TemplateSortOption,
 } from "@/lib/templatePopularity";
 import type { Template } from "@/lib/types";
+
 
 const MOCK_TEMPLATES: Template[] = [
   {

@@ -345,7 +345,8 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, getActiveSet, getActiveLayer]);
+  }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, getActiveSet, getActiveLayer, getActiveScreen]);
+
 
 
   // ── Global Clipboard Paste (Ctrl+V image screenshot) ─────────────────────

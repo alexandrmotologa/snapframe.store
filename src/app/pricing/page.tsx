@@ -56,8 +56,9 @@ const PRICING_FAQS = [
 ];
 
 export default function PricingPage() {
-  const { user, isPro, setAuthModalOpen, setProStatus, setUpgradeModalOpen } = useAuthStore();
+  const { user, isPro, setAuthModalOpen, setProStatus } = useAuthStore();
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
+
   const [isProcessing, setIsProcessing] = useState(false);
 
   const isGuest = Boolean(!user || user.isAnonymous);

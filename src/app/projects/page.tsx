@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useSyncExternalStore } from "react";
+import { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Plus, Layers, Clock, Copy, Trash2, ArrowRight, Sparkles,
-  Zap, Globe, Search, LayoutGrid, List, ArrowUpDown, Edit3,
-  Smartphone, ExternalLink, MoreHorizontal, Calendar, X,
+  Plus, Clock, Copy, Trash2, ArrowRight, Sparkles,
+  Globe, Search, LayoutGrid, List, ArrowUpDown, Edit3,
+  Smartphone, X,
   ShieldAlert, Lock, Folder,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NewProjectModal } from "@/components/dashboard/NewProjectModal";
@@ -17,7 +17,8 @@ import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
-import { Project, Screen, ScreenSet, TextLayer, Background } from "@/lib/types";
+import { Project, TextLayer, Background } from "@/lib/types";
+
 import { ScreenThumbnailCanvas } from "@/components/editor/ScreenThumbnailCanvas";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ConfirmActionModal } from "@/components/dashboard/ConfirmActionModal";

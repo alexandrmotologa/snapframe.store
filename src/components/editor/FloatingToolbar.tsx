@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
-import { TextLayer, ScreenshotLayer, ShapeLayer, Layer } from "@/lib/types";
+import { TextLayer, ScreenshotLayer, ShapeLayer, ImageLayer, Layer } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -11,26 +11,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch";
-import {
-  Bold, AlignLeft, AlignCenter, AlignRight,
-  Trash2, Copy, ChevronDown, Minus, Plus,
-  RotateCcw, Upload, Maximize2, Minimize2, Smartphone,
+  Trash2, Copy, RotateCcw, Upload,
   AlignCenterHorizontal, AlignCenterVertical,
   ArrowUpToLine, ArrowDownToLine, ArrowLeftToLine, ArrowRightToLine,
-  MoveHorizontal, MoveVertical, RefreshCw, Type, Palette, Check,
-  Scissors, Link2, Sparkles
+  RefreshCw,
 } from "lucide-react";
-import { cn, loadGoogleFont, nanoid } from "@/lib/utils";
-import { ColorInput } from "@/components/ui/color-input";
+import { cn } from "@/lib/utils";
 import { AICutoutModal } from "@/components/editor/AICutoutModal";
 import { toast } from "@/lib/store/toastStore";
 import {
-  FONT_FAMILIES,
   ToolbarBtn as Btn,
   ToolbarNumInput as NumInput,
   FloatingMockupTools,
@@ -44,16 +33,16 @@ export function FloatingToolbar() {
   const {
     getActiveLayer, getActiveScreen, getActiveSet,
     updateLayer, deleteLayer, duplicateLayer, setActiveLayer,
-    syncTextToScreens, syncTypographyToAllScreens, updateScreen
+    syncTypographyToAllScreens
   } = useEditorStore();
 
   const layer = getActiveLayer();
   const screen = getActiveScreen();
   const set = getActiveSet();
 
-  const [fontOpen, setFontOpen] = useState(false);
   const [showCutoutModal, setShowCutoutModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   if (!screen || !set) return null;
 
@@ -322,8 +311,9 @@ export function FloatingToolbar() {
       <AICutoutModal
         open={showCutoutModal}
         onClose={() => setShowCutoutModal(false)}
-        initialImageSrc={sl?.src || (layer.type === "image" ? (layer as any).src : undefined)}
+        initialImageSrc={sl?.src || (layer.type === "image" ? (layer as ImageLayer).src : undefined)}
       />
+
     </TooltipProvider>
   );
 }

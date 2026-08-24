@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Sparkles, Zap, Shield, Crown, Film, Globe, Image as ImageIcon, ArrowRight } from "lucide-react";
+import { Sparkles, Zap, Shield, Crown, Globe, Image as ImageIcon, ArrowRight } from "lucide-react";
 import { useAuthStore } from "@/lib/store/authStore";
+
 import { openPaddleCheckout } from "@/lib/paddle";
 import { toast } from "@/lib/store/toastStore";
 import { getIdTokenSafe } from "@/lib/firebase";

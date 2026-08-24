@@ -236,9 +236,10 @@ export default function AccountPage() {
       } else {
         toast.error("Could not cancel subscription. Please check your connection or contact support.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to process cancellation request.");
     } finally {
+
       setIsCanceling(false);
     }
   };

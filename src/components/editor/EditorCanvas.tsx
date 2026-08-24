@@ -2,8 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
-import { backgroundToCSS } from "@/lib/utils";
-import { Layer, TextLayer, ImageLayer, ShapeLayer, Screen } from "@/lib/types";
+import { TextLayer, ImageLayer, ShapeLayer } from "@/lib/types";
 import { Monitor } from "lucide-react";
 
 export function EditorCanvas() {
@@ -17,8 +16,8 @@ export function EditorCanvas() {
     getActiveSet,
     activeLayerId,
     setActiveLayer,
-    updateLayer,
   } = useEditorStore();
+
 
   const screen = getActiveScreen();
   const set = getActiveSet();

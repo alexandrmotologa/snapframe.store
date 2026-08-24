@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Download, Package, Loader2, CheckCircle2, Apple, Smartphone, Globe, Copy, ShieldCheck, FileText, Check, Film, Lock, Sparkles, Crown } from "lucide-react";
+import { X, Download, Package, Loader2, CheckCircle2, Globe, Copy, FileText, Film, Lock, Sparkles, Crown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useEditorStore } from "@/lib/store/editorStore";
@@ -9,11 +10,13 @@ import { useProjectStore } from "@/lib/store/projectStore";
 import { useLanguageStore, getLang } from "@/lib/store/languageStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
-import type { TextLayer, ShapeLayer, ImageLayer } from "@/lib/types";
 import { renderScreenToCanvas } from "@/lib/renderScreenToCanvas";
 import { cn } from "@/lib/utils";
-import { AppleStoreIcon, GooglePlayIcon, APP_STORE_LABEL, GOOGLE_PLAY_LABEL } from "@/components/icons/StoreIcons";
+import { AppleStoreIcon, GooglePlayIcon } from "@/components/icons/StoreIcons";
 import { ALL_DEVICES, isTabletDevice } from "@/lib/devices";
+import type JSZip from "jszip";
+
+
 
 interface ExportModalProps {
   projectId: string;
@@ -52,7 +55,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
 
   // Free tier can only export 1 platform and up to 3 screens per set in 1 language
   const activeSets = isPro ? screenSets.filter((ss) => selectedSets.has(ss.id)) : [screenSets.find((ss) => selectedSets.has(ss.id)) || screenSets[0]].filter(Boolean);
-  const activeLangs = isPro ? Array.from(selectedLangs) : [activeLang || "en"];
+  const activeLangs: string[] = isPro ? Array.from(selectedLangs) : [activeLang || "en"];
   const maxScreensPerSet = isPro ? 10 : 3;
   const screensPerLang = activeSets.reduce((acc, ss) => acc + Math.min(ss.screens.length, maxScreensPerSet), 0);
   const totalScreens = screensPerLang * Math.max(activeLangs.length, 1);
@@ -63,7 +66,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
       setSelectedSets(new Set([id]));
       return;
     }
-    setSelectedSets((prev) => {
+    setSelectedSets((prev: Set<string>) => {
       const next = new Set(prev);
       if (next.has(id)) {
         if (next.size > 1) next.delete(id);
@@ -79,7 +82,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
       toast.info("Multi-language batch export requires SnapFrame Pro.");
       return;
     }
-    setSelectedLangs((prev) => {
+    setSelectedLangs((prev: Set<string>) => {
       const next = new Set(prev);
       if (next.has(code)) {
         if (next.size > 1) next.delete(code); // keep at least 1
@@ -89,6 +92,7 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
       return next;
     });
   };
+
 
   // ── 1-Click Copy Active Screen to Clipboard ────────────────────────────────
   const handleCopyActiveScreen = async () => {
@@ -130,9 +134,10 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
         new ClipboardItem({ "image/png": blob }),
       ]);
       toast.success("Active screen PNG copied to clipboard!");
-    } catch (err) {
+    } catch {
       toast.error("Clipboard permission not granted by browser.");
     } finally {
+
       setIsCopying(false);
     }
   };
@@ -152,16 +157,15 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
     setExportedCount(0);
 
     // Dynamically import JSZip
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let JSZipClass: any = null;
+    let JSZipClass: typeof JSZip | null = null;
     try {
       const mod = await import("jszip");
       JSZipClass = mod.default;
     } catch {
       // JSZip not available
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const zip: any = JSZipClass ? new JSZipClass() : null;
+    const zip: JSZip | null = JSZipClass ? new JSZipClass() : null;
+
     let exported = 0;
 
     for (const ss of activeSets) {
@@ -231,9 +235,10 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
 
       const fullListingExport: Record<string, any> = {};
 
-      langsToExport.forEach((lang) => {
+      langsToExport.forEach((lang: string) => {
         const langKey = lang.toLowerCase();
         const langUpper = lang.toUpperCase();
+
         const langListing = (storeListingData[lang] || storeListingData["en"] || {}) as {
           ios?: Record<string, string>;
           android?: Record<string, string>;

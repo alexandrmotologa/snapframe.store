@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, Sparkles, Check, Layers, LayoutTemplate, Lock, Crown } from "lucide-react";
+import { Search, Check, Layers, LayoutTemplate, Lock, Crown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";

@@ -1,7 +1,8 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { getAdminAuth, isAdminConfigured } from "@/lib/firebaseAdmin";
+import { getAdminAuth } from "@/lib/firebaseAdmin";
 import { checkRateLimit } from "@/lib/rateLimiter";
+
 
 const f = createUploadthing();
 

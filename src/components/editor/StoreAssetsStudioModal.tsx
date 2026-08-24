@@ -790,7 +790,9 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
                               featureConfig.screenshotSrc === src ? "border-primary scale-105" : "border-border/60 opacity-60 hover:opacity-100"
                             }`}
                           >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={src} alt="screen" className="w-full h-full object-cover" />
+
                           </button>
                         ))}
                       </div>

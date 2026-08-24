@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
+
 import { CHARACTERS, Character, getCharacterSvgString } from "@/lib/characters";
 import { CharacterLayer } from "@/lib/types";
 import { nanoid } from "@/lib/utils";

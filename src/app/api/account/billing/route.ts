@@ -177,9 +177,10 @@ function formatFeatureName(rawFeature?: string): string {
         id: doc.id,
         ...doc.data(),
       }));
-    } catch (e) {
+    } catch {
       // Subcollection might be empty
     }
+
 
     const paddlePortalUrl = "https://paddle.net";
 

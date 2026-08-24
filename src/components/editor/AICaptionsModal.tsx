@@ -48,8 +48,9 @@ interface AICaptionsModalProps {
 export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
   const { getActiveSet, getActiveScreen, updateLayerLocalization } = useEditorStore();
   const { projectLanguages } = useLanguageStore();
-  const { user, isPro, aiCredits, consumeAiCredit, setAuthModalOpen } = useAuthStore();
+  const { user, consumeAiCredit, setAuthModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
+
 
   const [selectedLangs, setSelectedLangs] = useState<Set<string>>(
     new Set(projectLanguages.filter((c) => c !== "en"))
@@ -297,9 +298,14 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
                           key={code}
                           onClick={() => {
                             const next = new Set(selectedLangs);
-                            selected ? next.delete(code) : next.add(code);
+                            if (selected) {
+                              next.delete(code);
+                            } else {
+                              next.add(code);
+                            }
                             setSelectedLangs(next);
                           }}
+
                           className={cn(
                             "flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all",
                             selected
@@ -454,9 +460,14 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
                           onClick={() => {
                             if (code === "en") return;
                             const next = new Set(selectedLangs);
-                            selected ? next.delete(code) : next.add(code);
+                            if (selected) {
+                              next.delete(code);
+                            } else {
+                              next.add(code);
+                            }
                             setSelectedLangs(next);
                           }}
+
                           className={cn(
                             "flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all",
                             selected || code === "en"

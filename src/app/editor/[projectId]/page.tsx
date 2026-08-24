@@ -118,7 +118,7 @@ export default function EditorPage({ params }: EditorPageProps) {
     if (editorProjectId === projectId) {
       updateProject(projectId, { languages: projectLanguages });
     }
-  }, [projectLanguages, projectId, editorProjectId, updateProject]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [projectLanguages, projectId, editorProjectId, updateProject]);
 
   // Auto-save screenSets back to project store (debounced — fires 1s after last change)
   useEffect(() => {
@@ -128,7 +128,8 @@ export default function EditorPage({ params }: EditorPageProps) {
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [screenSets, hiddenScreenSets, themeId, projectId, editorProjectId, updateProject]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [screenSets, hiddenScreenSets, themeId, projectId, editorProjectId, updateProject]);
+
 
   // Auto-save thumbnail (debounced — fires 2s after last change)
   useEffect(() => {

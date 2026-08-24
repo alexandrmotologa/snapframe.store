@@ -23,8 +23,10 @@ import {
 } from "lucide-react";
 import { toast } from "@/lib/store/toastStore";
 import { nanoid } from "@/lib/utils";
-import { Layer } from "@/lib/types";
+import { Layer, ShapeLayer } from "@/lib/types";
+import Image from "next/image";
 import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
+
 
 interface BlockPreset {
   id: string;
@@ -1126,7 +1128,7 @@ const BADGE_PRESETS: BlockPreset[] = [
     keywords: ["apple", "app store", "ios badge", "download", "dark"],
     preview: (
       <div className="h-9 flex items-center justify-center p-1 bg-slate-900 rounded-lg border border-border/40">
-        <img src="/badges/appstore-dark.svg" alt="App Store Dark" className="h-7 object-contain" />
+        <Image src="/badges/appstore-dark.svg" alt="App Store Dark" width={100} height={28} className="h-7 w-auto object-contain" />
       </div>
     ),
     getLayers: (sw, sh) => {
@@ -1144,7 +1146,7 @@ const BADGE_PRESETS: BlockPreset[] = [
         y: Math.round((sh - h) / 2),
         rotation: 0,
         opacity: 1,
-      } as any];
+      } as Omit<ShapeLayer, "id">];
     },
   },
   {
@@ -1154,7 +1156,7 @@ const BADGE_PRESETS: BlockPreset[] = [
     keywords: ["apple", "app store", "ios badge", "download", "light", "white"],
     preview: (
       <div className="h-9 flex items-center justify-center p-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-border/40">
-        <img src="/badges/appstore-light.svg" alt="App Store Light" className="h-7 object-contain" />
+        <Image src="/badges/appstore-light.svg" alt="App Store Light" width={100} height={28} className="h-7 w-auto object-contain" />
       </div>
     ),
     getLayers: (sw, sh) => {
@@ -1172,7 +1174,7 @@ const BADGE_PRESETS: BlockPreset[] = [
         y: Math.round((sh - h) / 2),
         rotation: 0,
         opacity: 1,
-      } as any];
+      } as Omit<ShapeLayer, "id">];
     },
   },
   {
@@ -1182,7 +1184,7 @@ const BADGE_PRESETS: BlockPreset[] = [
     keywords: ["google", "play store", "android badge", "download", "dark"],
     preview: (
       <div className="h-9 flex items-center justify-center p-1 bg-slate-900 rounded-lg border border-border/40">
-        <img src="/badges/googleplay-dark.svg" alt="Google Play Dark" className="h-7 object-contain" />
+        <Image src="/badges/googleplay-dark.svg" alt="Google Play Dark" width={100} height={28} className="h-7 w-auto object-contain" />
       </div>
     ),
     getLayers: (sw, sh) => {
@@ -1200,7 +1202,7 @@ const BADGE_PRESETS: BlockPreset[] = [
         y: Math.round((sh - h) / 2),
         rotation: 0,
         opacity: 1,
-      } as any];
+      } as Omit<ShapeLayer, "id">];
     },
   },
   {
@@ -1210,7 +1212,7 @@ const BADGE_PRESETS: BlockPreset[] = [
     keywords: ["google", "play store", "android badge", "download", "light", "white"],
     preview: (
       <div className="h-9 flex items-center justify-center p-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-border/40">
-        <img src="/badges/googleplay-light.svg" alt="Google Play Light" className="h-7 object-contain" />
+        <Image src="/badges/googleplay-light.svg" alt="Google Play Light" width={100} height={28} className="h-7 w-auto object-contain" />
       </div>
     ),
     getLayers: (sw, sh) => {
@@ -1228,9 +1230,10 @@ const BADGE_PRESETS: BlockPreset[] = [
         y: Math.round((sh - h) / 2),
         rotation: 0,
         opacity: 1,
-      } as any];
+      } as Omit<ShapeLayer, "id">];
     },
   },
+
   {
     id: "rank-productivity",
     name: "#1 Top Free App Tag",

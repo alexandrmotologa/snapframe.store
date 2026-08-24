@@ -45,8 +45,9 @@ let googleProvider: GoogleAuthProvider | null = null;
 let githubProvider: GithubAuthProvider | null = null;
 let initPromise: Promise<Auth | null> | null = null;
 
-function setupProviders(_instanceAuth?: Auth) {
+function setupProviders() {
   googleProvider = new GoogleAuthProvider();
+
   googleProvider.setCustomParameters({ prompt: "select_account" });
   githubProvider = new GithubAuthProvider();
   githubProvider.addScope("read:user");
@@ -59,7 +60,7 @@ if (inlineFirebaseConfig.apiKey && inlineFirebaseConfig.projectId) {
     app = getApps().length > 0 ? getApp() : initializeApp(inlineFirebaseConfig);
     db = getFirestore(app);
     auth = getAuth(app);
-    setupProviders(auth);
+    setupProviders();
   } catch (err) {
     console.warn("Firebase inline initialization warning:", err);
   }
@@ -90,9 +91,10 @@ export async function getFirebaseAuth(): Promise<{
         app = getApps().length > 0 ? getApp() : initializeApp(data.config);
         db = getFirestore(app);
         auth = getAuth(app);
-        setupProviders(auth);
+        setupProviders();
         return auth;
       }
+
     } catch (err) {
       console.warn("Dynamic Firebase config fetch error:", err);
     }

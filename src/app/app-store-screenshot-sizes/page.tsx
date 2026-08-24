@@ -8,13 +8,7 @@ import {
   CheckCircle2,
   Sparkles,
   ArrowRight,
-  Download,
-  Layers,
-  HelpCircle,
-  Zap,
   Info,
-  ShieldCheck,
-  ExternalLink,
   ChevronDown,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
@@ -22,7 +16,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Footer } from "@/components/dashboard/Footer";
-import { motion, AnimatePresence } from "framer-motion";
+
 
 const IOS_SIZES = [
   {

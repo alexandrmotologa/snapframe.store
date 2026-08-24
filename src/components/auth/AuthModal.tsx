@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import {
   X,
   Loader2,
-  Sparkles,
   User as UserIcon,
   ShieldCheck,
   AlertCircle,
   ArrowRight,
   Globe,
 } from "lucide-react";
+
 import { useAuthStore } from "@/lib/store/authStore";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { BrandHeroIcon } from "@/components/ui/BrandHeroIcon";

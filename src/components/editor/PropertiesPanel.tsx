@@ -2,16 +2,16 @@
 
 import { memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
-import { TextLayer, ImageLayer, ShapeLayer, Background, GradientStop, GradientDirection } from "@/lib/types";
+import { TextLayer, ShapeLayer, Background, GradientDirection } from "@/lib/types";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Trash2, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 import { SlideLayout } from "@/lib/types";
 import { LAYOUT_LABEL, LAYOUT_HINT } from "@/lib/themes";
 import { applyLayoutToScreen } from "@/lib/layoutEngine";

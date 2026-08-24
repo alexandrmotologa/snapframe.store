@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Film, X, Loader2, CheckCircle2, AlertCircle,
-  Play, Pause, Settings2, Sparkles, Video, RefreshCw
+  Play, Pause, Sparkles, Video, RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useProjectStore } from "@/lib/store/projectStore";
 import { cn } from "@/lib/utils";
 import { renderScreenToCanvas } from "@/lib/renderScreenToCanvas";
-import { isTabletDevice } from "@/lib/devices";
 import { toast } from "@/lib/store/toastStore";
 
 interface GifExportModalProps {
@@ -20,7 +19,6 @@ interface GifExportModalProps {
 
 type ExportFormat = "gif" | "webm" | "mp4";
 type TransitionStyle = "slide" | "fade" | "cut";
-type AspectRatioMode = "native" | "story" | "landscape" | "square";
 type Step = "config" | "exporting" | "done" | "error";
 
 export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
@@ -32,10 +30,9 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
   const [step, setStep] = useState<Step>("config");
   const [format, setFormat] = useState<ExportFormat>("webm");
   const [transition, setTransition] = useState<TransitionStyle>("slide");
-  const [aspectRatio, setAspectRatio] = useState<AspectRatioMode>("native");
   const [fps, setFps] = useState(1.5);
   const [scale, setScale] = useState(1);
-  const [selectedSet, setSelectedSet] = useState<string>(screenSets[0]?.id ?? "");
+  const [selectedSet] = useState<string>(screenSets[0]?.id ?? "");
   const [progress, setProgress] = useState(0);
   const [statusMsg, setStatusMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -46,7 +43,8 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
   const cachedCanvasesRef = useRef<HTMLCanvasElement[]>([]);
 
   const activeSet = screenSets.find((s) => s.id === selectedSet) || screenSets[0];
-  const screens = activeSet?.screens ?? [];
+  const screens = useMemo(() => activeSet?.screens ?? [], [activeSet]);
+
 
   // Pre-render all screens to offscreen canvases for silky preview and recording
   useEffect(() => {

@@ -1,12 +1,12 @@
 import { useCallback, useRef, useEffect, useState, memo } from "react";
-import { Trash2, Copy, ArrowUp, ArrowDown, Lock, RefreshCw, GripHorizontal, AlignCenter, AlignJustify, Edit3, Upload } from "lucide-react";
+import { Trash2, GripHorizontal } from "lucide-react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useLanguageStore } from "@/lib/store/languageStore";
-import { toast } from "@/lib/store/toastStore";
 import {
   Screen, ScreenSet, TextLayer, ShapeLayer,
-  ImageLayer, ScreenshotLayer, FlagLayer, Layer
+  ImageLayer, ScreenshotLayer, FlagLayer
 } from "@/lib/types";
+
 import { ALL_DEVICES, IOS_DEVICES, ANDROID_DEVICES, COLOR_HEX_MAP, isTabletDevice } from "@/lib/devices";
 import { cn, loadGoogleFont, drawBackgroundToCanvas } from "@/lib/utils";
 import { getTextGradientPreset } from "@/lib/textPresets";
@@ -73,11 +73,11 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
 
   const {
     activeSetId, activeScreenId, activeLayerId, selectedLayerIds,
-    setActiveLayer, toggleSelectLayer, clearSelection,
-    deleteScreen, deleteLayer, duplicateLayer, updateLayer, updateScreen,
-    lockLayer, bringForward, sendBackward, zoom,
+    deleteScreen, updateScreen,
+    zoom,
   } = useEditorStore();
   const { activeLang } = useLanguageStore();
+
 
   const saveCaption = () => {
     setEditingCaption(false);
@@ -988,7 +988,11 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
             const r3 = i % 2 === 0 ? outerR : innerR;
             const px = cx2 + Math.cos(angle) * r3;
             const py = cy2 + Math.sin(angle) * r3;
-            i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            if (i === 0) {
+              ctx.moveTo(px, py);
+            } else {
+              ctx.lineTo(px, py);
+            }
           }
           ctx.closePath();
           ctx.fill(); applyStroke();
@@ -1000,10 +1004,15 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
             const angle = (Math.PI / 3) * i - Math.PI / 6;
             const px = cx2 + Math.cos(angle) * r4;
             const py = cy2 + Math.sin(angle) * r4;
-            i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            if (i === 0) {
+              ctx.moveTo(px, py);
+            } else {
+              ctx.lineTo(px, py);
+            }
           }
           ctx.closePath();
           ctx.fill(); applyStroke();
+
 
         } else if (sl.shape === "diamond") {
           ctx.beginPath();
@@ -1054,9 +1063,10 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
           try {
             const badgeImg = await loadImage(badgeSrc);
             ctx.drawImage(badgeImg, sl.x, sl.y, sl.width, sl.height);
-          } catch (e) {
+          } catch {
             // Fallback rendering
             ctx.fillStyle = isLight ? "#FFFFFF" : "#000000";
+
             ctx.beginPath();
             ctx.roundRect(sl.x, sl.y, sl.width, sl.height, Math.min(sl.width, sl.height) * 0.2);
             ctx.fill();
@@ -1198,9 +1208,9 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
 
           // Header line (App Name · time)
           const textLeft = iconX + iconSize + bh * 0.18;
-          const maxTextW = bw - (textLeft - bx) - bh * 0.18;
 
           ctx.textAlign = "left";
+
           ctx.textBaseline = "middle";
           ctx.font = `600 ${bh * 0.16}px "Inter", sans-serif`;
           ctx.fillStyle = "#64748B";
@@ -2210,7 +2220,9 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
 
       ctx.restore();
     }
-  }, [screen, isActiveScreen, activeLayerId, activeLang, hideScreenshots, screenSet.mockup]);
+  }, [screen, isActiveScreen, activeLayerId, activeLang, hideScreenshots, screenSet.mockup, screenSet.deviceId, screenSet.store, CARD_DISPLAY_WIDTH]);
+
+
 
   useEffect(() => {
     const animId = requestAnimationFrame(() => {
