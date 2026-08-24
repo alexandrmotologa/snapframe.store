@@ -6,30 +6,39 @@ let adminApp: App | null = null;
 let adminDb: Firestore | null = null;
 let adminAuth: Auth | null = null;
 
-const projectId =
-  process.env.FIREBASE_PROJECT_ID ||
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
-  ? process.env.FIREBASE_CLIENT_EMAIL.trim().replace(/^["']|["']$/g, "")
-  : undefined;
-
 function formatPrivateKey(key?: string): string | undefined {
   if (!key) return undefined;
   let formatted = key.trim();
-  // Strip outer quotes if pasted with quotes
   if ((formatted.startsWith('"') && formatted.endsWith('"')) || (formatted.startsWith("'") && formatted.endsWith("'"))) {
     formatted = formatted.slice(1, -1);
   }
-  // Replace escaped newlines
   formatted = formatted.replace(/\\n/g, "\n").replace(/\\r/g, "");
   return formatted;
 }
 
-const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+export function getFirebaseAdmin(): {
+  app: App | null;
+  db: Firestore | null;
+  auth: Auth | null;
+  isConfigured: boolean;
+} {
+  if (adminApp && adminDb && adminAuth) {
+    return { app: adminApp, db: adminDb, auth: adminAuth, isConfigured: true };
+  }
 
-export const isAdminConfigured = Boolean(projectId && clientEmail && privateKey);
+  const projectId =
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
+    ? process.env.FIREBASE_CLIENT_EMAIL.trim().replace(/^["']|["']$/g, "")
+    : undefined;
+  const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
-if (isAdminConfigured) {
+  const isConfigured = Boolean(projectId && clientEmail && privateKey);
+  if (!isConfigured) {
+    return { app: null, db: null, auth: null, isConfigured: false };
+  }
+
   try {
     if (getApps().length === 0) {
       adminApp = initializeApp({
@@ -45,8 +54,39 @@ if (isAdminConfigured) {
     adminDb = getFirestore(adminApp);
     adminAuth = getAuth(adminApp);
   } catch (error: any) {
-    console.error("Firebase Admin initialization error:", error?.message || "Unknown initialization error");
+    console.error("[Firebase Admin] Initialization error:", error?.message || error);
+    return { app: null, db: null, auth: null, isConfigured: false };
   }
+
+  return {
+    app: adminApp,
+    db: adminDb,
+    auth: adminAuth,
+    isConfigured: Boolean(adminApp && adminDb && adminAuth),
+  };
 }
 
-export { adminDb, adminAuth, FieldValue };
+export const isAdminConfigured = Boolean(
+  (process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) &&
+  process.env.FIREBASE_CLIENT_EMAIL &&
+  process.env.FIREBASE_PRIVATE_KEY
+);
+
+// Lazy proxies for backward compatibility
+export const adminDbProxy = new Proxy({} as Firestore, {
+  get(_target, prop) {
+    const { db } = getFirebaseAdmin();
+    if (!db) throw new Error("Firebase Admin Firestore is not initialized.");
+    return (db as any)[prop];
+  },
+});
+
+export const adminAuthProxy = new Proxy({} as Auth, {
+  get(_target, prop) {
+    const { auth } = getFirebaseAdmin();
+    if (!auth) throw new Error("Firebase Admin Auth is not initialized.");
+    return (auth as any)[prop];
+  },
+});
+
+export { adminDbProxy as adminDb, adminAuthProxy as adminAuth, FieldValue };
