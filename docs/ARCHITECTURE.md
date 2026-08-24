@@ -176,6 +176,12 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 - **Auto-Centering on Selection:** Active filter tabs trigger smooth programmatic scrolling (`scrollIntoView({ inline: 'center' })`), guaranteeing active chips remain in the user's viewport.
 - **Panel Width & Ergonomics:** Standardized sidebar slide-out width (`w-80` / 320px) calibrated for 2-column card layouts, giving titles 100% horizontal real estate, non-overlapping badge anchors (PRO top-left, screen counts top-right), and structured segmented grid controls across `TemplatesPanel`, `BackgroundPanel`, `BlocksPanel`, `ThemesPanel`, `StickersPanel`, and `LocalizationPanel`.
 
+### 6.6 3D Multi-Screen Dashboard Cover Architecture (`ProjectCoverShowcase`)
+- **Live 3D Screen Deck & Perspective Fan-out:** Dashboard cards render a live layered stack of the project's first 2–3 screens with realistic device bezels, dynamic island notches, and perspective rotations (`rotate-[6deg]`, `rotate-[11deg]`).
+- **Dynamic Ambient Glow Extraction:** Real-time color extraction from active screen backgrounds (`solid`, `gradient`, `mesh`, or `image`) renders an ambient lighting halo behind device mockups.
+- **Interactive Screen Peek:** Micro-dot hover navigation allows rapid screen cycling directly on dashboard cards without triggering heavy editor navigations.
+- **App Monogram & Contextual Teaser:** Generates consistent App Store-style squircle icons and extracts primary headline text for immediate project identification.
+
 ---
 
 ## 7. 3-Tier Monetization & Export Gating Matrix

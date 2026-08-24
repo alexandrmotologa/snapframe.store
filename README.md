@@ -32,6 +32,7 @@
 - **30+ Drag-and-Drop Block Elements:** Dynamic Islands, Live Activity workouts, iOS Toggle switches, Push Notification banners, Editors' Choice laurels, 30-Day Guarantee seals, Growth stats (+142%), and Before/After comparison cards.
 - **Responsive & Adaptable Studio UI:** Built-in horizontal scroll rails with interactive chevrons, vertical-to-horizontal mouse wheel conversion, and automatic tab centering across all category filters (Templates, Block Elements, Color Themes, Stickers, Languages).
 - **Ergonomic Template Cards & Controls:** Full-width titles with tooltip support, cleanly separated PRO and Screen-count indicators, responsive 2-column platform scope selectors ("All Platforms" vs "Active Only"), and a 5-column icon+label background switcher.
+- **3D Multi-Screen Dashboard Covers:** Realistic layered 3D screen deck preview with dynamic ambient glow extracted from project background palettes, interactive hover micro-gallery (screen peek), app icon monograms, and headline teasers.
 - **20+ Google Fonts:** Inter, Montserrat, Poppins, Outfit, Space Grotesk, Syne, Playfair Display, and more.
 - **Lossless 2D Canvas Engine:** 100% visual parity between the real-time editor, Live Store Simulator, PNG clipboard copy, and production 4K ZIP export.
 
