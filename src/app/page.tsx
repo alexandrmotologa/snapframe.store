@@ -117,12 +117,13 @@ export default function LandingPage() {
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-2 justify-center mb-10 max-w-2xl">
               {[
+                "📸 Instant Ctrl+V Paste",
                 "📱 3D & 2D Device Mockups",
                 "🎨 Continuous Panorama Flows",
                 "🤖 Vision AI Auto-Pilot",
                 "📐 Custom Canvas & Social Presets",
                 "🌙 Dual Theme Matching Sets",
-                "💾 Ultra HD PNG & ZIP Export",
+                "⚡ Fastlane Deliverfile ZIP",
                 "🌐 40+ Languages i18n",
                 "📱 Live Store & Tablet Simulator",
               ].map((f) => (

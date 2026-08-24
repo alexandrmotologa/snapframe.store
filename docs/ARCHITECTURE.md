@@ -192,6 +192,11 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 - **Automated Fastlane `Deliverfile`:** Exports ready-to-run Ruby `Deliverfile` alongside `README-FASTLANE.md` and localized `fastlane/metadata/[locale]/` structures for instant `fastlane deliver` terminal deployments.
 - **Dynamic Programmatic SEO & Sitemaps:** Next.js App Router `sitemap.ts`, `robots.ts`, and official 2026 App Store & Google Play Screenshot Sizes Reference (`/app-store-screenshot-sizes`).
 
+### 6.9 Synchronous History Snapshots & Fail-Safe Storage Sandboxing
+- **Synchronous Pre-Mutation Snapshotting:** Structural editor actions (`addScreen`, `deleteScreen`, `reorderScreens`, `addScreenSet`, `removeScreenSet`, `applyTemplate`) invoke `recordHistory(true)` immediately *prior* to state mutations. This guarantees the pre-action baseline is saved to the history stack so `undo()` (`Ctrl+Z`) restores the exact pre-mutation state deterministically.
+- **Continuous Debounced History:** Live value sliders, color pickers, and transform drags batch history states with a 300ms debounce timer to prevent history array explosion.
+- **Fail-Safe Browser Storage:** All client-side persistence invocations (`localStorage`) operate within structured `try/catch` sandboxes, ensuring zero unhandled exceptions when users operate in restricted incognito windows or private browsing containers.
+
 ---
 
 ## 7. 3-Tier Monetization & Export Gating Matrix
