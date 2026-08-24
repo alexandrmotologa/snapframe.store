@@ -15,40 +15,50 @@ export function getPaddleConfig() {
   const isBrowser = typeof window !== "undefined";
   const hostname = isBrowser ? window.location.hostname : "";
 
-  // 1. Resolve Client Token from environment variables
-  const clientToken =
+  const isDevelopOrLocal =
+    hostname.includes("develop.snapframe.store") ||
+    hostname.includes("localhost") ||
+    hostname.includes("127.0.0.1") ||
+    hostname.includes("vercel.app");
+
+  // Determine target environment
+  const forcedEnv = process.env.NEXT_PUBLIC_PADDLE_ENV?.toLowerCase();
+  const rawToken =
     process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
     process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN ||
     "";
 
-  // 2. Resolve Price IDs from environment variables
+  let environment: "sandbox" | "production" = "production";
+  if (forcedEnv === "production" || forcedEnv === "sandbox") {
+    environment = forcedEnv;
+  } else if (rawToken.startsWith("live_")) {
+    environment = "production";
+  } else if (rawToken.startsWith("test_")) {
+    environment = "sandbox";
+  } else if (isDevelopOrLocal) {
+    environment = "sandbox";
+  }
+
+  // Resolve matching credentials for that environment
+  const clientToken =
+    environment === "sandbox"
+      ? (process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN || process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "")
+      : (process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN || "");
+
   const monthlyPriceId =
-    process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY ||
-    process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY ||
-    "";
+    environment === "sandbox"
+      ? (process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY || process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY || "")
+      : (process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY || process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY || "");
 
   const annualPriceId =
-    process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL ||
-    process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL ||
-    "";
+    environment === "sandbox"
+      ? (process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL || process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL || "")
+      : (process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL || process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL || "");
 
-  // 3. Determine Paddle Environment
-  const forcedEnv = process.env.NEXT_PUBLIC_PADDLE_ENV?.toLowerCase();
-  let environment: "sandbox" | "production" = "production";
-
-  if (forcedEnv === "production") {
-    environment = "production";
-  } else if (forcedEnv === "sandbox") {
-    environment = "sandbox";
-  } else if (clientToken.startsWith("live_")) {
+  // Strict token-type alignment
+  if (clientToken.startsWith("live_")) {
     environment = "production";
   } else if (clientToken.startsWith("test_")) {
-    environment = "sandbox";
-  } else if (
-    hostname.includes("develop.snapframe.store") ||
-    hostname.includes("localhost") ||
-    hostname.includes("127.0.0.1")
-  ) {
     environment = "sandbox";
   }
 
