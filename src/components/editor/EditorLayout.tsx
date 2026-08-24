@@ -102,17 +102,46 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showTips, setShowTips] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
+  const [localName, setLocalName] = useState(project?.name ?? "");
   const [zoomOpen, setZoomOpen] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const thumbTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const renameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync external name changes
+  useEffect(() => {
+    if (project?.name !== undefined) {
+      setLocalName(project.name);
+    }
+  }, [project?.name]);
+
+  const handleNameChange = (val: string) => {
+    setLocalName(val);
+    if (project) {
+      setSaveStatus("saving");
+      if (renameTimerRef.current) clearTimeout(renameTimerRef.current);
+      renameTimerRef.current = setTimeout(() => {
+        useProjectStore.getState().updateProject(project.id, { name: val });
+      }, 500);
+    }
+  };
+
+  const handleNameBlur = () => {
+    if (renameTimerRef.current) clearTimeout(renameTimerRef.current);
+    if (project && localName !== project.name) {
+      useProjectStore.getState().updateProject(project.id, { name: localName });
+    }
+  };
 
   // ── First-visit quick tips trigger ───────────────────────────────────────
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const hasSeenTips = localStorage.getItem("sf_seen_quick_tips");
-      if (!hasSeenTips) {
-        setShowTips(true);
-      }
+      try {
+        const hasSeenTips = localStorage.getItem("sf_seen_quick_tips");
+        if (!hasSeenTips) {
+          setShowTips(true);
+        }
+      } catch {}
     }
   }, []);
 
@@ -419,17 +448,18 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
             <div className="relative flex items-center group">
               <input
                 type="text"
-                value={project?.name ?? ""}
-                onChange={(e) => {
-                  if (project) {
-                    setSaveStatus("saving");
-                    useProjectStore.getState().updateProject(project.id, { name: e.target.value });
+                value={localName}
+                onChange={(e) => handleNameChange(e.target.value)}
+                onBlur={handleNameBlur}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    (e.target as HTMLInputElement).blur();
                   }
                 }}
                 className="text-xs sm:text-sm font-semibold tracking-tight truncate max-w-32 sm:max-w-52 bg-transparent border border-transparent hover:border-border/60 focus:border-primary/60 outline-none focus:ring-1 focus:ring-primary/40 px-2 py-0.5 rounded-lg transition-all hover:bg-secondary/40 text-foreground"
                 placeholder="Untitled Project"
                 spellCheck={false}
-                title="Click to rename project"
+                title="Click to rename project (Enter to confirm)"
               />
               <Edit2 className="w-3 h-3 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 pointer-events-none" />
             </div>
@@ -444,12 +474,12 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
                   ? "bg-amber-500/10 text-amber-500 border border-amber-500/25"
                   : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 hover:bg-emerald-500/20"
               )}
-              title={saveStatus === "saving" ? "Saving changes..." : isPro ? "Cloud Synced (Click to save now)" : "Saved on device (Click to save now)"}
+              title={saveStatus === "saving" ? (isPro ? "Syncing changes to cloud..." : "Saving changes locally...") : isPro ? "Cloud Synced (Click to force sync)" : "Saved locally on device (Click to force save)"}
             >
               {saveStatus === "saving" ? (
                 <>
                   <Loader2 className="w-2.5 h-2.5 animate-spin" />
-                  <span>Saving...</span>
+                  <span>{isPro ? "Syncing..." : "Saving..."}</span>
                 </>
               ) : isPro ? (
                 <>
@@ -459,7 +489,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
               ) : (
                 <>
                   <Check className="w-3 h-3 text-emerald-500" />
-                  <span>Saved</span>
+                  <span>Saved locally</span>
                 </>
               )}
             </button>

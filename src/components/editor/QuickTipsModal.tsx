@@ -121,7 +121,9 @@ export function QuickTipsModal({ open, onClose }: QuickTipsModalProps) {
 
   const handleClose = () => {
     if (dontShowAgain && typeof window !== "undefined") {
-      localStorage.setItem("sf_seen_quick_tips", "true");
+      try {
+        localStorage.setItem("sf_seen_quick_tips", "true");
+      } catch {}
     }
     onClose();
   };

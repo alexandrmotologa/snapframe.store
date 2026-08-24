@@ -284,7 +284,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     if (targetSet && targetSet.screens.length >= 10) {
       return;
     }
-    get().recordHistory();
+    get().recordHistory(true);
     set((state) => {
       const sets = state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -325,11 +325,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         activeScreenId: newScreen?.id ?? state.activeScreenId,
       };
     });
-    get().recordHistory();
   },
 
   deleteScreen: (setId, screenId) => {
-    get().recordHistory();
+    get().recordHistory(true);
     set((state) => {
       const sets = state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -366,6 +365,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   reorderScreens: (setId, screenIds) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -375,7 +375,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return { ...ss, screens: reordered };
       }),
     }));
-    get().recordHistory();
   },
 
   updateBackground: (setId, screenId, background) => {
@@ -1157,6 +1156,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   canRedo: () => get().historyIndex < get().history.length - 1,
 
   applyTemplate: (setId, template) => {
+    get().recordHistory(true);
     const { screenSets, activeSetId } = get();
     const isAll = setId === "all" || !setId;
 
@@ -1287,6 +1287,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   addScreenSet: (store) => {
+    get().recordHistory(true);
     const { screenSets, hiddenScreenSets } = get();
     const existingHidden = hiddenScreenSets.find((s) => s.store === store);
 
@@ -1409,6 +1410,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   addTabletSet: (store = "ios") => {
+    get().recordHistory(true);
     const isIOS = store === "ios";
     const tabletDeviceId = isIOS ? "ipad-pro-13" : "samsung-tab-s10-ultra";
     const tabletDevice = ALL_DEVICES.find((d) => d.id === tabletDeviceId);
@@ -1518,7 +1520,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   removeScreenSet: (setId) => {
-    get().recordHistory();
+    get().recordHistory(true);
     const { screenSets, hiddenScreenSets, activeSetId } = get();
     if (screenSets.length <= 1) return; // keep at least one set
     const setToHide = screenSets.find((s) => s.id === setId);
