@@ -107,16 +107,18 @@ export async function verifyAndSyncUserEnvironment(
             )} and cannot be used on ${getEnvironmentLabel(currentEnv)}.`,
         };
       }
-      return {
-        allowed: true,
-        registeredEnvironment: data.registeredEnvironment || currentEnv,
-        currentEnvironment: currentEnv,
-        isPro: Boolean(data.isPro),
-        plan: data.plan || null,
-        subscriptionStatus: data.subscriptionStatus || null,
-        aiCredits: typeof data.aiCredits === "number" ? data.aiCredits : 3,
-        usedAiCredits: typeof data.usedAiCredits === "number" ? data.usedAiCredits : 0,
-      };
+      if (typeof data.isPro === "boolean") {
+        return {
+          allowed: true,
+          registeredEnvironment: data.registeredEnvironment || currentEnv,
+          currentEnvironment: currentEnv,
+          isPro: Boolean(data.isPro),
+          plan: data.plan || null,
+          subscriptionStatus: data.subscriptionStatus || null,
+          aiCredits: typeof data.aiCredits === "number" ? data.aiCredits : (data.isPro ? 9999 : 3),
+          usedAiCredits: typeof data.usedAiCredits === "number" ? data.usedAiCredits : 0,
+        };
+      }
     }
   } catch (apiErr) {
     console.warn("[AuthEnv] Server verification endpoint error, falling back to client Firestore:", apiErr);
@@ -155,17 +157,22 @@ export async function verifyAndSyncUserEnvironment(
         lastLoginEnvironment: currentEnv,
       });
 
+      const now = Date.now();
+      const isPeriodValid = data.subscriptionExpiresAt ? data.subscriptionExpiresAt > now : true;
+      const isPro = Boolean(data.isPro && isPeriodValid);
+
       return {
         allowed: true,
         registeredEnvironment: registeredEnv || currentEnv,
         currentEnvironment: currentEnv,
-        isPro: Boolean(data.isPro),
+        isPro,
         plan: data.plan || null,
         subscriptionStatus: data.subscriptionStatus || null,
-        aiCredits: typeof data.aiCredits === "number" ? data.aiCredits : 3,
+        aiCredits: typeof data.aiCredits === "number" ? data.aiCredits : (isPro ? 9999 : 3),
         usedAiCredits: typeof data.usedAiCredits === "number" ? data.usedAiCredits : 0,
       };
-    } else {
+    }
+ else {
       // First-time registration for this user
       // Also verify if another doc with the same email exists with a different environment
       if (user.email) {
