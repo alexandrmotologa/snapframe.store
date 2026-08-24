@@ -74,7 +74,9 @@ export async function syncProjectsOnLogin(uid: string): Promise<void> {
     }
 
     const mergedList = Array.from(mergedMap.values());
-    useProjectStore.setState({ projects: mergedList });
+    if (mergedList.length > 0) {
+      useProjectStore.setState({ projects: mergedList });
+    }
 
     // 3. Attach real-time snapshot listener for changes across other devices/tabs
     if (currentUnsub) {
@@ -103,11 +105,16 @@ export async function syncProjectsOnLogin(uid: string): Promise<void> {
         });
       }
     }, (error) => {
-      console.warn("Firestore projects snapshot listener error:", error);
+      // Gracefully handle permission errors when security rules are restricted
+      if (error?.code !== "permission-denied") {
+        console.warn("[CloudSync] Snapshot listener info:", error?.message || error);
+      }
     });
 
-  } catch (err) {
-    console.warn("Cloud project sync error:", err);
+  } catch (err: any) {
+    if (err?.code !== "permission-denied" && !err?.message?.includes("permissions")) {
+      console.warn("[CloudSync] Sync notice:", err?.message || err);
+    }
   } finally {
     isSyncing = false;
   }
@@ -139,8 +146,10 @@ export async function saveProjectToCloud(uid: string, project: Project): Promise
       ...project,
       updatedAt: project.updatedAt || Date.now(),
     }, { merge: true });
-  } catch (err) {
-    console.warn("Failed to save project to cloud:", err);
+  } catch (err: any) {
+    if (err?.code !== "permission-denied" && !err?.message?.includes("permissions")) {
+      console.warn("[CloudSync] Failed to save project to cloud:", err?.message || err);
+    }
   }
 }
 
@@ -178,8 +187,10 @@ export async function deleteProjectFromCloud(uid: string, projectId: string): Pr
     if (!db) return;
     const projectRef = doc(db, "users", uid, "projects", projectId);
     await deleteDoc(projectRef);
-  } catch (err) {
-    console.warn("Failed to delete project from cloud:", err);
+  } catch (err: any) {
+    if (err?.code !== "permission-denied" && !err?.message?.includes("permissions")) {
+      console.warn("[CloudSync] Failed to delete project from cloud:", err?.message || err);
+    }
   }
 }
 
