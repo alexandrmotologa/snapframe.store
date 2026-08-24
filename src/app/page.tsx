@@ -42,7 +42,6 @@ export default function LandingPage() {
             className="flex items-center gap-2 cursor-pointer group"
           >
             <SnapFrameLogo size={32} withText textClassName="text-lg" />
-            <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 ml-1">Beta</Badge>
           </Link>
 
           <div className="flex items-center gap-3">
