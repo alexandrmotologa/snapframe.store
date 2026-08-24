@@ -142,6 +142,13 @@ export async function GET(req: NextRequest) {
 
     const paddlePortalUrl = "https://paddle.net";
 
+    const isAnnualPlan = Boolean(userData.plan?.includes("annual"));
+    const billingAmount = isAnnualPlan ? 69 : 9;
+    const isCanceled = userData.subscriptionStatus === "canceled";
+    const subscriptionStartedAt = userData.subscriptionStartedAt || userData.lastPaymentAt || userData.createdAt || null;
+    const subscriptionExpiresAt = userData.subscriptionExpiresAt || null;
+    const nextBilledAt = (!isPro || isCanceled) ? null : (userData.nextBilledAt || subscriptionExpiresAt || null);
+
     return NextResponse.json({
       user: {
         uid,
@@ -151,9 +158,14 @@ export async function GET(req: NextRequest) {
         isPro,
         plan: userData.plan || (isPro ? "pro-monthly" : "free"),
         subscriptionStatus: isPro
-          ? (userData.subscriptionStatus || "active")
-          : (userData.subscriptionStatus === "canceled" ? "expired" : "free"),
-        subscriptionExpiresAt: userData.subscriptionExpiresAt || null,
+          ? (isCanceled ? "canceled" : (userData.subscriptionStatus || "active"))
+          : (isCanceled ? "expired" : "free"),
+        subscriptionStartedAt,
+        subscriptionExpiresAt,
+        nextBilledAt,
+        autoRenew: isPro && !isCanceled,
+        billingAmount: isPro ? billingAmount : 0,
+        currency: userData.currency || "USD",
         paddleCustomerId: userData.paddleCustomerId || null,
         paddleSubscriptionId: userData.paddleSubscriptionId || null,
         createdAt: userData.createdAt || Date.now(),
@@ -197,13 +209,21 @@ export async function POST(req: NextRequest) {
 
       if (isConfigured && adminDb) {
         const userRef = adminDb.collection("users").doc(uid);
+        const userSnap = await userRef.get();
+        const existingData = userSnap.data() || {};
+        const startedAt = existingData.subscriptionStartedAt || now;
+
         await userRef.set(
           {
             isPro: true,
             plan: isAnnual ? "pro-annual" : "pro-monthly",
             subscriptionStatus: "active",
+            subscriptionStartedAt: startedAt,
             lastPaymentAt: now,
             subscriptionExpiresAt: expiresAt,
+            nextBilledAt: expiresAt,
+            billingAmount: isAnnual ? 69 : 9,
+            currency: "USD",
             aiCredits: 9999,
             canceledAt: null,
             cancelReason: null,

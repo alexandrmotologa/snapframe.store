@@ -116,19 +116,34 @@ export async function POST(req: NextRequest) {
       case "transaction.completed": {
         const status = data?.status || "active";
         const isPro = status === "active" || status === "trialing";
+        const startedAt = data?.started_at
+          ? new Date(data.started_at).getTime()
+          : (data?.first_billed_at ? new Date(data.first_billed_at).getTime() : Date.now());
+        const periodEndsAt = data?.current_billing_period?.ends_at
+          ? new Date(data.current_billing_period.ends_at).getTime()
+          : Date.now() + (plan === "annual" ? 365 : 30) * 86400000;
+        const nextBilledAt = data?.next_billed_at
+          ? new Date(data.next_billed_at).getTime()
+          : (status === "active" ? periodEndsAt : null);
+        const billingAmount = plan === "annual" ? 69 : 9;
 
         await targetDocRef.set(
           {
             isPro,
             plan: plan === "annual" ? "pro-annual" : "pro-monthly",
             subscriptionStatus: status,
+            subscriptionStartedAt: startedAt,
+            subscriptionExpiresAt: periodEndsAt,
+            nextBilledAt: status === "active" ? nextBilledAt : null,
+            billingAmount,
+            currency: data?.currency_code || "USD",
             paddleCustomerId: data?.customer_id || null,
             paddleSubscriptionId: data?.id || null,
             updatedAt: Date.now(),
           },
           { merge: true }
         );
-        console.log(`[Paddle Webhook] User upgraded to Pro (plan: ${plan}, status: ${status})`);
+        console.log(`[Paddle Webhook] User upgraded to Pro (plan: ${plan}, status: ${status}, nextBilledAt: ${nextBilledAt ? new Date(nextBilledAt).toISOString() : "none"})`);
         break;
       }
 

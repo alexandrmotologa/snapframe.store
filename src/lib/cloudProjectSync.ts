@@ -123,6 +123,28 @@ export async function syncProjectsOnLogin(uid: string): Promise<void> {
 const cloudSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 /**
+ * Recursively cleans any `undefined` values from an object or array to ensure compatibility with Firestore setDoc/updateDoc.
+ */
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === null || data === undefined) {
+    return null as any;
+  }
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item)) as any;
+  }
+  if (typeof data === "object") {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        cleaned[key] = sanitizeForFirestore(value);
+      }
+    }
+    return cleaned as T;
+  }
+  return data;
+}
+
+/**
  * Saves or updates a project in Firestore under users/{uid}/projects/{projectId} (Immediate)
  * Only executed for Pro subscribers.
  */
@@ -142,10 +164,11 @@ export async function saveProjectToCloud(uid: string, project: Project): Promise
     const db = await getFirebaseDb();
     if (!db) return;
     const projectRef = doc(db, "users", uid, "projects", project.id);
-    await setDoc(projectRef, {
+    const payload = sanitizeForFirestore({
       ...project,
       updatedAt: project.updatedAt || Date.now(),
-    }, { merge: true });
+    });
+    await setDoc(projectRef, payload, { merge: true });
   } catch (err: any) {
     if (err?.code !== "permission-denied" && !err?.message?.includes("permissions")) {
       console.warn("[CloudSync] Failed to save project to cloud:", err?.message || err);

@@ -25,6 +25,7 @@ import {
   Layers,
   Globe,
   Upload,
+  XCircle,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -64,6 +65,12 @@ interface BillingDetails {
     isPro: boolean;
     plan: string;
     subscriptionStatus: string;
+    subscriptionStartedAt?: number | null;
+    subscriptionExpiresAt?: number | null;
+    nextBilledAt?: number | null;
+    autoRenew?: boolean;
+    billingAmount?: number;
+    currency?: string;
     paddleCustomerId?: string | null;
     paddleSubscriptionId?: string | null;
     createdAt: number;
@@ -195,6 +202,28 @@ export default function AccountPage() {
   const memberSince = billingData?.user?.createdAt
     ? new Date(billingData.user.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     : "Recently";
+
+  const formatFriendlyDate = (timestamp?: number | null) => {
+    if (!timestamp) return "—";
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const subStartedAt = billingData?.user?.subscriptionStartedAt;
+  const subExpiresAt = billingData?.user?.subscriptionExpiresAt;
+  const subNextBilledAt = billingData?.user?.nextBilledAt;
+  const subCanceledAt = billingData?.user?.canceledAt;
+  const isCanceled = subscriptionStatus === "canceled" || Boolean(subCanceledAt);
+  const autoRenew = Boolean(isPro && !isCanceled);
+  const planPrice = plan?.includes("annual") ? "$69.00 USD" : "$9.00 USD";
+  const planBillingCycle = plan?.includes("annual") ? "Annual billing cycle" : "Monthly billing cycle";
+
+  const remainingDays = subExpiresAt
+    ? Math.max(0, Math.ceil((subExpiresAt - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
@@ -421,33 +450,145 @@ export default function AccountPage() {
                 </div>
 
                 {/* Plan Status Banner */}
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div
+                  className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs ${
+                    isPro && !isCanceled
+                      ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-emerald-300"
+                      : isCanceled
+                      ? "bg-amber-500/10 border-amber-500/25 text-amber-700 dark:text-amber-300"
+                      : "bg-secondary/50 border-border/50 text-foreground"
+                  }`}
+                >
                   <div className="flex items-center gap-2">
                     <span
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        isPro && subscriptionStatus !== "canceled"
+                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                        isPro && !isCanceled
                           ? "bg-emerald-500 animate-pulse"
-                          : subscriptionStatus === "canceled"
+                          : isCanceled
                           ? "bg-amber-500"
                           : "bg-muted-foreground"
                       }`}
                     />
-                    <span className="font-semibold text-foreground">
+                    <span className="font-semibold">
                       Status:{" "}
-                      <span className="capitalize font-bold text-primary">
+                      <span className="font-bold">
                         {isPro
-                          ? subscriptionStatus === "canceled"
+                          ? isCanceled
                             ? "Canceled (Active until period ends)"
-                            : "Active"
+                            : "Active (Auto-Renewing)"
                           : "Free Tier"}
                       </span>
                     </span>
                   </div>
 
-                  <span className="text-muted-foreground font-mono text-[11px]">
+                  <span className="font-mono text-[11px] opacity-80">
                     Processed via <strong>Paddle.com</strong> (Merchant of Record)
                   </span>
                 </div>
+
+                {/* Detailed Subscription Lifecycle Metrics */}
+                {isPro && (
+                  <div className="space-y-3 pt-1">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Subscription &amp; Renewal Details
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* 1. Activation Date */}
+                      <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                          <Calendar className="w-3.5 h-3.5 text-primary" />
+                          <span>Activated On (Data activării)</span>
+                        </div>
+                        <p className="text-sm font-bold text-foreground">
+                          {formatFriendlyDate(subStartedAt || billingData?.user?.createdAt)}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Initial subscription start date
+                        </p>
+                      </div>
+
+                      {/* 2. Auto-Renewal Status */}
+                      <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                          <RefreshCw className="w-3.5 h-3.5 text-primary" />
+                          <span>Auto-Renewal (Reînnoire automată)</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          {autoRenew ? (
+                            <span className="inline-flex items-center gap-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                              <CheckCircle2 className="w-4 h-4" />
+                              Enabled (Automatic)
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-sm font-bold text-amber-600 dark:text-amber-400">
+                              <XCircle className="w-4 h-4" />
+                              Disabled (Will not renew)
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          {autoRenew
+                            ? `Next auto-charge of ${planPrice}`
+                            : "No future charges will be billed"}
+                        </p>
+                      </div>
+
+                      {/* 3. Next Billing / Period End Date */}
+                      <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                          <Clock className="w-3.5 h-3.5 text-primary" />
+                          <span>
+                            {autoRenew
+                              ? "Next Renewal Date (Data reînnoirii)"
+                              : "Pro Access Valid Until (Valabilitate)"}
+                          </span>
+                        </div>
+                        <p className="text-sm font-bold text-foreground">
+                          {formatFriendlyDate(subNextBilledAt || subExpiresAt)}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {remainingDays !== null
+                            ? `${remainingDays} days of Pro access remaining`
+                            : "Active billing term"}
+                        </p>
+                      </div>
+
+                      {/* 4. Renewal Price & Frequency */}
+                      <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                          <CreditCard className="w-3.5 h-3.5 text-primary" />
+                          <span>Renewal Amount (Suma reînnoirii)</span>
+                        </div>
+                        <p className="text-sm font-bold text-foreground">
+                          {autoRenew ? `${planPrice} / ${plan?.includes("annual") ? "year" : "month"}` : "$0.00 (No charge)"}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {autoRenew ? planBillingCycle : "Subscription canceled"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Cancellation Alert Banner */}
+                    {isCanceled && (
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-1.5 text-xs">
+                        <div className="flex items-center gap-2 font-bold text-amber-600 dark:text-amber-400">
+                          <AlertTriangle className="w-4 h-4 shrink-0" />
+                          <span>
+                            Subscription canceled on {formatFriendlyDate(subCanceledAt || Date.now())}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground leading-relaxed">
+                          Your subscription will not renew at the end of the billing period. You retain 100% full access to all Pro features, unlimited projects, multi-device cloud synchronization, and 4K exports until <strong>{formatFriendlyDate(subExpiresAt)}</strong>.
+                        </p>
+                        {billingData?.user?.cancelReason && (
+                          <p className="text-[11px] text-muted-foreground/80 font-mono">
+                            Reason: {billingData.user.cancelReason}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Plan Perks Included */}
                 <div className="space-y-3 pt-2">
@@ -457,7 +598,7 @@ export default function AccountPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>{isPro ? "Unlimited AI Vision Auto-Pilot" : "3 Free AI Credits included"}</span>
+                      <span>{isPro ? "1,500 AI Generations / Month (up to 150/day)" : "3 Free AI Credits included"}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -496,13 +637,22 @@ export default function AccountPage() {
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
 
-                      {subscriptionStatus !== "canceled" && (
+                      {!isCanceled ? (
                         <button
                           type="button"
                           onClick={() => setShowCancelModal(true)}
                           className="text-xs font-semibold text-rose-500 hover:text-rose-400 hover:underline transition-colors cursor-pointer"
                         >
                           Cancel Subscription
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setUpgradeModalOpen(true)}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>Reactivate Pro / Renew</span>
                         </button>
                       )}
                     </>
