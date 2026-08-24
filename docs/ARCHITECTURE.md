@@ -52,11 +52,12 @@ graph TD
 
 SnapFrame uses three primary Zustand stores designed for reactivity, persistence, and non-blocking undo/redo history.
 
-### 1. `editorStore.ts`
-- **Active Selection:** `activeSetId`, `activeScreenId`, `activeLayerId`.
-- **Screen Sets Hierarchy:** A project contains an array of `ScreenSet` objects (e.g. iPhone 16 Pro set, iPad Pro set, Android Phone set, Android Tablet set).
-- **Screens & Layers:** Each `Screen` holds dimensions (`width`, `height`), `background`, `localizations`, and an ordered list of `Layer` objects.
-- **Undo / Redo History Stack:** Maintains full immutable state snapshots with history recording on user actions (`recordHistory()`), supporting standard `Ctrl+Z` and `Ctrl+Y` shortcuts.
+### 1. `editorStore.ts` (Modular Slice Architecture)
+The studio store is decomposed into focused, single-responsibility Zustand slices composed cleanly into a unified hook:
+- **`SelectionSlice` (`selectionSlice.ts`):** `activeSetId`, `activeScreenId`, `activeLayerId`, `selectedLayerIds` (multi-select), selection toggling, and fast element getter helpers (`getActiveSet()`, `getActiveScreen()`, `getActiveLayer()`).
+- **`UiSlice` (`uiSlice.ts`):** `zoom` (clamped `0.1`–`2.0`), `showGrid`, `showGuides`, and `canvasBackground`.
+- **`HistorySlice` (`historySlice.ts`):** Stack of immutable state snapshots with automatic history recording (`recordHistory()`), debounced micro-changes, and non-blocking `undo()` and `redo()`.
+- **`ContentSlice` (`contentSlice.ts`):** Complete CRUD actions for screen sets, screens, layers (text, screenshot, shape, sticker), dual-theme generation, polymorphic theme applicator (`applyThemeToProject`), device scaling, and strictly-typed template instantiation.
 
 ### 2. `projectStore.ts`
 - **Project Metadata:** `id`, `name`, `thumbnail`, `createdAt`, `updatedAt`.

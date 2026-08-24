@@ -93,8 +93,8 @@
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Icons:** [Lucide Icons](https://lucide.dev/)
-- **Testing:** [Vitest](https://vitest.dev/) automated unit test suite with 100% path-alias resolution
-- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) with undo/redo history stack & local persistence
+- **Testing:** [Vitest](https://vitest.dev/) automated unit test suite with 55+ tests and 100% path-alias resolution
+- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) with modular slices (selection, ui, history, content), undo/redo history stack & local persistence
 - **Canvas Rendering:** Native HTML5 Canvas 2D with high-DPI supersampling & LRU cache eviction
 - **Export & Compression:** [JSZip](https://stuk.github.io/jszip/) & FileSaver
 - **AI Backend:** Universal 5-provider failover engine (Google Gemini, OpenAI, Groq, Mistral, xAI Grok)
@@ -152,7 +152,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```
 snapframe.store/
 ├── docs/                      # Comprehensive technical documentation
-│   ├── ARCHITECTURE.md        # State management, canvas engine & layer pipeline
+│   ├── ARCHITECTURE.md        # State management slices, canvas engine & layer pipeline
 │   ├── AI_SUPERPOWERS.md      # AI multi-provider failover, Vision & ASO copilot
 │   ├── DEVICES_AND_CANVAS.md  # Device matrix, vector frames, and tablet support
 │   ├── EXPORT_AND_ASO.md      # Fastlane, store submission guidelines & ZIP builder
@@ -178,7 +178,9 @@ snapframe.store/
 │   ├── components/
 │   │   ├── auth/              # AuthModal, UserMenu & provider OAuth linking
 │   │   ├── editor/            # Canvas, toolbar, timeline, filmstrip, background selector & modals
+│   │   │   ├── card/          # Canvas screen card drawers, overlays, and interaction hooks
 │   │   │   ├── panels/        # Sidebar panels (Text, Background, Platforms, Blocks, StoreListing, Localization, etc.)
+│   │   │   ├── toolbar/       # Modular contextual toolbars (Text, Shape, Mockup, Screen)
 │   │   │   ├── AIAutoPilotModal.tsx
 │   │   │   ├── CanvasBackgroundSelector.tsx
 │   │   │   ├── ExportModal.tsx
@@ -191,7 +193,7 @@ snapframe.store/
 │       ├── canvasBackgrounds.ts # 8 workspace background patterns (Square Grid, Dots, Blueprint, Isometric, etc.)
 │       ├── devices.ts         # Device database (iPhone, iPad, Pixel, Galaxy, Tabs)
 │       ├── renderScreenToCanvas.ts # Universal 4K Canvas 2D rendering engine
-│       ├── store/             # Zustand stores (editorStore, projectStore, languageStore, authStore)
+│       ├── store/             # Modular Zustand store with slices (selection, ui, history, content)
 │       └── types.ts           # Core TypeScript types & layer schemas
 ├── .env.example               # Environment variables template
 └── package.json
