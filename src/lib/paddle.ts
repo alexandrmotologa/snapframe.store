@@ -74,6 +74,7 @@ export function getPaddleConfig() {
 }
 
 let paddleInitialized = false;
+let activeSuccessHandler: (() => void) | null = null;
 
 /**
  * Ensures Paddle.js is loaded and initialized in the browser
@@ -102,6 +103,13 @@ export async function initializePaddle(): Promise<boolean> {
           eventCallback: (data: any) => {
             if (process.env.NODE_ENV !== "production" || config.environment === "sandbox") {
               console.log("[Paddle Event]", data);
+            }
+            if (data?.name === "checkout.completed" || data?.data?.status === "completed") {
+              toast.success("🎉 Payment successful! Welcome to SnapFrame Pro.");
+              if (activeSuccessHandler) {
+                activeSuccessHandler();
+                activeSuccessHandler = null;
+              }
             }
           },
         });
@@ -151,33 +159,10 @@ export async function openPaddleCheckout({
   const config = getPaddleConfig();
   const priceId = plan === "annual" ? config.prices.annual : config.prices.monthly;
 
-  // Fallback demo simulation if Paddle keys have not yet been configured in environment
-  const isDummyOrMissing =
-    !config.clientToken ||
-    !priceId ||
-    config.clientToken.startsWith("test_0123") ||
-    config.clientToken.startsWith("test_4ec75") ||
-    priceId.startsWith("pri_0123") ||
-    priceId.startsWith("pri_01m0g") ||
-    priceId.startsWith("pri_monthly_snapframe_pro") ||
-    priceId.startsWith("pri_annual_snapframe_pro");
-
-  if (isDummyOrMissing) {
-    console.log(`[Paddle] Simulation mode (${config.environment}) for:`, {
-      plan,
-      userEmail,
-      userId,
-    });
-    toast.info(
-      `Demo Mode: Paddle API keys not configured. Simulating Pro Upgrade for testing (${
-        plan === "annual" ? "$69/year" : "$9/month"
-      })...`
+  if (!config.clientToken || !priceId) {
+    toast.error(
+      "Paddle payment keys are not configured. Please set NEXT_PUBLIC_PADDLE_CLIENT_TOKEN and Price IDs in environment variables."
     );
-
-    setTimeout(() => {
-      toast.success("🎉 Welcome to SnapFrame Pro! (Test Upgrade Active)");
-      onSuccess?.();
-    }, 800);
     return;
   }
 
@@ -187,6 +172,8 @@ export async function openPaddleCheckout({
     toast.error("Unable to load Paddle payment gateway. Please check your connection or ad-blocker.");
     return;
   }
+
+  activeSuccessHandler = onSuccess || null;
 
   try {
     window.Paddle.Checkout.open({
@@ -215,7 +202,6 @@ export async function openPaddleCheckout({
     });
   } catch (err: any) {
     console.error("Paddle Checkout error:", err);
-    toast.error("Failed to open payment checkout. Please try again or contact support.");
+    toast.error("Failed to open payment checkout. Please verify your Paddle credentials.");
   }
 }
-
