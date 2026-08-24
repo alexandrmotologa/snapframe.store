@@ -99,9 +99,9 @@ export function useScreenDragDrop({
       }
       const layer = screen.layers.find((l) => l.id === hit);
       if (layer && !layer.locked) {
-        const gid = (layer as any).groupId;
+        const gid = layer.groupId;
         const groupLayers = gid
-          ? screen.layers.filter((l) => (l as any).groupId === gid && !l.locked)
+          ? screen.layers.filter((l) => l.groupId === gid && !l.locked)
           : [layer];
 
         dragRef.current = {
@@ -202,9 +202,9 @@ export function useScreenDragDrop({
     e.preventDefault();
     if (!activeLayer) return;
 
-    const gid = (activeLayer as any).groupId;
+    const gid = activeLayer.groupId;
     const groupLayers = gid
-      ? screen.layers.filter((l) => (l as any).groupId === gid)
+      ? screen.layers.filter((l) => l.groupId === gid)
       : [activeLayer];
 
     resizeRef.current = {
@@ -225,9 +225,10 @@ export function useScreenDragDrop({
         origY: l.y,
         origW: l.width,
         origH: l.height,
-        origFontSize: (l as any).fontSize,
+        origFontSize: l.type === "text" ? (l as TextLayer).fontSize : undefined,
       })),
     };
+
 
     const onMove = (ev: MouseEvent) => {
       if (!resizeRef.current || !activeLayer) return;
@@ -318,33 +319,34 @@ export function useScreenDragDrop({
             const relY = (gl.origY - resizeRef.current!.origY) * scaleY;
             const newW = Math.round(gl.origW * scaleX);
             const newH = Math.round(gl.origH * scaleY);
-            const updates: any = {
+            const updates: Partial<Layer> = {
               x: Math.round(nx + relX),
               y: Math.round(ny + relY),
               width: Math.max(10, newW),
               height: Math.max(10, newH),
             };
             if (gl.type === "text" && gl.origFontSize) {
-              updates.fontSize = Math.max(8, Math.round(gl.origFontSize * avgScale));
+              (updates as Partial<TextLayer>).fontSize = Math.max(8, Math.round(gl.origFontSize * avgScale));
             }
-            updateLayer(screenSet.id, screen.id, gl.id, updates as Parameters<typeof updateLayer>[3]);
+            updateLayer(screenSet.id, screen.id, gl.id, updates);
           }
         });
       } else {
-        const updates: any = {
+        const updates: Partial<Layer> = {
           x: Math.round(nx),
           y: Math.round(ny),
           width: Math.round(nw),
           height: Math.round(nh),
         };
         if (activeLayer.type === "text") {
-          const origFontSize = resizeRef.current.groupLayers?.[0]?.origFontSize || (activeLayer as any).fontSize || 40;
+          const origFontSize = resizeRef.current.groupLayers?.[0]?.origFontSize || (activeLayer as TextLayer).fontSize || 40;
           if (h === "se" || h === "sw" || h === "ne" || h === "nw") {
-            updates.fontSize = Math.max(8, Math.round(origFontSize * avgScale));
+            (updates as Partial<TextLayer>).fontSize = Math.max(8, Math.round(origFontSize * avgScale));
           }
         }
-        updateLayer(screenSet.id, screen.id, activeLayer.id, updates as Parameters<typeof updateLayer>[3]);
+        updateLayer(screenSet.id, screen.id, activeLayer.id, updates);
       }
+
     };
 
     const onUp = () => {

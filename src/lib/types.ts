@@ -151,6 +151,7 @@ export interface TextLayer {
   rotation: number;
   opacity: number;
   locked?: boolean;
+  groupId?: string;
   /** Canvas transform scale (applied on top of fontSize) */
   scale?: number;
   textCase?: "none" | "uppercase" | "lowercase" | "capitalize";
@@ -186,6 +187,7 @@ export interface ImageLayer {
   opacity: number;
   cornerRadius: number;
   locked?: boolean;
+  groupId?: string;
 }
 
 export interface FocusOverlay {
@@ -241,6 +243,7 @@ export interface ScreenshotLayer {
   cleanStatusBar?: boolean;
   statusBarTheme?: "light" | "dark";
   locked?: boolean;
+  groupId?: string;
 }
 
 export interface ShapeLayer {
@@ -284,6 +287,7 @@ export interface FlagLayer {
   rotation: number;
   opacity: number;
   locked?: boolean;
+  groupId?: string;
 }
 
 export interface CharacterLayer {
@@ -302,7 +306,9 @@ export interface CharacterLayer {
   /** Optional tint color overlay */
   tintColor?: string;
   locked?: boolean;
+  groupId?: string;
 }
+
 
 export type Layer = TextLayer | ImageLayer | ScreenshotLayer | ShapeLayer | FlagLayer | CharacterLayer;
 

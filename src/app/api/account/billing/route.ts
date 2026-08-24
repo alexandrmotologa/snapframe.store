@@ -232,12 +232,19 @@ function formatFeatureName(rawFeature?: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateLimit = checkRateLimit(`billing_post:${ip}`, { limit: 20, windowMs: 60000, keyPrefix: "billing_post" });
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many billing action requests. Please slow down." }, { status: 429 });
+    }
+
     const authResult = await verifyAuth(req);
     if (!authResult.success) {
       return authResult.response;
     }
 
     const { uid } = authResult.data;
+
     const body = await req.json();
     const { action, reason, plan, transactionId } = body;
 

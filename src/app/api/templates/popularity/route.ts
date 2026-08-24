@@ -2,10 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb, FieldValue, isAdminConfigured } from "@/lib/firebaseAdmin";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const clientIp = getClientIp(req);
+  const rateLimit = checkRateLimit(`template-popularity-get:${clientIp}`, {
+    limit: 60,
+    windowMs: 60000,
+    keyPrefix: "tpl_pop_get",
+  });
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { success: false, error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   if (!isAdminConfigured || !adminDb) {
     return NextResponse.json({ success: true, counts: {}, configured: false });
   }
+
 
   try {
     const querySnapshot = await adminDb.collection("template_stats").get();

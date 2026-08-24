@@ -52,6 +52,10 @@ export async function POST(req: NextRequest) {
 
     // In production or when keys are provided, require a valid signature
     if (secretKeys.length > 0) {
+      if (!signatureHeader) {
+        return NextResponse.json({ error: "Missing webhook signature" }, { status: 401 });
+      }
+
       const isValid = secretKeys.some((key) =>
         verifyPaddleSignature(rawBody, signatureHeader, key)
       );
@@ -63,7 +67,14 @@ export async function POST(req: NextRequest) {
     } else if (process.env.NODE_ENV === "production") {
       console.error("[Paddle Webhook] No Paddle webhook secret keys configured in production");
       return NextResponse.json({ error: "Webhook verification not configured" }, { status: 500 });
+    } else {
+      // Non-production without configured keys: only allow if mock header is present
+      const isDevMock = req.headers.get("x-paddle-dev-mock") === "true";
+      if (!isDevMock) {
+        return NextResponse.json({ error: "Webhook secret key missing in dev environment" }, { status: 401 });
+      }
     }
+
 
     const payload = JSON.parse(rawBody);
     const { event_type, data } = payload;

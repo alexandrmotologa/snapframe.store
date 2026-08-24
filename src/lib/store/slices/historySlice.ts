@@ -1,7 +1,7 @@
 import { StateCreator } from "zustand";
 import { EditorStore, HistorySlice } from "./types";
+import { MAX_UNDO_HISTORY, HISTORY_DEBOUNCE_MS } from "@/lib/constants";
 
-const MAX_HISTORY = 50;
 let historyDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 const doRecordHistory = (get: () => EditorStore, set: (partial: Partial<EditorStore>) => void) => {
@@ -10,14 +10,14 @@ const doRecordHistory = (get: () => EditorStore, set: (partial: Partial<EditorSt
 
   const clone = typeof structuredClone === "function"
     ? structuredClone
-    : (obj: any) => JSON.parse(JSON.stringify(obj));
+    : <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
   newHistory.push({
     screenSets: clone(screenSets),
     hiddenScreenSets: clone(hiddenScreenSets),
   });
 
-  if (newHistory.length > MAX_HISTORY) newHistory.shift();
+  if (newHistory.length > MAX_UNDO_HISTORY) newHistory.shift();
   set({ history: newHistory, historyIndex: newHistory.length - 1 });
 };
 
@@ -36,9 +36,10 @@ export const createHistorySlice: StateCreator<EditorStore, [], [], HistorySlice>
       historyDebounceTimer = setTimeout(() => {
         doRecordHistory(get, set);
         historyDebounceTimer = null;
-      }, 300);
+      }, HISTORY_DEBOUNCE_MS);
     }
   },
+
 
   undo: () => {
     const { history, historyIndex } = get();

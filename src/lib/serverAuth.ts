@@ -86,10 +86,28 @@ export async function verifyAuth(
     }
   } catch (err: unknown) {
     const error = err as { code?: string; message?: string };
-    console.warn("[ServerAuth] Dynamic verify warning:", error?.message || error);
+    console.warn("[ServerAuth] Cryptographic verify failed:", error?.message || error);
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: "Unauthorized: Invalid or expired authentication token." },
+        { status: 401 }
+      ),
+    };
   }
 
-  // Seamless fallback to validated decoded JWT
+  // In production, reject unverified tokens if Admin Auth is not configured
+  if (process.env.NODE_ENV === "production") {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: "Unauthorized: Authentication verification service unavailable." },
+        { status: 503 }
+      ),
+    };
+  }
+
+  // Non-production local development fallback only when Admin SDK is unconfigured
   return {
     success: true,
     data: {
@@ -98,6 +116,7 @@ export async function verifyAuth(
     },
   };
 }
+
 
 /**
  * Validates that an AI generation request is permitted (rate-limited + authenticated via Firebase token)

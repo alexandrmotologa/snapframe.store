@@ -1,31 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  ArrowLeft,
   Undo2,
   Redo2,
-  Sparkles,
-  Film,
   Keyboard,
   ZoomIn,
   ZoomOut,
   ChevronDown,
   Copy,
-  Download,
-  Lightbulb,
+  Folder,
+  Edit2,
+  Loader2,
   Cloud,
   Check,
-  Loader2,
-  Edit2,
-  Folder,
+  Lightbulb,
+  Download,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { KeyboardShortcutsModal } from "@/components/editor/KeyboardShortcutsModal";
-import { QuickTipsModal } from "@/components/editor/QuickTipsModal";
-import { StorePreviewModal } from "@/components/editor/StorePreviewModal";
-import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { toast } from "@/lib/store/toastStore";
 import { Separator } from "@/components/ui/separator";
 import { useEditorStore } from "@/lib/store/editorStore";
@@ -33,24 +26,28 @@ import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { EditorSidebar } from "@/components/editor/EditorSidebar";
 import { HorizontalCanvas } from "@/components/editor/HorizontalCanvas";
-import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { FloatingToolbar } from "@/components/editor/FloatingToolbar";
 import { ScreenStrip } from "@/components/editor/ScreenStrip";
+import { FloatingToolbar } from "@/components/editor/FloatingToolbar";
+import { CanvasBackgroundSelector } from "@/components/editor/CanvasBackgroundSelector";
 import { ExportModal } from "@/components/editor/ExportModal";
 import { GifExportModal } from "@/components/editor/GifExportModal";
-import { AIAutoPilotModal } from "@/components/editor/AIAutoPilotModal";
 import { StoreAssetsStudioModal } from "@/components/editor/StoreAssetsStudioModal";
-import { CanvasBackgroundSelector } from "@/components/editor/CanvasBackgroundSelector";
-import Link from "next/link";
+import { StorePreviewModal } from "@/components/editor/StorePreviewModal";
+import { AIAutoPilotModal } from "@/components/editor/AIAutoPilotModal";
+import { KeyboardShortcutsModal } from "@/components/editor/KeyboardShortcutsModal";
+import { QuickTipsModal } from "@/components/editor/QuickTipsModal";
+import { UpgradeModal } from "@/components/pricing/UpgradeModal";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { AuthModal } from "@/components/auth/AuthModal";
-import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { cn, drawBackgroundToCanvas } from "@/lib/utils";
 
 interface EditorLayoutProps {
   projectId: string;
 }
+
 
 // Simple icon button — avoids nested <button> hydration warnings
 function IconBtn({
@@ -83,7 +80,6 @@ function IconBtn({
 }
 
 export function EditorLayout({ projectId }: EditorLayoutProps) {
-  const router = useRouter();
   const project = useProjectStore((s) => s.getProject(projectId));
   const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
@@ -92,6 +88,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     activeSetId, activeScreenId, activeLayerId, getActiveSet,
     getActiveScreen, getActiveLayer, deleteLayer, duplicateLayer,
     updateLayer, setActiveLayer, addLayer,
+
   } = useEditorStore();
   const saveProjectThumbnail = useProjectStore((s) => s.saveProjectThumbnail);
   const screenSets = useEditorStore((s) => s.screenSets);
@@ -101,20 +98,29 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
   const [showStorePreview, setShowStorePreview] = useState(false);
   const [showAIAutoPilot, setShowAIAutoPilot] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showTips, setShowTips] = useState(false);
+  const [showTips, setShowTips] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return !localStorage.getItem("sf_seen_quick_tips");
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
   const [localName, setLocalName] = useState(project?.name ?? "");
+  const [prevProjectName, setPrevProjectName] = useState(project?.name);
+  if (project?.name !== prevProjectName) {
+    setPrevProjectName(project?.name);
+    setLocalName(project?.name ?? "");
+  }
+
   const [zoomOpen, setZoomOpen] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const thumbTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const renameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Sync external name changes
-  useEffect(() => {
-    if (project?.name !== undefined) {
-      setLocalName(project.name);
-    }
-  }, [project?.name]);
+  const isFirstRender = useRef(true);
 
   const handleNameChange = (val: string) => {
     setLocalName(val);
@@ -134,26 +140,24 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     }
   };
 
-  // ── First-visit quick tips trigger ───────────────────────────────────────
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const hasSeenTips = localStorage.getItem("sf_seen_quick_tips");
-        if (!hasSeenTips) {
-          setShowTips(true);
-        }
-      } catch {}
-    }
-  }, []);
-
   // ── Dynamic save status listener (1s debounce) ───────────────────────────
   useEffect(() => {
-    setSaveStatus("saving");
-    const timer = setTimeout(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const startTimer = setTimeout(() => {
+      setSaveStatus("saving");
+    }, 0);
+    const saveTimer = setTimeout(() => {
       setSaveStatus("saved");
     }, 1100);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(saveTimer);
+    };
   }, [screenSets]);
+
 
   const handleForceSave = () => {
     if (project) {
@@ -197,9 +201,9 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
 
 
   const activeSet = getActiveSet();
-  const activeScreen = getActiveScreen();
 
   // ── Quick copy active screen to clipboard ────────────────────────────────
+
   const handleCopyScreenToClipboard = async () => {
     try {
       setIsCopying(true);
@@ -341,7 +345,8 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, getActiveSet, getActiveScreen, getActiveLayer]);
+  }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, getActiveSet, getActiveLayer]);
+
 
   // ── Global Clipboard Paste (Ctrl+V image screenshot) ─────────────────────
   useEffect(() => {

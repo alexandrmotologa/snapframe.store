@@ -1,10 +1,12 @@
 import { StateCreator } from "zustand";
 import { EditorStore, UiSlice } from "./types";
 import { getSavedCanvasBackground, saveCanvasBackground } from "@/lib/canvasBackgrounds";
+import { DEFAULT_ZOOM } from "@/lib/constants";
 
 export const createUiSlice: StateCreator<EditorStore, [], [], UiSlice> = (set) => ({
-  zoom: 0.65,
+  zoom: DEFAULT_ZOOM,
   showGrid: false,
+
   showGuides: true,
   canvasBackground: getSavedCanvasBackground(),
 

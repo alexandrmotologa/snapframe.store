@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -11,7 +11,6 @@ import {
   Clock,
   ArrowLeft,
   ExternalLink,
-  ShieldAlert,
   ShieldCheck,
   CheckCircle2,
   AlertTriangle,
@@ -19,12 +18,6 @@ import {
   Receipt,
   LogOut,
   RefreshCw,
-  Zap,
-  Info,
-  ChevronRight,
-  Layers,
-  Globe,
-  Upload,
   XCircle,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
@@ -45,6 +38,15 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+
+const emptySubscribe = () => () => {};
+function useMounted() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+}
 
 interface CreditLog {
   id: string;
@@ -86,18 +88,15 @@ interface BillingDetails {
 
 export default function AccountPage() {
   const router = useRouter();
+  const mounted = useMounted();
+  const [now] = useState(() => Date.now());
   const { user, isInitialized, isPro, aiCredits, usedAiCredits, plan, subscriptionStatus, setAuthModalOpen, setUpgradeModalOpen, signOutUser } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<"subscription" | "credits" | "invoices">("subscription");
   const [billingData, setBillingData] = useState<BillingDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("No longer needed");
   const [isCanceling, setIsCanceling] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const isGuest = Boolean(!user || user.isAnonymous);
 
@@ -150,7 +149,6 @@ export default function AccountPage() {
     if (!mounted || !isInitialized) return;
 
     if (!user || isGuest) {
-      setIsLoading(false);
       return;
     }
 
@@ -162,6 +160,7 @@ export default function AccountPage() {
           await new Promise((r) => setTimeout(r, 350));
           idToken = await getIdTokenSafe(user);
         }
+
 
         const res = await fetch(`/api/account/billing?uid=${user.uid}`, {
           headers: {
@@ -270,8 +269,9 @@ export default function AccountPage() {
   const planBillingCycle = plan?.includes("annual") ? "Annual billing cycle" : "Monthly billing cycle";
 
   const remainingDays = subExpiresAt
-    ? Math.max(0, Math.ceil((subExpiresAt - Date.now()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, Math.ceil((subExpiresAt - now) / (1000 * 60 * 60 * 24)))
     : null;
+
 
   if (!mounted) {
     return (
@@ -644,8 +644,9 @@ export default function AccountPage() {
                         <div className="flex items-center gap-2 font-bold text-amber-600 dark:text-amber-400">
                           <AlertTriangle className="w-4 h-4 shrink-0" />
                           <span>
-                            Subscription canceled on {formatFriendlyDate(subCanceledAt || Date.now())}
+                            Subscription canceled on {formatFriendlyDate(subCanceledAt || now)}
                           </span>
+
                         </div>
                         <p className="text-muted-foreground leading-relaxed">
                           Your subscription will not renew at the end of the billing period. You retain 100% full access to all Pro features, unlimited projects, multi-device cloud synchronization, and 4K exports until <strong>{formatFriendlyDate(subExpiresAt)}</strong>.

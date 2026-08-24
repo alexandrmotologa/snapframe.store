@@ -1,11 +1,58 @@
 import { StateCreator } from "zustand";
 import { EditorStore, ContentSlice } from "./types";
-import { Layer, Screen, ScreenSet, MockupSettings, UploadedAsset, Template } from "@/lib/types";
+import { Layer, Screen, ScreenSet, MockupSettings, UploadedAsset, ScreenshotLayer } from "@/lib/types";
 import { themeById } from "@/lib/themes";
 import { nanoid } from "@/lib/utils";
 import { ALL_DEVICES, isTabletDevice } from "@/lib/devices";
+import { MAX_SCREENS_PER_SET } from "@/lib/constants";
+
+/**
+ * Reusable helper to proportionally scale and transform layers when changing device or canvas dimensions
+ */
+export function scaleLayersForDimensions(
+  layers: Layer[],
+  oldW: number,
+  oldH: number,
+  newW: number,
+  newH: number,
+  assignNewIds: boolean = false
+): Layer[] {
+  if (oldW === newW && oldH === newH && !assignNewIds) return layers;
+  const scaleX = newW / oldW;
+  const scaleY = newH / oldH;
+  const scaleAvg = (scaleX + scaleY) / 2;
+
+  return layers.map((layer) => {
+    const base = {
+      ...layer,
+      ...(assignNewIds ? { id: nanoid() } : {}),
+      x: Math.round(layer.x * scaleX),
+      y: Math.round(layer.y * scaleY),
+      width: Math.round(layer.width * scaleX),
+      height: Math.round(layer.height * scaleY),
+    };
+    if (layer.type === "text") {
+      return { ...base, fontSize: Math.round((layer.fontSize || 56) * scaleAvg) } as Layer;
+    }
+    if (layer.type === "shape") {
+      return {
+        ...base,
+        cornerRadius: layer.cornerRadius !== undefined ? Math.round(layer.cornerRadius * scaleAvg) : undefined,
+        strokeWidth: layer.strokeWidth !== undefined ? Math.round(layer.strokeWidth * scaleAvg) : undefined,
+      } as Layer;
+    }
+    if (layer.type === "image") {
+      return {
+        ...base,
+        cornerRadius: Math.round((layer.cornerRadius || 0) * scaleAvg),
+      } as Layer;
+    }
+    return base as Layer;
+  });
+}
 
 export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice> = (set, get) => ({
+
   projectId: null,
   themeId: "clean-light",
   screenSets: [],
@@ -98,10 +145,11 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
 
   addScreen: (setId) => {
     const targetSet = get().screenSets.find((s) => s.id === setId);
-    if (targetSet && targetSet.screens.length >= 10) {
+    if (targetSet && targetSet.screens.length >= MAX_SCREENS_PER_SET) {
       return;
     }
     get().recordHistory(true);
+
     set((state) => {
       const sets = state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -696,45 +744,12 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         const newW = newDevice?.width || oldW;
         const newH = newDevice?.height || oldH;
 
-        const needsScale = newDevice && (oldW !== newW || oldH !== newH);
-        const scaleX = newW / oldW;
-        const scaleY = newH / oldH;
-        const scaleAvg = (scaleX + scaleY) / 2;
-
-        const updatedScreens: Screen[] = ss.screens.map((screen) => {
-          if (!needsScale) return screen;
-          return {
-            ...screen,
-            width: newW,
-            height: newH,
-            layers: screen.layers.map((layer) => {
-              const base = {
-                ...layer,
-                x: Math.round(layer.x * scaleX),
-                y: Math.round(layer.y * scaleY),
-                width: Math.round(layer.width * scaleX),
-                height: Math.round(layer.height * scaleY),
-              };
-              if (layer.type === "text") {
-                return { ...base, fontSize: Math.round((layer.fontSize || 56) * scaleAvg) } as Layer;
-              }
-              if (layer.type === "shape") {
-                return {
-                  ...base,
-                  cornerRadius: layer.cornerRadius !== undefined ? Math.round(layer.cornerRadius * scaleAvg) : undefined,
-                  strokeWidth: layer.strokeWidth !== undefined ? Math.round(layer.strokeWidth * scaleAvg) : undefined,
-                } as Layer;
-              }
-              if (layer.type === "image") {
-                return {
-                  ...base,
-                  cornerRadius: Math.round((layer.cornerRadius || 0) * scaleAvg),
-                } as Layer;
-              }
-              return base as Layer;
-            }),
-          };
-        });
+        const updatedScreens: Screen[] = ss.screens.map((screen) => ({
+          ...screen,
+          width: newW,
+          height: newH,
+          layers: scaleLayersForDimensions(screen.layers, oldW, oldH, newW, newH),
+        }));
 
         return {
           ...ss,
@@ -769,43 +784,12 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
 
         if (oldW === newW && oldH === newH) return ss;
 
-        const scaleX = newW / oldW;
-        const scaleY = newH / oldH;
-        const scaleAvg = (scaleX + scaleY) / 2;
-
-        const updatedScreens: Screen[] = ss.screens.map((screen) => {
-          return {
-            ...screen,
-            width: newW,
-            height: newH,
-            layers: screen.layers.map((layer) => {
-              const base = {
-                ...layer,
-                x: Math.round(layer.x * scaleX),
-                y: Math.round(layer.y * scaleY),
-                width: Math.round(layer.width * scaleX),
-                height: Math.round(layer.height * scaleY),
-              };
-              if (layer.type === "text") {
-                return { ...base, fontSize: Math.round((layer.fontSize || 56) * scaleAvg) } as Layer;
-              }
-              if (layer.type === "shape") {
-                return {
-                  ...base,
-                  cornerRadius: layer.cornerRadius !== undefined ? Math.round(layer.cornerRadius * scaleAvg) : undefined,
-                  strokeWidth: layer.strokeWidth !== undefined ? Math.round(layer.strokeWidth * scaleAvg) : undefined,
-                } as Layer;
-              }
-              if (layer.type === "image") {
-                return {
-                  ...base,
-                  cornerRadius: Math.round((layer.cornerRadius || 0) * scaleAvg),
-                } as Layer;
-              }
-              return base as Layer;
-            }),
-          };
-        });
+        const updatedScreens: Screen[] = ss.screens.map((screen) => ({
+          ...screen,
+          width: newW,
+          height: newH,
+          layers: scaleLayersForDimensions(screen.layers, oldW, oldH, newW, newH),
+        }));
 
         const customName = label || `Custom (${newW} × ${newH})`;
 
@@ -822,6 +806,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       }),
     }));
   },
+
 
   setMockupScale: (setId, scale) => {
     const clampedScale = Math.max(0.4, Math.min(2.0, Number(scale.toFixed(2))));
@@ -915,18 +900,18 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
     const updatedSets = screenSets.map((ss) => {
       if (!isAll && ss.id !== setId) return ss;
       const existingSrcs = ss.screens.flatMap((s) =>
-        s.layers.filter((l) => l.type === "screenshot" && (l as any).src).map((l) => (l as any).src)
+        s.layers.filter((l): l is ScreenshotLayer => l.type === "screenshot" && Boolean(l.src)).map((l) => l.src!)
       );
       let srcIndex = 0;
 
-      const newScreens = template.screens.map((tScreen: any, idx: number) => ({
+      const newScreens = template.screens.map((tScreen, idx: number) => ({
         id: nanoid(),
         name: tScreen.name ?? `Screen ${idx + 1}`,
         width: ss.preset.width,
         height: ss.preset.height,
         caption: "",
         background: tScreen.background ?? { type: "solid", color: "#1a1a2e" },
-        layers: (tScreen.layers ?? []).map((l: any): Layer => {
+        layers: (tScreen.layers ?? []).map((l): Layer => {
           const id = nanoid();
           if (l.type === "screenshot") {
             const src = existingSrcs[srcIndex] || undefined;
@@ -940,6 +925,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
           }
           return { ...l, id } as Layer;
         }),
+
       }));
       return {
         ...ss,
@@ -947,6 +933,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         screens: newScreens,
       };
     });
+
 
     const activeSetAfter = updatedSets.find((s) => s.id === activeSetId) || updatedSets[0];
     const newActiveScreenId = activeSetAfter?.screens[0]?.id ?? null;
@@ -1066,9 +1053,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
 
     const oldW = sourceSet?.preset.width || 1290;
     const oldH = sourceSet?.preset.height || 2796;
-    const scaleX = newW / oldW;
-    const scaleY = newH / oldH;
-    const scaleAvg = (scaleX + scaleY) / 2;
 
     const newScreens: Screen[] = (sourceSet ? sourceSet.screens : []).map((screen, idx) => ({
       ...screen,
@@ -1076,33 +1060,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       name: screen.name || `Screen ${idx + 1}`,
       width: newW,
       height: newH,
-      layers: screen.layers.map((layer) => {
-        const baseLayer = {
-          ...layer,
-          id: nanoid(),
-          x: Math.round(layer.x * scaleX),
-          y: Math.round(layer.y * scaleY),
-          width: Math.round(layer.width * scaleX),
-          height: Math.round(layer.height * scaleY),
-        };
-        if (layer.type === "text") {
-          return { ...baseLayer, fontSize: Math.round((layer.fontSize || 56) * scaleAvg) } as Layer;
-        }
-        if (layer.type === "shape") {
-          return {
-            ...baseLayer,
-            cornerRadius: layer.cornerRadius !== undefined ? Math.round(layer.cornerRadius * scaleAvg) : undefined,
-            strokeWidth: layer.strokeWidth !== undefined ? Math.round(layer.strokeWidth * scaleAvg) : undefined,
-          } as Layer;
-        }
-        if (layer.type === "image") {
-          return {
-            ...baseLayer,
-            cornerRadius: Math.round((layer.cornerRadius || 0) * scaleAvg),
-          } as Layer;
-        }
-        return baseLayer as Layer;
-      }),
+      layers: scaleLayersForDimensions(screen.layers, oldW, oldH, newW, newH, true),
     }));
 
     const newSet: ScreenSet = {
@@ -1174,9 +1132,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
 
     const oldW = sourceSet?.preset.width || 1290;
     const oldH = sourceSet?.preset.height || 2796;
-    const scaleX = newW / oldW;
-    const scaleY = newH / oldH;
-    const scaleAvg = (scaleX + scaleY) / 2;
 
     const newScreens = (sourceSet ? sourceSet.screens : []).map((screen, idx) => ({
       ...screen,
@@ -1184,34 +1139,9 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       name: `iPad Screen ${idx + 1}`,
       width: newW,
       height: newH,
-      layers: screen.layers.map((layer) => {
-        const baseLayer = {
-          ...layer,
-          id: nanoid(),
-          x: Math.round(layer.x * scaleX),
-          y: Math.round(layer.y * scaleY),
-          width: Math.round(layer.width * scaleX),
-          height: Math.round(layer.height * scaleY),
-        };
-        if (layer.type === "text") {
-          return { ...baseLayer, fontSize: Math.round((layer.fontSize || 56) * scaleAvg) } as Layer;
-        }
-        if (layer.type === "shape") {
-          return {
-            ...baseLayer,
-            cornerRadius: layer.cornerRadius !== undefined ? Math.round(layer.cornerRadius * scaleAvg) : undefined,
-            strokeWidth: layer.strokeWidth !== undefined ? Math.round(layer.strokeWidth * scaleAvg) : undefined,
-          } as Layer;
-        }
-        if (layer.type === "image") {
-          return {
-            ...baseLayer,
-            cornerRadius: Math.round((layer.cornerRadius || 0) * scaleAvg),
-          } as Layer;
-        }
-        return baseLayer as Layer;
-      }),
+      layers: scaleLayersForDimensions(screen.layers, oldW, oldH, newW, newH, true),
     }));
+
 
     const newSet: ScreenSet = {
       id: newId,
