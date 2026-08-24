@@ -35,9 +35,11 @@ interface AuthState {
   setUpgradeModalOpen: (open: boolean) => void;
   clearError: () => void;
   initializeAuth: () => Promise<void>;
+  signIn: (provider: "google" | "github") => Promise<User | null>;
   signInWithGoogle: () => Promise<User | null>;
   signInWithGithub: () => Promise<User | null>;
   signInAnonymous: () => Promise<any>;
+  link: (provider: "google" | "github") => Promise<User | null>;
   linkWithGoogle: () => Promise<User | null>;
   linkWithGithub: () => Promise<User | null>;
   signOutUser: () => Promise<void>;
@@ -335,12 +337,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
       return;
     },
 
+    signIn: async (provider: "google" | "github") => {
+      return await handleProviderAuth(provider, "signIn", set, get);
+    },
+
     signInWithGoogle: async () => {
-      return await handleProviderAuth("google", "signIn", set, get);
+      return await get().signIn("google");
     },
 
     signInWithGithub: async () => {
-      return await handleProviderAuth("github", "signIn", set, get);
+      return await get().signIn("github");
     },
 
     signInAnonymous: async () => {
@@ -386,12 +392,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
     },
 
+    link: async (provider: "google" | "github") => {
+      return await handleProviderAuth(provider, "link", set, get);
+    },
+
     linkWithGoogle: async () => {
-      return await handleProviderAuth("google", "link", set, get);
+      return await get().link("google");
     },
 
     linkWithGithub: async () => {
-      return await handleProviderAuth("github", "link", set, get);
+      return await get().link("github");
     },
 
     signOutUser: async () => {

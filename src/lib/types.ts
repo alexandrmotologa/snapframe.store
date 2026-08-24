@@ -44,7 +44,6 @@ export type ShapeType =
   | "diamond"
   | "crescent"
   | "arrowRight"
-  | "arrow-right"
   | "arrow-left"
   | "arrow-up"
   | "arrow-down"
@@ -154,8 +153,6 @@ export interface TextLayer {
   locked?: boolean;
   /** Canvas transform scale (applied on top of fontSize) */
   scale?: number;
-  /** Text alignment alias for canvas rendering */
-  textAlign?: "left" | "center" | "right";
   textCase?: "none" | "uppercase" | "lowercase" | "capitalize";
   shadow?: {
     color: string;

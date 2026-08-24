@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 // ISO 639-1 language codes with native names and flags
 export interface SupportedLanguage {
@@ -94,37 +95,44 @@ interface LanguageStore {
   ) => string;
 }
 
-export const useLanguageStore = create<LanguageStore>((set, get) => ({
-  activeLang: "en",
-  projectLanguages: ["en"],
+export const useLanguageStore = create<LanguageStore>()(
+  persist(
+    (set, get) => ({
+      activeLang: "en",
+      projectLanguages: ["en"],
 
-  setActiveLang: (code) => set({ activeLang: code }),
+      setActiveLang: (code) => set({ activeLang: code }),
 
-  setProjectLanguages: (codes) => {
-    const withEn = codes.includes("en") ? codes : ["en", ...codes];
-    set({ projectLanguages: withEn });
-  },
+      setProjectLanguages: (codes) => {
+        const withEn = codes.includes("en") ? codes : ["en", ...codes];
+        set({ projectLanguages: withEn });
+      },
 
-  addLanguage: (code) => {
-    const { projectLanguages } = get();
-    if (!projectLanguages.includes(code)) {
-      set({ projectLanguages: [...projectLanguages, code] });
+      addLanguage: (code) => {
+        const { projectLanguages } = get();
+        if (!projectLanguages.includes(code)) {
+          set({ projectLanguages: [...projectLanguages, code] });
+        }
+      },
+
+      removeLanguage: (code) => {
+        if (code === "en") return; // Cannot remove English (base language)
+        set((state) => ({
+          projectLanguages: state.projectLanguages.filter((l) => l !== code),
+          activeLang: state.activeLang === code ? "en" : state.activeLang,
+        }));
+      },
+
+      getLocalizedText: (layerId, originalContent, localizations) => {
+        const { activeLang } = get();
+        if (activeLang === "en" || !localizations) return originalContent;
+        const langMap = localizations[activeLang];
+        if (!langMap) return originalContent;
+        return langMap[layerId]?.content ?? originalContent;
+      },
+    }),
+    {
+      name: "snapframe-language",
     }
-  },
-
-  removeLanguage: (code) => {
-    if (code === "en") return; // Cannot remove English (base language)
-    set((state) => ({
-      projectLanguages: state.projectLanguages.filter((l) => l !== code),
-      activeLang: state.activeLang === code ? "en" : state.activeLang,
-    }));
-  },
-
-  getLocalizedText: (layerId, originalContent, localizations) => {
-    const { activeLang } = get();
-    if (activeLang === "en" || !localizations) return originalContent;
-    const langMap = localizations[activeLang];
-    if (!langMap) return originalContent;
-    return langMap[layerId]?.content ?? originalContent;
-  },
-}));
+  )
+);

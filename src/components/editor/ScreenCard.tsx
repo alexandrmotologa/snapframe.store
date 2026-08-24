@@ -20,6 +20,7 @@ import {
   drawAutoFitText,
   ResizeOverlay,
   ScreenContextMenu,
+  InlineTextEditor,
 } from "@/components/editor/card";
 
 interface ScreenCardProps {
@@ -40,14 +41,6 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
   // Text inline edit state
   const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (editingLayerId && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.select();
-    }
-  }, [editingLayerId]);
 
   // Right-click context menu
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; layerId: string } | null>(null);
@@ -2724,69 +2717,19 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
         )}
 
         {/* Inline text edit overlay — shown on double-click */}
-        {isActiveScreen && editingLayerId && (() => {
-          const editLayer = screen.layers.find((l) => l.id === editingLayerId) as TextLayer | undefined;
-          if (!editLayer) return null;
-          return (
-            <div
-              className="absolute inset-0 z-40 bg-black/20 backdrop-blur-[2px] rounded-2xl"
-              onClick={() => {
-                updateLayer(screenSet.id, screen.id, editingLayerId, { content: editText } as Partial<Layer>);
-                useEditorStore.getState().recordHistory();
-                setEditingLayerId(null);
-                toast.success("Text updated");
-              }}
-            >
-              <textarea
-                ref={textareaRef}
-                autoFocus
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    setEditingLayerId(null);
-                  }
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    updateLayer(screenSet.id, screen.id, editingLayerId, { content: editText } as Partial<Layer>);
-                    useEditorStore.getState().recordHistory();
-                    setEditingLayerId(null);
-                    toast.success("Text updated");
-                  }
-                }}
-                style={{
-                  position: "absolute",
-                  left: Math.max(6, Math.min(editLayer.x * scale, CARD_DISPLAY_WIDTH - 140)),
-                  top: Math.max(6, Math.min(editLayer.y * scale, displayH - 60)),
-                  width: Math.min(CARD_DISPLAY_WIDTH - 16, Math.max(140, editLayer.width * scale)),
-                  minHeight: Math.max(48, editLayer.height * scale),
-                  fontSize: Math.max(13, editLayer.fontSize * scale),
-                  fontFamily: `"${editLayer.fontFamily}", sans-serif`,
-                  fontWeight: editLayer.fontWeight,
-                  color: editLayer.color,
-                  textAlign: editLayer.align,
-                  lineHeight: editLayer.lineHeight,
-                  letterSpacing: `${editLayer.letterSpacing * scale}px`,
-                  background: "rgba(15, 23, 42, 0.92)",
-                  backdropFilter: "blur(12px)",
-                  border: "2px solid #6366f1",
-                  borderRadius: 8,
-                  outline: "none",
-                  resize: "none",
-                  padding: "6px 10px",
-                  boxShadow: "0 12px 30px -4px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(99, 102, 241, 0.4)",
-                  zIndex: 50,
-                }}
-              />
-              <div className="absolute bottom-2.5 inset-x-2 flex items-center justify-center pointer-events-none">
-                <span className="px-2.5 py-1 rounded-md bg-black/80 text-white/90 text-[10px] font-medium shadow-md">
-                  ↵ Enter to save · Shift+↵ for new line · Esc to cancel
-                </span>
-              </div>
-            </div>
-          );
-        })()}
+        {isActiveScreen && editingLayerId && (
+          <InlineTextEditor
+            editingLayerId={editingLayerId}
+            editText={editText}
+            screen={screen}
+            screenSet={screenSet}
+            scale={scale}
+            cardDisplayWidth={CARD_DISPLAY_WIDTH}
+            displayHeight={displayH}
+            onTextChange={setEditText}
+            onClose={() => setEditingLayerId(null)}
+          />
+        )}
         </div>
 
         {/* Right-click context menu */}

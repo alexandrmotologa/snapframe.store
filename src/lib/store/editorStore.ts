@@ -92,7 +92,7 @@ interface EditorStore {
   setCustomScreenDimensions: (setId: string, width: number, height: number, label?: string) => void;
   setMockupScale: (setId: string, scale: number) => void;
   setThemeId: (themeId: ThemeId) => void;
-  applyThemeToProject: (themeId: ThemeId) => void;
+  applyThemeToProject: (themeOrPalette: ThemeId | { bg: string; fg: string; gradient?: Background["gradient"] }) => void;
   applyCustomThemeToProject: (palette: { bg: string; fg: string; gradient?: Background["gradient"] }) => void;
 
   // Actions: UI
@@ -350,6 +350,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   updateScreen: (setId, screenId, updates) => {
+    get().recordHistory();
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -386,6 +387,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   updateAllScreensBackground: (setId, background) => {
+    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -434,11 +436,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
               ),
             }
       ),
-      activeLayerId: newLayers[newLayers.length - 1]?.id ?? null,
+      activeLayerId: newLayers[newLayers.length - 1]?.id ?? state.activeLayerId,
     }));
   },
 
   updateLayer: (setId, screenId, layerId, updates) => {
+    get().recordHistory();
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -1053,41 +1056,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   setThemeId: (themeId) => set({ themeId }),
 
-  applyThemeToProject: (themeId) => {
-    const theme = themeById(themeId);
-    get().recordHistory(true);
-    set((state) => ({
-      themeId,
-      screenSets: state.screenSets.map((ss) => ({
-        ...ss,
-        screens: ss.screens.map((s) => ({
-          ...s,
-          background: theme.gradient
-            ? {
-                ...s.background,
-                type: "gradient",
-                gradient: theme.gradient,
-              }
-            : {
-                ...s.background,
-                type: "solid",
-                color: theme.bg,
-              },
-          layers: s.layers.map((l) => {
-            if (l.type === "text") {
-              return { ...l, color: theme.fg };
-            }
-            return l;
-          }),
-        })),
-      })),
-    }));
-  },
+  applyThemeToProject: (themeOrPalette) => {
+    const isCustom = typeof themeOrPalette === "object";
+    const theme = isCustom ? null : themeById(themeOrPalette);
+    const palette = isCustom ? themeOrPalette : theme ? { bg: theme.bg, fg: theme.fg, gradient: theme.gradient } : null;
+    if (!palette) return;
 
-  applyCustomThemeToProject: (palette) => {
     get().recordHistory(true);
     set((state) => ({
-      themeId: "custom",
+      themeId: isCustom ? "custom" : themeOrPalette,
       screenSets: state.screenSets.map((ss) => ({
         ...ss,
         screens: ss.screens.map((s) => ({
@@ -1112,6 +1089,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         })),
       })),
     }));
+  },
+
+  applyCustomThemeToProject: (palette) => {
+    get().applyThemeToProject(palette);
   },
 
   // UI
