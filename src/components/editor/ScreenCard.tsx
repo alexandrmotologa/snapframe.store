@@ -12,6 +12,15 @@ import { cn, loadGoogleFont, drawBackgroundToCanvas } from "@/lib/utils";
 import { getTextGradientPreset } from "@/lib/textPresets";
 import { Draggable } from "@hello-pangea/dnd";
 import { ScreenVerticalMenu } from "@/components/editor/ScreenVerticalMenu";
+import {
+  loadImage,
+  parseColorStr,
+  drawPlaceholder,
+  drawWrappedText,
+  drawAutoFitText,
+  ResizeOverlay,
+  ScreenContextMenu,
+} from "@/components/editor/card";
 
 interface ScreenCardProps {
   screen: Screen;
@@ -22,32 +31,6 @@ interface ScreenCardProps {
 }
 
 const BASE_CARD_WIDTH = 300;
-
-// ── Image cache ───────────────────────────────────────────────────────────────
-const imgCache = new Map<string, HTMLImageElement>();
-function loadImage(src: string): Promise<HTMLImageElement> {
-  if (imgCache.has(src)) return Promise.resolve(imgCache.get(src)!);
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => { imgCache.set(src, img); resolve(img); };
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-// ── Draw gradient string helper ────────────────────────────────────────────────
-function parseColorStr(ctx: CanvasRenderingContext2D, fill: string | undefined, x: number, y: number, w: number, h: number): string | CanvasGradient {
-  if (!fill) return "#000000";
-  if (typeof fill === "string" && fill.startsWith("linear-gradient")) {
-    // Simple top-to-bottom gradient fallback
-    const g = ctx.createLinearGradient(x, y, x, y + h);
-    g.addColorStop(0, "rgba(0,0,0,0)");
-    g.addColorStop(1, "#000000");
-    return g;
-  }
-  return fill;
-}
 
 export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, hideScreenshots }: ScreenCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -2806,156 +2789,19 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
         })()}
         </div>
 
-        {/* Right-click context menu (Rendered outside overflow-hidden with clamped position) */}
-        {ctxMenu && isActiveScreen && (() => {
-          const ctxLayer = screen.layers.find((l) => l.id === ctxMenu.layerId);
-          if (!ctxLayer) return null;
-          const MENU_WIDTH = 196;
-          const MENU_HEIGHT = 280;
-          const menuLeft = Math.max(6, Math.min(ctxMenu.x, CARD_DISPLAY_WIDTH - MENU_WIDTH - 6));
-          const menuTop = Math.max(6, Math.min(ctxMenu.y, displayH - MENU_HEIGHT - 6));
-
-          const isTextLayer = ctxLayer.type === "text";
-
-          return (
-            <div
-              className="absolute z-50 min-w-48 bg-card/95 backdrop-blur-xl border border-border/80 rounded-2xl shadow-2xl shadow-black/50 py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-100"
-              style={{ left: menuLeft, top: menuTop }}
-              onMouseLeave={() => setCtxMenu(null)}
-            >
-              {/* Layer name header */}
-              <div className="px-3 py-1.5 border-b border-border/50">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">
-                  {isTextLayer
-                    ? (ctxLayer as TextLayer).content.slice(0, 20) || "Text"
-                    : ctxLayer.type}
-                </p>
-              </div>
-
-              {[
-                ...(isTextLayer ? [{
-                  icon: Edit3,
-                  label: "Edit Text",
-                  action: () => {
-                    setEditingLayerId(ctxMenu.layerId);
-                    setEditText((ctxLayer as TextLayer).content);
-                    setCtxMenu(null);
-                  }
-                }] : []),
-                ...(ctxLayer.type === "screenshot" ? [
-                  {
-                    icon: Upload,
-                    label: (ctxLayer as ScreenshotLayer).src ? "Replace Screenshot" : "Upload Screenshot",
-                    action: () => {
-                      setCtxMenu(null);
-                      const input = document.createElement("input");
-                      input.type = "file";
-                      input.accept = "image/*";
-                      input.onchange = (e) => {
-                        const f = (e.target as HTMLInputElement).files?.[0];
-                        if (!f) return;
-                        const r = new FileReader();
-                        r.onload = (ev) => {
-                          const src = ev.target?.result as string;
-                          if (!src) return;
-                          updateLayer(screenSet.id, screen.id, ctxMenu.layerId, { src } as Partial<ScreenshotLayer>);
-                          useEditorStore.getState().addProjectAsset({ name: f.name, dataUrl: src });
-                          useEditorStore.getState().recordHistory();
-                          toast.success("Screenshot loaded & added to Media Assets!");
-                        };
-                        r.readAsDataURL(f);
-                      };
-                      input.click();
-                    }
-                  },
-                  ...((ctxLayer as ScreenshotLayer).src ? [{
-                    icon: Trash2,
-                    label: "Clear Screenshot (Empty Frame)",
-                    danger: true,
-                    action: () => {
-                      updateLayer(screenSet.id, screen.id, ctxMenu.layerId, { src: undefined } as Partial<ScreenshotLayer>);
-                      useEditorStore.getState().recordHistory();
-                      setCtxMenu(null);
-                      toast.info("Screenshot cleared from mockup.");
-                    }
-                  }] : []),
-                ] : []),
-                {
-                  icon: Copy, label: "Duplicate", action: () => {
-                    duplicateLayer(screenSet.id, screen.id, ctxMenu.layerId);
-                    setCtxMenu(null);
-                    toast.success("Layer duplicated");
-                  }
-                },
-                {
-                  icon: AlignCenter, label: "Center Horizontally", action: () => {
-                    updateLayer(screenSet.id, screen.id, ctxMenu.layerId, { x: Math.round(screen.width / 2 - ctxLayer.width / 2) } as Partial<Layer>);
-                    useEditorStore.getState().recordHistory();
-                    setCtxMenu(null);
-                    toast.info("Layer centered horizontally");
-                  }
-                },
-                {
-                  icon: AlignJustify, label: "Center Vertically", action: () => {
-                    updateLayer(screenSet.id, screen.id, ctxMenu.layerId, { y: Math.round(screen.height / 2 - ctxLayer.height / 2) } as Partial<Layer>);
-                    useEditorStore.getState().recordHistory();
-                    setCtxMenu(null);
-                    toast.info("Layer centered vertically");
-                  }
-                },
-                {
-                  icon: ArrowUp, label: "Bring Forward", action: () => {
-                    bringForward(screenSet.id, screen.id, ctxMenu.layerId);
-                    setCtxMenu(null);
-                  }
-                },
-                {
-                  icon: ArrowDown, label: "Send Backward", action: () => {
-                    sendBackward(screenSet.id, screen.id, ctxMenu.layerId);
-                    setCtxMenu(null);
-                  }
-                },
-                {
-                  icon: ctxLayer.locked ? Lock : Lock,
-                  label: ctxLayer.locked ? "Unlock Layer" : "Lock Layer",
-                  action: () => {
-                    lockLayer(screenSet.id, screen.id, ctxMenu.layerId, !ctxLayer.locked);
-                    setCtxMenu(null);
-                    toast.info(ctxLayer.locked ? "Layer unlocked" : "Layer locked");
-                  }
-                },
-              ].map(({ icon: Icon, label, action, danger }: any) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={action}
-                  className={cn(
-                    "w-full flex items-center gap-2.5 px-3 py-1.5 text-xs hover:bg-secondary transition-colors text-left",
-                    danger ? "text-destructive/90 hover:text-destructive hover:bg-destructive/10" : "text-foreground"
-                  )}
-                >
-                  <Icon className={cn("w-3.5 h-3.5 shrink-0", danger ? "text-destructive" : "text-muted-foreground")} />
-                  {label}
-                </button>
-              ))}
-
-              <div className="border-t border-border/50 mt-1 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    deleteLayer(screenSet.id, screen.id, ctxMenu.layerId);
-                    setCtxMenu(null);
-                    toast.info("Layer deleted");
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs hover:bg-destructive/15 text-destructive transition-colors text-left"
-                >
-                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                  Delete Layer
-                </button>
-              </div>
-            </div>
-          );
-        })()}
+        {/* Right-click context menu */}
+        {ctxMenu && isActiveScreen && (
+          <ScreenContextMenu
+            ctxMenu={ctxMenu}
+            screen={screen}
+            screenSet={screenSet}
+            onClose={() => setCtxMenu(null)}
+            onStartTextEdit={(id: string, content: string) => {
+              setEditingLayerId(id);
+              setEditText(content);
+            }}
+          />
+        )}
 
         {/* Vertical Screen Context Menu (1-3 Mockups + Background) - only visible when the screen/frame itself is selected, NOT when a layer inside is selected */}
         {isActiveScreen && !activeLayerId && (!selectedLayerIds || selectedLayerIds.length === 0) && (
@@ -2970,252 +2816,6 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
     </Draggable>
   );
 });
-
-// ── Resize handles overlay ─────────────────────────────────────────────────────
-function ResizeOverlay({
-  layer, scale, onResizeStart,
-}: {
-  layer: Layer;
-  scale: number;
-  onResizeStart: (e: React.MouseEvent, handle: string) => void;
-}) {
-  const x = layer.x * scale;
-  const y = layer.y * scale;
-  const w = layer.width * scale;
-  const h = layer.height * scale;
-  const hs = 10; // handle size px
-  const rot = layer.rotation || 0;
-
-  const handles: { id: string; cx: number; cy: number; cursor: string }[] = [
-    { id: "nw", cx: x,       cy: y,       cursor: "nwse-resize" },
-    { id: "n",  cx: x + w/2, cy: y,       cursor: "ns-resize" },
-    { id: "ne", cx: x + w,   cy: y,       cursor: "nesw-resize" },
-    { id: "e",  cx: x + w,   cy: y + h/2, cursor: "ew-resize" },
-    { id: "se", cx: x + w,   cy: y + h,   cursor: "nwse-resize" },
-    { id: "s",  cx: x + w/2, cy: y + h,   cursor: "ns-resize" },
-    { id: "sw", cx: x,       cy: y + h,   cursor: "nesw-resize" },
-    { id: "w",  cx: x,       cy: y + h/2, cursor: "ew-resize" },
-  ];
-
-  return (
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{ zIndex: 10 }}
-    >
-      <div 
-        className="absolute inset-0"
-        style={{
-          transformOrigin: `${x + w/2}px ${y + h/2}px`,
-          transform: rot ? `rotate(${rot}deg)` : "none"
-        }}
-      >
-        {/* Selection box */}
-        <div
-          className="absolute border-2 border-primary/70"
-          style={{ left: x, top: y, width: w, height: h }}
-        />
-        {/* Handles */}
-        {handles.map(({ id, cx, cy, cursor }) => (
-          <div
-            key={id}
-            className="absolute pointer-events-auto bg-white border-2 border-primary rounded-sm shadow-sm hover:bg-primary/20 transition-colors"
-            style={{
-              left: cx - hs / 2,
-              top: cy - hs / 2,
-              width: hs,
-              height: hs,
-              cursor,
-            }}
-            onMouseDown={(e) => onResizeStart(e, id)}
-          />
-        ))}
-        {/* Rotation handle */}
-        <div
-          className="absolute pointer-events-auto bg-white border-2 border-primary shadow-sm hover:bg-primary/20 transition-colors"
-          style={{
-            left: x + w/2 - hs/2,
-            top: y - hs * 3,
-            width: hs,
-            height: hs,
-            borderRadius: '50%',
-            cursor: 'crosshair',
-          }}
-          onMouseDown={(e) => onResizeStart(e, "rotate")}
-        />
-        {/* Line connecting rotation handle to box */}
-        <div
-          className="absolute bg-primary/70 pointer-events-none"
-          style={{
-            left: x + w/2 - 1,
-            top: y - hs * 3 + hs,
-            width: 2,
-            height: hs * 2,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ── Placeholder drawing ────────────────────────────────────────────────────────
-function drawPlaceholder(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number,
-  label?: string,
-) {
-  // Dark translucent fill
-  ctx.fillStyle = "rgba(15,23,42,0.55)";
-  ctx.fillRect(x, y, w, h);
-
-  // Dashed border
-  ctx.strokeStyle = "rgba(99,102,241,0.55)";
-  ctx.lineWidth = 10;
-  ctx.setLineDash([30, 20]);
-  ctx.strokeRect(x + 5, y + 5, w - 10, h - 10);
-  ctx.setLineDash([]);
-
-  // Phone icon (simple outline)
-  const iw = w * 0.25;
-  const ih = iw * 1.8;
-  const ix = x + (w - iw) / 2;
-  const iy = y + (h - ih) / 2 - (label ? h * 0.05 : 0);
-  const ir = iw * 0.15;
-
-  ctx.strokeStyle = "rgba(99,102,241,0.8)";
-  ctx.lineWidth = Math.max(8, iw * 0.04);
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.roundRect(ix, iy, iw, ih, ir);
-  ctx.stroke();
-
-  // Small home indicator
-  ctx.fillStyle = "rgba(99,102,241,0.8)";
-  ctx.beginPath();
-  ctx.roundRect(ix + iw * 0.3, iy + ih - iw * 0.12, iw * 0.4, iw * 0.04, iw * 0.02);
-  ctx.fill();
-
-  // Upload icon (arrow up + line)
-  const arrowCx = x + w / 2;
-  const arrowCy = iy + ih / 2;
-  const arrowSize = iw * 0.35;
-  ctx.strokeStyle = "rgba(99,102,241,0.7)";
-  ctx.lineWidth = Math.max(6, iw * 0.035);
-  ctx.beginPath();
-  ctx.moveTo(arrowCx, arrowCy - arrowSize * 0.6);
-  ctx.lineTo(arrowCx, arrowCy + arrowSize * 0.4);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(arrowCx - arrowSize * 0.4, arrowCy - arrowSize * 0.2);
-  ctx.lineTo(arrowCx, arrowCy - arrowSize * 0.6);
-  ctx.lineTo(arrowCx + arrowSize * 0.4, arrowCy - arrowSize * 0.2);
-  ctx.stroke();
-
-  // Label text
-  let instrY = iy + ih + h * 0.06;
-  if (label) {
-    const fontSize = Math.round(w * 0.085);
-    ctx.font = `600 ${fontSize}px "Inter", sans-serif`;
-    ctx.fillStyle = "rgba(255,255,255,1)";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-
-    // Split text into lines if it's too wide
-    const words = label.split(" ");
-    let line = "";
-    const lines: string[] = [];
-    for (let i = 0; i < words.length; i++) {
-      const testLine = line + words[i] + " ";
-      if (ctx.measureText(testLine).width > w * 0.9 && i > 0) {
-        lines.push(line.trim());
-        line = words[i] + " ";
-      } else {
-        line = testLine;
-      }
-    }
-    lines.push(line.trim());
-
-    for (const l of lines) {
-      ctx.fillText(l, x + w / 2, instrY);
-      instrY += fontSize * 1.3;
-    }
-    instrY += h * 0.02;
-  } else {
-    instrY += w * 0.08 + h * 0.02;
-  }
-
-  // Tap instruction
-  const instrFontSize = Math.round(w * 0.06);
-  ctx.font = `500 ${instrFontSize}px "Inter", sans-serif`;
-  ctx.fillStyle = "rgba(226,232,240,1)";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.fillText("Click or drop image here", x + w / 2, instrY);
-}
-
-// ── Multi-line word-wrapped text drawer ────────────────────────────────────────
-function drawWrappedText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number,
-  align: CanvasTextAlign = "center"
-) {
-  const words = (text || "").split(" ");
-  const lines: string[] = [];
-  let currentLine = "";
-
-  for (let i = 0; i < words.length; i++) {
-    const testLine = currentLine ? `${currentLine} ${words[i]}` : words[i];
-    const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = words[i];
-    } else {
-      currentLine = testLine;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
-
-  ctx.textAlign = align;
-  ctx.textBaseline = "middle";
-
-  const totalHeight = lines.length * lineHeight;
-  const startY = y - totalHeight / 2 + lineHeight / 2;
-
-  lines.forEach((line, index) => {
-    ctx.fillText(line, x, startY + index * lineHeight);
-  });
-}
-
-// ── Single-line auto-fitting text drawer (never overflows container) ───────────
-function drawAutoFitText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  baseFontSize: number,
-  fontWeight: number | string = 700,
-  fontFamily: string = '"Inter", sans-serif',
-  color: string = "#FFFFFF",
-  align: CanvasTextAlign = "center"
-) {
-  let fontSize = baseFontSize;
-  ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-  const measured = ctx.measureText(text).width;
-  if (measured > maxWidth && maxWidth > 0) {
-    fontSize = Math.max(10, fontSize * (maxWidth / measured));
-    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-  }
-  ctx.fillStyle = color;
-  ctx.textAlign = align;
-  ctx.textBaseline = "middle";
-  ctx.fillText(text, x, y);
-}
 
 
 
