@@ -29,8 +29,8 @@ if (isAdminConfigured) {
     }
     adminDb = getFirestore(adminApp);
     adminAuth = getAuth(adminApp);
-  } catch (error) {
-    console.error("Firebase Admin initialization error:", error);
+  } catch (error: any) {
+    console.error("Firebase Admin initialization error:", error?.message || "Unknown initialization error");
   }
 }
 

@@ -22,9 +22,9 @@ export const ourFileRouter = {
         throw new UploadThingError("Rate limit exceeded for uploads. Please wait a minute.");
       }
 
-      // 2. Extract Bearer token if provided
+      // 2. Enforce authentication
       const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-      let userId = `anon_${clientIp.replace(/[^a-zA-Z0-9]/g, "_")}`;
+      let userId: string | null = null;
 
       if (authHeader && authHeader.startsWith("Bearer ")) {
         const token = authHeader.split("Bearer ")[1]?.trim();
@@ -34,11 +34,17 @@ export const ourFileRouter = {
             userId = decoded.uid;
           } catch (e) {
             console.warn("[UploadThing] Invalid auth token during upload:", e);
+            throw new UploadThingError("Invalid authentication token. Please sign in again.");
           }
         }
       }
 
-      return { userId };
+      // If Firebase Admin is configured, require authentication
+      if (isAdminConfigured && !userId) {
+        throw new UploadThingError("Authentication required for cloud file uploads.");
+      }
+
+      return { userId: userId || `dev_${clientIp.replace(/[^a-zA-Z0-9]/g, "_")}` };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("[UploadThing] Upload complete for userId:", metadata.userId, "url:", file.url);

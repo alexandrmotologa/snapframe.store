@@ -24,6 +24,10 @@ export async function POST(req: NextRequest) {
     const isArray = Array.isArray(texts);
     const textList: string[] = isArray ? texts : Object.values(texts);
 
+    if (textList.length > 50 || textList.some((t) => typeof t === "string" && t.length > 1000)) {
+      return NextResponse.json({ error: "Too many texts or text exceeds 1,000 characters per item (max 50 items)" }, { status: 400 });
+    }
+
     const prompt = `You are a native copywriter and localization expert for mobile apps.
 Translate and culturally adapt the following marketing texts into native, natural, high-converting ${targetLang}.
 Context: ${context}.

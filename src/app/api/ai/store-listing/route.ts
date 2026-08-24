@@ -18,6 +18,14 @@ export async function POST(req: NextRequest) {
       return authCheck.response;
     }
 
+    if (appName && typeof appName === "string" && appName.length > 200) {
+      return NextResponse.json({ error: "App name too long (max 200 characters)" }, { status: 400 });
+    }
+
+    if (nicheKeywords && typeof nicheKeywords === "string" && nicheKeywords.length > 1000) {
+      return NextResponse.json({ error: "Keywords too long (max 1,000 characters)" }, { status: 400 });
+    }
+
     const prompt = `You are a world-class App Store Optimization (ASO) specialist and copywriter.
 Generate a complete, high-ranking, high-conversion App Store and Google Play store listing for the mobile app "${appName}".
 Category: ${category}.

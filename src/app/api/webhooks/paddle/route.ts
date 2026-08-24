@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("[Paddle Webhook] Processing error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to process webhook" },
+      { error: "Webhook processing failed" },
       { status: 500 }
     );
   }

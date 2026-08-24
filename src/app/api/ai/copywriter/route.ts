@@ -23,6 +23,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
+    if (text && typeof text === "string" && text.length > 5000) {
+      return NextResponse.json({ error: "Text too long (maximum 5,000 characters)" }, { status: 400 });
+    }
+
     let prompt = "";
 
     if (action === "ideas") {

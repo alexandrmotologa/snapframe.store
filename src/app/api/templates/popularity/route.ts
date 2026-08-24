@@ -21,7 +21,7 @@ export async function GET() {
     return NextResponse.json({ success: true, counts, configured: true });
   } catch (error: any) {
     console.warn("Firestore template stats fetch warning:", error?.message || error);
-    return NextResponse.json({ success: true, counts: {}, fallback: true, error: error?.message });
+    return NextResponse.json({ success: true, counts: {}, fallback: true });
   }
 }
 

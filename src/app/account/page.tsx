@@ -270,7 +270,7 @@ export default function AccountPage() {
                   className="flex-1 sm:flex-initial h-9 px-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-primary/20 transition-all cursor-pointer active:scale-95"
                 >
                   <Crown className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Upgrade to Pro ($9/mo)</span>
+                  <span>Upgrade to Pro (from $5.75/mo)</span>
                 </button>
               )}
 
@@ -499,7 +499,7 @@ export default function AccountPage() {
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs font-bold hover:opacity-90 transition-all shadow-md cursor-pointer"
                     >
                       <Crown className="w-4 h-4 text-amber-300" />
-                      <span>Upgrade to Pro ($9/mo)</span>
+                      <span>Upgrade to Pro (from $5.75/mo)</span>
                     </button>
                   )}
                 </div>
