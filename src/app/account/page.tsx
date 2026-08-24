@@ -87,6 +87,7 @@ interface BillingDetails {
 export default function AccountPage() {
   const router = useRouter();
   const { user, isInitialized, isPro, aiCredits, usedAiCredits, plan, subscriptionStatus, setAuthModalOpen, setUpgradeModalOpen, signOutUser } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<"subscription" | "credits" | "invoices">("subscription");
   const [billingData, setBillingData] = useState<BillingDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,24 +95,48 @@ export default function AccountPage() {
   const [cancelReason, setCancelReason] = useState("No longer needed");
   const [isCanceling, setIsCanceling] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const fetchBillingInfo = async () => {
     if (!user || isGuest) {
+      setIsLoading(false);
       return;
     }
 
     try {
       setIsLoading(true);
-      const idToken = await getIdTokenSafe(user);
+      let idToken = await getIdTokenSafe(user);
+      if (!idToken) {
+        // Wait briefly if auth token is currently initializing
+        await new Promise((r) => setTimeout(r, 350));
+        idToken = await getIdTokenSafe(user);
+      }
+
       const res = await fetch(`/api/account/billing?uid=${user.uid}`, {
         headers: {
           ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
         },
       });
+
       if (res.ok) {
         const data = await res.json();
         setBillingData(data);
+      } else if (res.status === 401) {
+        // Retry with force-refreshed token
+        const freshToken = await getIdTokenSafe(user, true);
+        if (freshToken) {
+          const retryRes = await fetch(`/api/account/billing?uid=${user.uid}`, {
+            headers: { Authorization: `Bearer ${freshToken}` },
+          });
+          if (retryRes.ok) {
+            const data = await retryRes.json();
+            setBillingData(data);
+          }
+        }
       }
     } catch (err) {
       console.warn("Failed to load billing details:", err);
@@ -122,20 +147,42 @@ export default function AccountPage() {
 
   useEffect(() => {
     let isCancelled = false;
-    if (!user || isGuest) return;
+    if (!mounted || !isInitialized) return;
+
+    if (!user || isGuest) {
+      setIsLoading(false);
+      return;
+    }
 
     async function load() {
       try {
         setIsLoading(true);
-        const idToken = await getIdTokenSafe(user);
+        let idToken = await getIdTokenSafe(user);
+        if (!idToken && !isCancelled) {
+          await new Promise((r) => setTimeout(r, 350));
+          idToken = await getIdTokenSafe(user);
+        }
+
         const res = await fetch(`/api/account/billing?uid=${user.uid}`, {
           headers: {
             ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
           },
         });
+
         if (res.ok && !isCancelled) {
           const data = await res.json();
           setBillingData(data);
+        } else if (res.status === 401 && !isCancelled) {
+          const freshToken = await getIdTokenSafe(user, true);
+          if (freshToken && !isCancelled) {
+            const retryRes = await fetch(`/api/account/billing?uid=${user.uid}`, {
+              headers: { Authorization: `Bearer ${freshToken}` },
+            });
+            if (retryRes.ok && !isCancelled) {
+              const data = await retryRes.json();
+              setBillingData(data);
+            }
+          }
         }
       } catch (err) {
         console.warn("Failed to load billing details:", err);
@@ -150,17 +197,18 @@ export default function AccountPage() {
     return () => {
       isCancelled = true;
     };
-  }, [user, isGuest]);
+  }, [user, isGuest, isInitialized, mounted]);
 
   useEffect(() => {
-    if (!isLoading && isInitialized && !user) {
+    if (mounted && !isLoading && isInitialized && !user) {
       router.push("/");
     }
-  }, [user, isLoading, isInitialized, router]);
+  }, [user, isLoading, isInitialized, router, mounted]);
 
   const handleCancelSubscription = async () => {
     if (!user) return;
     setIsCanceling(true);
+
 
     try {
       const idToken = await getIdTokenSafe(user);
@@ -225,7 +273,29 @@ export default function AccountPage() {
     ? Math.max(0, Math.ceil((subExpiresAt - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <header className="border-b border-border/50 bg-card/60 backdrop-blur-md sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 group cursor-pointer">
+              <SnapFrameLogo size={32} withText textClassName="text-lg font-bold" />
+            </Link>
+          </div>
+        </header>
+        <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12">
+          <div className="space-y-6 animate-pulse">
+            <div className="h-32 bg-card rounded-3xl border border-border/60" />
+            <div className="h-12 bg-card rounded-2xl w-80 border border-border/60" />
+            <div className="h-64 bg-card rounded-2xl border border-border/60" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
+
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       {/* Top Header */}
       <header className="border-b border-border/50 bg-card/60 backdrop-blur-md sticky top-0 z-40">

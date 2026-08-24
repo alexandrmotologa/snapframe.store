@@ -101,6 +101,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
+function formatFeatureName(rawFeature?: string): string {
+  if (!rawFeature) return "AI Generation";
+  const map: Record<string, string> = {
+    "vision-autopilot": "AI Vision Auto-Pilot",
+    "ai-translate": "AI Multi-Language Translation",
+    "ai-scrape-captions": "AI App Store Scraping & Captions",
+    "ai-copywriter": "AI Headline & Marketing Copy",
+    "ai-store-listing": "AI App Store Listing Metadata",
+    "ai-cutout": "AI Magic Background Cutout",
+    "ai-palette": "AI Smart Color Palette",
+  };
+  return map[rawFeature] || rawFeature.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
     // Fetch latest 50 credit spending logs
     let creditLogs: CreditLogEntry[] = [];
     try {
@@ -112,7 +126,7 @@ export async function GET(req: NextRequest) {
 
       creditLogs = logsSnap.docs.map((doc) => ({
         id: doc.id,
-        feature: doc.data().feature || "AI Generation",
+        feature: formatFeatureName(doc.data().feature),
         timestamp: doc.data().timestamp || Date.now(),
         cost: doc.data().cost ?? 1,
         remaining: doc.data().remaining ?? 0,
@@ -121,6 +135,33 @@ export async function GET(req: NextRequest) {
       }));
     } catch (e) {
       console.warn("[Billing API] Failed to query credit_logs:", e);
+    }
+
+    // If subcollection had no entries yet, construct baseline activity from user record
+    if (creditLogs.length === 0) {
+      if (userData.createdAt) {
+        creditLogs.push({
+          id: "log_welcome",
+          feature: "Free Welcome Bonus Credits",
+          timestamp: userData.createdAt,
+          cost: -3,
+          remaining: 3,
+          isPro: false,
+          status: "credited",
+        });
+      }
+
+      if (userData.lastAiUsedAt && (userData.usedAiCredits || 0) > 0) {
+        creditLogs.unshift({
+          id: "log_last_used",
+          feature: formatFeatureName(userData.lastAiFeature || "AI Vision Auto-Pilot"),
+          timestamp: userData.lastAiUsedAt,
+          cost: isPro ? 0 : 1,
+          remaining: isPro ? 9999 : Math.max(0, (userData.aiCredits ?? 2)),
+          isPro,
+          status: "completed",
+        });
+      }
     }
 
     // Fetch transactions / invoices if recorded
@@ -141,6 +182,7 @@ export async function GET(req: NextRequest) {
     }
 
     const paddlePortalUrl = "https://paddle.net";
+
 
     const isAnnualPlan = Boolean(userData.plan?.includes("annual"));
     const billingAmount = isAnnualPlan ? 69 : 9;

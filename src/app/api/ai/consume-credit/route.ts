@@ -3,6 +3,20 @@ import { adminDb, isAdminConfigured, FieldValue } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/serverAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 
+function formatFeatureName(rawFeature?: string): string {
+  if (!rawFeature) return "AI Vision Auto-Pilot";
+  const map: Record<string, string> = {
+    "vision-autopilot": "AI Vision Auto-Pilot",
+    "ai-translate": "AI Multi-Language Translation",
+    "ai-scrape-captions": "AI App Store Scraping & Captions",
+    "ai-copywriter": "AI Headline & Marketing Copy",
+    "ai-store-listing": "AI App Store Listing Metadata",
+    "ai-cutout": "AI Magic Background Cutout",
+    "ai-palette": "AI Smart Color Palette",
+  };
+  return map[rawFeature] || rawFeature.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export async function POST(req: NextRequest) {
   try {
     // 1. Rate limiting by IP
@@ -24,6 +38,7 @@ export async function POST(req: NextRequest) {
     const { uid } = authResult.data;
     const body = await req.json().catch(() => ({}));
     const { feature } = body;
+    const formattedFeature = formatFeatureName(feature);
 
     // If Firebase Admin is not configured
     if (!isAdminConfigured || !adminDb) {
@@ -45,6 +60,7 @@ export async function POST(req: NextRequest) {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
+      const now = Date.now();
       // Create user with 3 free credits and consume 1
       await userRef.set({
         uid,
@@ -53,10 +69,32 @@ export async function POST(req: NextRequest) {
         subscriptionStatus: null,
         aiCredits: 2,
         usedAiCredits: 1,
-        createdAt: Date.now(),
-        lastAiUsedAt: Date.now(),
-        lastAiFeature: feature || "general",
+        createdAt: now,
+        lastAiUsedAt: now,
+        lastAiFeature: formattedFeature,
       });
+
+      // Record welcome credits log and initial consumption log
+      try {
+        await userRef.collection("credit_logs").add({
+          feature: "Free Welcome Bonus Credits",
+          timestamp: now - 1000,
+          cost: -3,
+          isPro: false,
+          remaining: 3,
+          status: "credited",
+        });
+        await userRef.collection("credit_logs").add({
+          feature: formattedFeature,
+          timestamp: now,
+          cost: 1,
+          isPro: false,
+          remaining: 2,
+          status: "completed",
+        });
+      } catch (logErr) {
+        console.warn("[ConsumeCredit] Failed to write initial credit logs:", logErr);
+      }
 
       return NextResponse.json({
         allowed: true,
@@ -67,20 +105,21 @@ export async function POST(req: NextRequest) {
     }
 
     const data = userDoc.data() || {};
+    const now = Date.now();
 
     // 1. Pro users have unlimited AI
     if (data.isPro) {
       await userRef.update({
-        lastAiUsedAt: Date.now(),
-        lastAiFeature: feature || "general",
+        lastAiUsedAt: now,
+        lastAiFeature: formattedFeature,
         usedAiCredits: FieldValue.increment(1),
       });
 
       // Append to credit logs subcollection
       try {
         await userRef.collection("credit_logs").add({
-          feature: feature || "AI Vision Auto-Pilot",
-          timestamp: Date.now(),
+          feature: formattedFeature,
+          timestamp: now,
           cost: 0,
           isPro: true,
           remaining: 9999,
@@ -116,8 +155,8 @@ export async function POST(req: NextRequest) {
     await userRef.update({
       aiCredits: FieldValue.increment(-1),
       usedAiCredits: FieldValue.increment(1),
-      lastAiUsedAt: Date.now(),
-      lastAiFeature: feature || "general",
+      lastAiUsedAt: now,
+      lastAiFeature: formattedFeature,
     });
 
     const remaining = currentCredits - 1;
@@ -125,8 +164,8 @@ export async function POST(req: NextRequest) {
     // Append to credit logs subcollection
     try {
       await userRef.collection("credit_logs").add({
-        feature: feature || "AI Vision Auto-Pilot",
-        timestamp: Date.now(),
+        feature: formattedFeature,
+        timestamp: now,
         cost: 1,
         isPro: false,
         remaining,
@@ -151,3 +190,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

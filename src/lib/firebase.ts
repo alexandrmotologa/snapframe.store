@@ -113,12 +113,12 @@ export async function getFirebaseDb(): Promise<Firestore | null> {
 
 /**
  * Safely retrieves an ID token from a Firebase User or the current active Firebase Auth instance.
- * Gracefully handles plain JSON cached user objects and prevents TypeError exceptions.
+ * Gracefully handles plain JSON cached user objects and awaits authStateReady when available.
  */
-export async function getIdTokenSafe(userObj?: any): Promise<string> {
+export async function getIdTokenSafe(userObj?: any, forceRefresh = false): Promise<string> {
   if (userObj && typeof userObj.getIdToken === "function") {
     try {
-      const token = await userObj.getIdToken();
+      const token = await userObj.getIdToken(forceRefresh);
       if (typeof token === "string" && token) return token;
     } catch {
       // Fallback to live auth instance
@@ -127,9 +127,16 @@ export async function getIdTokenSafe(userObj?: any): Promise<string> {
 
   try {
     const { auth: liveAuth } = await getFirebaseAuth();
-    if (liveAuth?.currentUser && typeof liveAuth.currentUser.getIdToken === "function") {
-      const token = await liveAuth.currentUser.getIdToken();
-      if (typeof token === "string" && token) return token;
+    if (liveAuth) {
+      if (typeof (liveAuth as any).authStateReady === "function") {
+        try {
+          await (liveAuth as any).authStateReady();
+        } catch {}
+      }
+      if (liveAuth.currentUser && typeof liveAuth.currentUser.getIdToken === "function") {
+        const token = await liveAuth.currentUser.getIdToken(forceRefresh);
+        if (typeof token === "string" && token) return token;
+      }
     }
   } catch {
     return "";
@@ -143,3 +150,4 @@ export const isFirebaseConfigured = Boolean(
 );
 
 export { app, db, auth, googleProvider, githubProvider };
+

@@ -442,8 +442,30 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
           localStorage.setItem(usageKey, (currentDailyUsage + 1).toString());
         }
+
+        // Asynchronously notify backend to record generation in credit_logs
+        (async () => {
+          try {
+            const idToken = await getIdTokenSafe(currentUser);
+            await fetch("/api/ai/consume-credit", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+              },
+              body: JSON.stringify({ uid: currentUser.uid, feature }),
+            });
+          } catch (e) {
+            console.warn("Failed to record Pro AI credit usage:", e);
+          }
+        })();
+
+        const nextUsed = (state.usedAiCredits || 0) + 1;
+        set({ usedAiCredits: nextUsed });
+        persistAuthSession({ ...get(), usedAiCredits: nextUsed });
         return { allowed: true, remaining: 9999, isPro: true };
       }
+
 
       // 3. If credits exhausted, open Upgrade modal
       if (state.aiCredits <= 0) {
