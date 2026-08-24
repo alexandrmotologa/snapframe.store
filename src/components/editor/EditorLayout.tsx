@@ -14,9 +14,16 @@ import {
   ChevronDown,
   Copy,
   Download,
+  Lightbulb,
+  Cloud,
+  Check,
+  Loader2,
+  Edit2,
+  Folder,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { KeyboardShortcutsModal } from "@/components/editor/KeyboardShortcutsModal";
+import { QuickTipsModal } from "@/components/editor/QuickTipsModal";
 import { StorePreviewModal } from "@/components/editor/StorePreviewModal";
 import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { toast } from "@/lib/store/toastStore";
@@ -93,9 +100,42 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
   const [showStorePreview, setShowStorePreview] = useState(false);
   const [showAIAutoPilot, setShowAIAutoPilot] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showTips, setShowTips] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving">("saved");
   const [zoomOpen, setZoomOpen] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const thumbTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── First-visit quick tips trigger ───────────────────────────────────────
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hasSeenTips = localStorage.getItem("sf_seen_quick_tips");
+      if (!hasSeenTips) {
+        setShowTips(true);
+      }
+    }
+  }, []);
+
+  // ── Dynamic save status listener (1s debounce) ───────────────────────────
+  useEffect(() => {
+    setSaveStatus("saving");
+    const timer = setTimeout(() => {
+      setSaveStatus("saved");
+    }, 1100);
+    return () => clearTimeout(timer);
+  }, [screenSets]);
+
+  const handleForceSave = () => {
+    if (project) {
+      useProjectStore.getState().updateProject(project.id, {
+        screenSets,
+        hiddenScreenSets: useEditorStore.getState().hiddenScreenSets,
+        themeId: useEditorStore.getState().themeId,
+      });
+      setSaveStatus("saved");
+      toast.success(isPro ? "☁️ Project saved and synced to Cloud!" : "💾 Project saved to local storage!");
+    }
+  };
 
   // ── Auto-save thumbnail (debounced, 3 s after last change) ────────────────
   const generateThumbnail = useCallback(async () => {
@@ -278,7 +318,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
       {/* ── Top Navigation Bar ── */}
       <header className="h-11 border-b border-border/50 bg-card/90 backdrop-blur-md flex items-center px-3 gap-2 shrink-0 z-40 justify-between">
         <div className="flex items-center gap-2">
-          {/* Back & Logo */}
+          {/* Back to Dashboard & Logo */}
           <Link
             href="/projects"
             className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-secondary transition-colors group cursor-pointer"
@@ -289,24 +329,64 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
 
           <Separator orientation="vertical" className="h-4" />
 
-          {/* Project name & Autosave Badge */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={project?.name ?? ""}
-              onChange={(e) => {
-                if (project) {
-                  useProjectStore.getState().updateProject(project.id, { name: e.target.value });
-                }
-              }}
-              className="text-sm font-semibold tracking-tight truncate max-w-44 bg-transparent border-none outline-none focus:ring-1 focus:ring-primary/50 px-1 py-0.5 rounded transition-all hover:bg-secondary/50"
-              placeholder="Untitled Project"
-              spellCheck={false}
-            />
-            <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Saved
-            </span>
+          {/* Breadcrumb & Project Name Inline Editor */}
+          <div className="flex items-center gap-1.5">
+            <Link
+              href="/projects"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:inline-flex items-center gap-1"
+            >
+              <Folder className="w-3.5 h-3.5 text-muted-foreground/70" />
+              <span>Projects</span>
+            </Link>
+            <span className="text-muted-foreground/40 text-xs hidden sm:inline">/</span>
+
+            <div className="relative flex items-center group">
+              <input
+                type="text"
+                value={project?.name ?? ""}
+                onChange={(e) => {
+                  if (project) {
+                    setSaveStatus("saving");
+                    useProjectStore.getState().updateProject(project.id, { name: e.target.value });
+                  }
+                }}
+                className="text-xs sm:text-sm font-semibold tracking-tight truncate max-w-32 sm:max-w-52 bg-transparent border border-transparent hover:border-border/60 focus:border-primary/60 outline-none focus:ring-1 focus:ring-primary/40 px-2 py-0.5 rounded-lg transition-all hover:bg-secondary/40 text-foreground"
+                placeholder="Untitled Project"
+                spellCheck={false}
+                title="Click to rename project"
+              />
+              <Edit2 className="w-3 h-3 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 pointer-events-none" />
+            </div>
+
+            {/* Dynamic Real-Time Save State Badge */}
+            <button
+              type="button"
+              onClick={handleForceSave}
+              className={cn(
+                "hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium transition-all duration-300 cursor-pointer select-none",
+                saveStatus === "saving"
+                  ? "bg-amber-500/10 text-amber-500 border border-amber-500/25"
+                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 hover:bg-emerald-500/20"
+              )}
+              title={saveStatus === "saving" ? "Saving changes..." : isPro ? "Cloud Synced (Click to save now)" : "Saved on device (Click to save now)"}
+            >
+              {saveStatus === "saving" ? (
+                <>
+                  <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : isPro ? (
+                <>
+                  <Cloud className="w-3 h-3 text-emerald-500" />
+                  <span>Cloud Synced</span>
+                </>
+              ) : (
+                <>
+                  <Check className="w-3 h-3 text-emerald-500" />
+                  <span>Saved</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
@@ -322,7 +402,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
           </div>
         </div>
 
-        {/* Right Tools: Zoom, Copy, Shortcuts, Theme, Export */}
+        {/* Right Tools: Zoom, Copy, Tips, Shortcuts, Theme, Export */}
         <div className="flex items-center gap-1.5">
           {/* Zoom Popover */}
           <Popover open={zoomOpen} onOpenChange={setZoomOpen}>
@@ -397,6 +477,17 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
             <Copy className="w-3.5 h-3.5 shrink-0" />
             <span className="show-under-1200">Screen</span>
             <span className="show-from-1200">Copy Screen</span>
+          </button>
+
+          {/* Quick Tips / Onboarding button */}
+          <button
+            type="button"
+            onClick={() => setShowTips(true)}
+            className="h-7 px-2 rounded-lg flex items-center gap-1 text-xs font-medium text-amber-500 hover:text-amber-400 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 transition-colors cursor-pointer shadow-2xs"
+            title="Quick Tips & Guide"
+          >
+            <Lightbulb className="w-3.5 h-3.5 shrink-0" />
+            <span className="show-from-1200">Tips</span>
           </button>
 
           {/* Keyboard shortcuts */}
@@ -520,6 +611,9 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
       )}
       {showShortcuts && (
         <KeyboardShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      )}
+      {showTips && (
+        <QuickTipsModal open={showTips} onClose={() => setShowTips(false)} />
       )}
       <AuthModal />
       <UpgradeModal />

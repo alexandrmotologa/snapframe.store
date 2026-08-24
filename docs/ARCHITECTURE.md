@@ -182,6 +182,11 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 - **Interactive Screen Peek:** Micro-dot hover navigation allows rapid screen cycling directly on dashboard cards without triggering heavy editor navigations.
 - **App Monogram & Contextual Teaser:** Generates consistent App Store-style squircle icons and extracts primary headline text for immediate project identification.
 
+### 6.7 Real-Time Save State Engine & Onboarding Studio Guide (`EditorLayout` & `QuickTipsModal`)
+- **Debounced Save Lifecycle:** Tracks real-time editing states (`saving` vs `saved`) with debounced Firestore batching (1200ms) and automatic thumbnail refresh.
+- **Visual Breadcrumb & Inline Renaming:** Header breadcrumb navigation (`Projects / [Name]`) with hover editing affordance and 1-click force save capabilities.
+- **Interactive 3-Step Quick Tips Modal:** Onboarding modal introducing multi-platform presets, 30+ conversion UI blocks, and AI Vision Auto-Pilot.
+
 ---
 
 ## 7. 3-Tier Monetization & Export Gating Matrix
