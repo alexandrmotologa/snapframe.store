@@ -104,9 +104,12 @@ export async function initializePaddle(): Promise<boolean> {
         window.Paddle.Initialize({
           token: config.clientToken,
           eventCallback: (data: any) => {
-            if (process.env.NODE_ENV !== "production" || config.environment === "sandbox") {
-              console.log("[Paddle Event]", data);
+            console.log("[Paddle Event]", data?.name, data);
+            
+            if (data?.name === "checkout.error" || data?.name === "checkout.warning") {
+              console.error("[Paddle Checkout Error/Warning]:", data);
             }
+
             if (data?.name === "checkout.completed" || data?.data?.status === "completed") {
               toast.success("🎉 Payment successful! Welcome to SnapFrame Pro.");
               if (activeSuccessHandler) {
@@ -177,6 +180,13 @@ export async function openPaddleCheckout({
   }
 
   activeSuccessHandler = onSuccess || null;
+
+  console.log("[Paddle] Opening Checkout with config:", {
+    environment: config.environment,
+    tokenPrefix: config.clientToken.slice(0, 10),
+    priceId,
+    userEmail: userEmail || "(none)",
+  });
 
   try {
     window.Paddle.Checkout.open({
