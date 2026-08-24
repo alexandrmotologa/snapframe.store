@@ -216,7 +216,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
   },
 
   addLayer: (setId, screenId, layer) => {
-    get().recordHistory(true);
     const newLayer = { ...layer, id: nanoid() } as Layer;
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
@@ -233,10 +232,10 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       ),
       activeLayerId: newLayer.id,
     }));
+    get().recordHistory(true);
   },
 
   addLayers: (setId, screenId, layers) => {
-    get().recordHistory(true);
     const newLayers = layers.map((l) => ({ ...l, id: nanoid() })) as Layer[];
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
@@ -253,6 +252,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       ),
       activeLayerId: newLayers[newLayers.length - 1]?.id ?? state.activeLayerId,
     }));
+    get().recordHistory(true);
   },
 
   updateLayer: (setId, screenId, layerId, updates) => {
@@ -279,7 +279,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
   },
 
   deleteLayer: (setId, screenId, layerId) => {
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -296,12 +295,12 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       activeLayerId:
         state.activeLayerId === layerId ? null : state.activeLayerId,
     }));
+    get().recordHistory(true);
   },
 
   deleteSelectedLayers: () => {
     const { activeSetId, activeScreenId, selectedLayerIds } = get();
     if (!activeSetId || !activeScreenId || selectedLayerIds.length === 0) return;
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== activeSetId ? ss : {
@@ -317,10 +316,10 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       activeLayerId: null,
       selectedLayerIds: [],
     }));
+    get().recordHistory(true);
   },
 
   reorderLayers: (setId, screenId, layerIds) => {
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId
@@ -337,10 +336,10 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
             }
       ),
     }));
+    get().recordHistory(true);
   },
 
   duplicateLayer: (setId, screenId, layerId) => {
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -359,6 +358,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         };
       }),
     }));
+    get().recordHistory(true);
   },
 
   lockLayer: (setId, screenId, layerId, locked) => {
@@ -381,7 +381,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
   },
 
   bringForward: (setId, screenId, layerId) => {
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId ? ss : {
@@ -397,10 +396,10 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         }
       ),
     }));
+    get().recordHistory(true);
   },
 
   sendBackward: (setId, screenId, layerId) => {
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
         ss.id !== setId ? ss : {
@@ -416,10 +415,10 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         }
       ),
     }));
+    get().recordHistory(true);
   },
 
   syncTextToScreens: (setId, srcScreenId, layerIndex) => {
-    get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) => {
         if (ss.id !== setId) return ss;
@@ -441,6 +440,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         };
       }),
     }));
+    get().recordHistory(true);
   },
 
   syncTypographyToAllScreens: (setId, sourceLayerId) => {
@@ -663,7 +663,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
   },
 
   updateMockup: (setId, updates) => {
-    get().recordHistory(true);
     const DEFAULT_MOCKUP: MockupSettings = {
       device: "iphone-16-pro",
       color: "black",
@@ -682,6 +681,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
             }
       ),
     }));
+    get().recordHistory(true);
   },
 
   updateDevice: (setId, deviceId) => {
@@ -874,7 +874,6 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
     const palette = isCustom ? themeOrPalette : theme ? { bg: theme.bg, fg: theme.fg, gradient: theme.gradient } : null;
     if (!palette) return;
 
-    get().recordHistory(true);
     set((state) => ({
       themeId: isCustom ? "custom" : themeOrPalette,
       screenSets: state.screenSets.map((ss) => ({
@@ -901,6 +900,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
         })),
       })),
     }));
+    get().recordHistory(true);
   },
 
   applyCustomThemeToProject: (palette) => {
