@@ -497,7 +497,7 @@ export default function AccountPage() {
                       <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                           <Calendar className="w-3.5 h-3.5 text-primary" />
-                          <span>Activated On (Data activării)</span>
+                          <span>Activated On</span>
                         </div>
                         <p className="text-sm font-bold text-foreground">
                           {formatFriendlyDate(subStartedAt || billingData?.user?.createdAt)}
@@ -511,7 +511,7 @@ export default function AccountPage() {
                       <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                           <RefreshCw className="w-3.5 h-3.5 text-primary" />
-                          <span>Auto-Renewal (Reînnoire automată)</span>
+                          <span>Auto-Renewal Status</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           {autoRenew ? (
@@ -539,8 +539,8 @@ export default function AccountPage() {
                           <Clock className="w-3.5 h-3.5 text-primary" />
                           <span>
                             {autoRenew
-                              ? "Next Renewal Date (Data reînnoirii)"
-                              : "Pro Access Valid Until (Valabilitate)"}
+                              ? "Next Renewal Date"
+                              : "Pro Access Valid Until"}
                           </span>
                         </div>
                         <p className="text-sm font-bold text-foreground">
@@ -557,7 +557,7 @@ export default function AccountPage() {
                       <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/50 space-y-1">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                           <CreditCard className="w-3.5 h-3.5 text-primary" />
-                          <span>Renewal Amount (Suma reînnoirii)</span>
+                          <span>Renewal Amount</span>
                         </div>
                         <p className="text-sm font-bold text-foreground">
                           {autoRenew ? `${planPrice} / ${plan?.includes("annual") ? "year" : "month"}` : "$0.00 (No charge)"}
