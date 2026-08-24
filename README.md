@@ -28,11 +28,13 @@
 ---
 
 ### 🎨 Design & Canvas Capabilities
+- **Global Clipboard Paste (`Ctrl+V` / `Cmd+V`):** Paste screenshots directly from your system clipboard (`Win+Shift+S` / `Cmd+Shift+4`) straight into the selected device mockup frame without saving files or opening disk dialogs.
 - **Continuous Panoramic Flow:** Connect seamless backgrounds, waves, gradients, or custom uploaded ultra-wide panoramas across multiple screens.
 - **30+ Drag-and-Drop Block Elements:** Dynamic Islands, Live Activity workouts, iOS Toggle switches, Push Notification banners, Editors' Choice laurels, 30-Day Guarantee seals, Growth stats (+142%), and Before/After comparison cards.
 - **Responsive & Adaptable Studio UI:** Built-in horizontal scroll rails with interactive chevrons, vertical-to-horizontal mouse wheel conversion, and automatic tab centering across all category filters (Templates, Block Elements, Color Themes, Stickers, Languages).
 - **Ergonomic Template Cards & Controls:** Full-width titles with tooltip support, cleanly separated PRO and Screen-count indicators, responsive 2-column platform scope selectors ("All Platforms" vs "Active Only"), and a 5-column icon+label background switcher.
 - **3D Multi-Screen Dashboard Covers:** Realistic layered 3D screen deck preview with dynamic ambient glow extracted from project background palettes, interactive hover micro-gallery (screen peek), app icon monograms, and headline teasers.
+- **Real-Time Save Engine & Breadcrumb Renaming:** Live `Saving...` / `Cloud Synced` status badge with 1-click force save and header breadcrumb navigation (`Projects / [Name]`).
 - **20+ Google Fonts:** Inter, Montserrat, Poppins, Outfit, Space Grotesk, Syne, Playfair Display, and more.
 - **Lossless 2D Canvas Engine:** 100% visual parity between the real-time editor, Live Store Simulator, PNG clipboard copy, and production 4K ZIP export.
 
@@ -44,10 +46,12 @@
   - `App Store (iPad)/`
   - `Google Play (Phone)/`
   - `Google Play (Tablet)/`
-- **Fastlane & App Store Connect Package:** Structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`, etc.) and `store_listing.json`.
+- **Fastlane `Deliverfile` & App Store Connect Package:** Includes an automated `Deliverfile` ready for `fastlane deliver`, `README-FASTLANE.md` instructions, and structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`, etc.).
+- **Multi-Format Export Control:** Choose between **PNG Lossless (4K)**, **WebP (Optimized, <8MB)**, and **JPEG (High Quality 90%)** for App Store upload compliance.
 - **Live Store Simulator:** Interactive Apple App Store and Google Play preview with device switching and instant multi-language preview.
 - **GIF Animator:** Export animated showcase GIFs of your screenshot sets.
 - **1-Click 4K PNG Clipboard Copy:** Instantly copy active screens to clipboard for Figma, Slack, or Notion.
+- **App Store Screenshot Sizes Guide:** Built-in 2026 developer reference guide at `/app-store-screenshot-sizes`.
 
 ### 💎 Account Tiers & Architecture
 

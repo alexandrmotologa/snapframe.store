@@ -187,6 +187,11 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 - **Visual Breadcrumb & Inline Renaming:** Header breadcrumb navigation (`Projects / [Name]`) with hover editing affordance and 1-click force save capabilities.
 - **Interactive 3-Step Quick Tips Modal:** Onboarding modal introducing multi-platform presets, 30+ conversion UI blocks, and AI Vision Auto-Pilot.
 
+### 6.8 Global Clipboard Paste & Fastlane CLI Automation Suite
+- **Global Clipboard Paste Hook:** Native listener intercepts `Ctrl+V` / `Cmd+V` image data, seamlessly inserting app screenshots into active device mockups without requiring file saves or disk pickers.
+- **Automated Fastlane `Deliverfile`:** Exports ready-to-run Ruby `Deliverfile` alongside `README-FASTLANE.md` and localized `fastlane/metadata/[locale]/` structures for instant `fastlane deliver` terminal deployments.
+- **Dynamic Programmatic SEO & Sitemaps:** Next.js App Router `sitemap.ts`, `robots.ts`, and official 2026 App Store & Google Play Screenshot Sizes Reference (`/app-store-screenshot-sizes`).
+
 ---
 
 ## 7. 3-Tier Monetization & Export Gating Matrix

@@ -90,7 +90,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     zoom, setZoom, undo, redo, canUndo, canRedo,
     activeSetId, activeScreenId, activeLayerId, getActiveSet,
     getActiveScreen, getActiveLayer, deleteLayer, duplicateLayer,
-    updateLayer, setActiveLayer,
+    updateLayer, setActiveLayer, addLayer,
   } = useEditorStore();
   const saveProjectThumbnail = useProjectStore((s) => s.saveProjectThumbnail);
   const screenSets = useEditorStore((s) => s.screenSets);
@@ -312,6 +312,82 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, getActiveSet, getActiveScreen, getActiveLayer]);
+
+  // ── Global Clipboard Paste (Ctrl+V image screenshot) ─────────────────────
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.indexOf("image") !== -1) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (!file) continue;
+
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const dataUrl = event.target?.result as string;
+            if (!dataUrl) return;
+
+            const set = getActiveSet() || screenSets[0];
+            if (!set || set.screens.length === 0) return;
+
+            const screen = set.screens.find((s) => s.id === activeScreenId) || set.screens[0];
+            if (!screen) return;
+
+            // Find existing screenshot/device frame layer or image layer
+            const existingScreenshot = screen.layers.find((l) => l.type === "screenshot");
+            if (existingScreenshot) {
+              useEditorStore.getState().recordHistory();
+              updateLayer(set.id, screen.id, existingScreenshot.id, { src: dataUrl });
+              toast.success("📸 Screenshot inserted into device frame!");
+            } else {
+              const img = new Image();
+              img.onload = () => {
+                const maxW = Math.round(screen.width * 0.8);
+                const maxH = Math.round(screen.height * 0.8);
+                let w = img.naturalWidth || 600;
+                let h = img.naturalHeight || 800;
+
+                if (w > maxW || h > maxH) {
+                  const scale = Math.min(maxW / w, maxH / h);
+                  w = Math.round(w * scale);
+                  h = Math.round(h * scale);
+                }
+
+                useEditorStore.getState().recordHistory();
+                addLayer(set.id, screen.id, {
+                  type: "image",
+                  src: dataUrl,
+                  x: Math.round((screen.width - w) / 2),
+                  y: Math.round((screen.height - h) / 2),
+                  width: w,
+                  height: h,
+                  rotation: 0,
+                  opacity: 1,
+                  cornerRadius: 16,
+                });
+                toast.success("🖼️ Image pasted onto canvas!");
+              };
+              img.src = dataUrl;
+            }
+          };
+          reader.readAsDataURL(file);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+  }, [screenSets, activeScreenId, getActiveSet, updateLayer, addLayer]);
 
   return (
     <div className="relative flex flex-col h-screen bg-background overflow-hidden select-none">

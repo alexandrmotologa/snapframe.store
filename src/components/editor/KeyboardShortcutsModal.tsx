@@ -36,6 +36,7 @@ const SHORTCUT_GROUPS = [
       { key: "Shift + Arrow Keys", label: "Fast nudge layer position (10px)" },
       { key: "Shift + Click", label: "Multi-select layers" },
       { key: "Double Click Text", label: "Direct inline text edit" },
+      { key: "Ctrl + V / Cmd + V", label: "Paste screenshot directly into device frame" },
       { key: "Drag from files", label: "Drop image/screenshot onto canvas" },
       { key: "Right Click", label: "Layer context menu (ordering, lock)" },
     ],

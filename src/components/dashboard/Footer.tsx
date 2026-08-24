@@ -11,6 +11,7 @@ import {
   Crown,
   CreditCard,
   CheckCircle2,
+  Smartphone,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { GithubIcon } from "@/components/ui/GithubIcon";
@@ -89,6 +90,12 @@ export function Footer() {
                   <Link href="/refunds" className="hover:text-foreground transition-colors flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                     <span>14-Day Money-Back</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/app-store-screenshot-sizes" className="hover:text-foreground transition-colors flex items-center gap-1.5">
+                    <Smartphone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                    <span>2026 Screenshot Sizes</span>
                   </Link>
                 </li>
                 <li>
