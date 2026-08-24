@@ -47,6 +47,111 @@ interface AuthState {
   setProStatus: (isPro: boolean, plan?: string) => void;
 }
 
+interface CachedAuthSession {
+  user: {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+    isAnonymous: boolean;
+  } | null;
+  isPro: boolean;
+  plan: string | null;
+  subscriptionStatus: string | null;
+  aiCredits: number;
+  usedAiCredits: number;
+  timestamp: number;
+}
+
+const AUTH_STORAGE_KEY = "snapframe-cached-auth-session";
+
+function getInitialCachedAuth(): {
+  user: any | null;
+  isInitialized: boolean;
+  isPro: boolean;
+  plan: string | null;
+  subscriptionStatus: string | null;
+  aiCredits: number;
+  usedAiCredits: number;
+} {
+  if (typeof window === "undefined") {
+    return {
+      user: null,
+      isInitialized: false,
+      isPro: false,
+      plan: null,
+      subscriptionStatus: null,
+      aiCredits: 0,
+      usedAiCredits: 0,
+    };
+  }
+
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (raw) {
+      const parsed: CachedAuthSession = JSON.parse(raw);
+      if (parsed && parsed.user && typeof parsed.user.uid === "string") {
+        return {
+          user: parsed.user,
+          isInitialized: true,
+          isPro: Boolean(parsed.isPro),
+          plan: parsed.plan || null,
+          subscriptionStatus: parsed.subscriptionStatus || null,
+          aiCredits: typeof parsed.aiCredits === "number" ? parsed.aiCredits : 3,
+          usedAiCredits: typeof parsed.usedAiCredits === "number" ? parsed.usedAiCredits : 0,
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("Cached auth load error:", e);
+  }
+
+  return {
+    user: null,
+    isInitialized: false,
+    isPro: false,
+    plan: null,
+    subscriptionStatus: null,
+    aiCredits: 0,
+    usedAiCredits: 0,
+  };
+}
+
+function persistAuthSession(state: {
+  user: any | null;
+  isPro?: boolean;
+  plan?: string | null;
+  subscriptionStatus?: string | null;
+  aiCredits?: number;
+  usedAiCredits?: number;
+}) {
+  if (typeof window === "undefined") return;
+  try {
+    if (!state.user) {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      return;
+    }
+    const session: CachedAuthSession = {
+      user: {
+        uid: state.user.uid,
+        email: state.user.email || null,
+        displayName: state.user.displayName || null,
+        photoURL: state.user.photoURL || null,
+        isAnonymous: Boolean(state.user.isAnonymous),
+      },
+      isPro: Boolean(state.isPro),
+      plan: state.plan || null,
+      subscriptionStatus: state.subscriptionStatus || null,
+      aiCredits: typeof state.aiCredits === "number" ? state.aiCredits : 3,
+      usedAiCredits: typeof state.usedAiCredits === "number" ? state.usedAiCredits : 0,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  } catch (e) {
+    console.warn("Cached auth save error:", e);
+  }
+}
+
 async function handleProviderAuth(
   providerName: "google" | "github",
   mode: "signIn" | "link",
@@ -80,22 +185,39 @@ async function handleProviderAuth(
       const verification = await verifyAndSyncUserEnvironment(result.user);
       if (!verification.allowed) {
         await signOut(auth);
+        persistAuthSession({ user: null });
         const err = verification.error || "This account is not allowed on this environment.";
         set({ user: null, isAuthModalOpen: true, isLoading: false, authError: err });
         toast.error(err);
         return null;
       }
 
+      const isProVal = Boolean(verification.isPro);
+      const planVal = verification.plan || null;
+      const subStatusVal = verification.subscriptionStatus || null;
+      const creditsVal = typeof verification.aiCredits === "number" ? verification.aiCredits : DEFAULT_FREE_AI_CREDITS;
+      const usedVal = typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0;
+
+      persistAuthSession({
+        user: result.user,
+        isPro: isProVal,
+        plan: planVal,
+        subscriptionStatus: subStatusVal,
+        aiCredits: creditsVal,
+        usedAiCredits: usedVal,
+      });
+
       set({
         user: result.user,
         isAuthModalOpen: false,
         isLoading: false,
         authError: null,
-        isPro: Boolean(verification.isPro),
-        plan: verification.plan || null,
-        subscriptionStatus: verification.subscriptionStatus || null,
-        aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : DEFAULT_FREE_AI_CREDITS,
-        usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
+        isInitialized: true,
+        isPro: isProVal,
+        plan: planVal,
+        subscriptionStatus: subStatusVal,
+        aiCredits: creditsVal,
+        usedAiCredits: usedVal,
       });
 
       const welcomeName = result.user.displayName || result.user.email || (providerName === "github" ? "Developer" : "Creator");
@@ -136,6 +258,8 @@ async function handleProviderAuth(
   }
 }
 
+const initialCached = getInitialCachedAuth();
+
 export const useAuthStore = create<AuthState>((set, get) => {
   // Attach auth listener and check redirect results on startup
   if (typeof window !== "undefined") {
@@ -154,6 +278,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
               const verification = await verifyAndSyncUserEnvironment(redirectResult.user);
               if (!verification.allowed) {
                 await signOut(auth);
+                persistAuthSession({ user: null });
                 set({
                   user: null,
                   isLoading: false,
@@ -165,16 +290,31 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 return;
               }
 
+              const isProVal = Boolean(verification.isPro);
+              const planVal = verification.plan || null;
+              const subStatusVal = verification.subscriptionStatus || null;
+              const creditsVal = typeof verification.aiCredits === "number" ? verification.aiCredits : 3;
+              const usedVal = typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0;
+
+              persistAuthSession({
+                user: redirectResult.user,
+                isPro: isProVal,
+                plan: planVal,
+                subscriptionStatus: subStatusVal,
+                aiCredits: creditsVal,
+                usedAiCredits: usedVal,
+              });
+
               set({
                 user: redirectResult.user,
                 isLoading: false,
                 isAuthModalOpen: false,
                 isInitialized: true,
-                isPro: Boolean(verification.isPro),
-                plan: verification.plan || null,
-                subscriptionStatus: verification.subscriptionStatus || null,
-                aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : 3,
-                usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
+                isPro: isProVal,
+                plan: planVal,
+                subscriptionStatus: subStatusVal,
+                aiCredits: creditsVal,
+                usedAiCredits: usedVal,
               });
               toast.success(`Welcome, ${redirectResult.user.displayName || "Creator"}!`);
               return;
@@ -188,6 +328,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
               const verification = await verifyAndSyncUserEnvironment(currentUser);
               if (!verification.allowed) {
                 await signOut(auth);
+                persistAuthSession({ user: null });
                 set({
                   user: null,
                   isLoading: false,
@@ -199,15 +340,30 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 return;
               }
 
+              const isProVal = Boolean(verification.isPro);
+              const planVal = verification.plan || null;
+              const subStatusVal = verification.subscriptionStatus || null;
+              const creditsVal = typeof verification.aiCredits === "number" ? verification.aiCredits : (currentUser.isAnonymous ? 0 : 3);
+              const usedVal = typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0;
+
+              persistAuthSession({
+                user: currentUser,
+                isPro: isProVal,
+                plan: planVal,
+                subscriptionStatus: subStatusVal,
+                aiCredits: creditsVal,
+                usedAiCredits: usedVal,
+              });
+
               set({
                 user: currentUser,
                 isLoading: false,
                 isInitialized: true,
-                isPro: Boolean(verification.isPro),
-                plan: verification.plan || null,
-                subscriptionStatus: verification.subscriptionStatus || null,
-                aiCredits: typeof verification.aiCredits === "number" ? verification.aiCredits : (currentUser.isAnonymous ? 0 : 3),
-                usedAiCredits: typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0,
+                isPro: isProVal,
+                plan: planVal,
+                subscriptionStatus: subStatusVal,
+                aiCredits: creditsVal,
+                usedAiCredits: usedVal,
               });
 
               // Trigger multi-device cloud project sync
@@ -222,6 +378,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
               } catch {}
               const currentLocalUser = get().user;
               if (!currentLocalUser?.isAnonymous || currentLocalUser?.email) {
+                persistAuthSession({ user: null });
                 set({ user: null, isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
               } else {
                 set({ isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
@@ -239,22 +396,26 @@ export const useAuthStore = create<AuthState>((set, get) => {
   }
 
   return {
-    user: null,
+    user: initialCached.user,
     isLoading: false,
     isAuthModalOpen: false,
     isUpgradeModalOpen: false,
     authError: null,
-    isInitialized: false,
-    isPro: false,
-    plan: null,
-    subscriptionStatus: null,
-    aiCredits: 0,
-    usedAiCredits: 0,
+    isInitialized: initialCached.isInitialized,
+    isPro: initialCached.isPro,
+    plan: initialCached.plan,
+    subscriptionStatus: initialCached.subscriptionStatus,
+    aiCredits: initialCached.aiCredits,
+    usedAiCredits: initialCached.usedAiCredits,
 
     setAuthModalOpen: (open) => set({ isAuthModalOpen: open }),
     setUpgradeModalOpen: (open) => set({ isUpgradeModalOpen: open }),
     clearError: () => set({ authError: null }),
-    setProStatus: (isPro, plan) => set({ isPro, plan: plan || (isPro ? "pro-monthly" : null) }),
+    setProStatus: (isPro, plan) => {
+      const nextPlan = plan || (isPro ? "pro-monthly" : null);
+      set({ isPro, plan: nextPlan });
+      persistAuthSession({ ...get(), isPro, plan: nextPlan });
+    },
 
     consumeAiCredit: async (feature = "general") => {
       const state = get();
@@ -307,17 +468,21 @@ export const useAuthStore = create<AuthState>((set, get) => {
           const data = await res.json();
           if (data.allowed) {
             const remaining = typeof data.remaining === "number" ? data.remaining : Math.max(0, state.aiCredits - 1);
+            const nextUsed = (state.usedAiCredits || 0) + 1;
+            const nextIsPro = Boolean(data.isPro);
             set({
               aiCredits: remaining,
-              usedAiCredits: (state.usedAiCredits || 0) + 1,
-              isPro: Boolean(data.isPro),
+              usedAiCredits: nextUsed,
+              isPro: nextIsPro,
             });
+            persistAuthSession({ ...get(), aiCredits: remaining, usedAiCredits: nextUsed, isPro: nextIsPro });
             if (remaining === 0) {
               toast.info("⚡ Last free AI credit used! Upgrade to Pro anytime for unlimited generations.");
             }
-            return { allowed: true, remaining, isPro: Boolean(data.isPro) };
+            return { allowed: true, remaining, isPro: nextIsPro };
           } else {
             set({ isUpgradeModalOpen: true, aiCredits: 0 });
+            persistAuthSession({ ...get(), aiCredits: 0 });
             toast.info(data.message || "Free AI credits exhausted. Upgrade to Pro for unlimited AI!");
             return { allowed: false, remaining: 0, isPro: false };
           }
@@ -328,7 +493,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
       // Local fallback decrement
       const nextRemaining = Math.max(0, state.aiCredits - 1);
-      set({ aiCredits: nextRemaining, usedAiCredits: (state.usedAiCredits || 0) + 1 });
+      const nextUsed = (state.usedAiCredits || 0) + 1;
+      set({ aiCredits: nextRemaining, usedAiCredits: nextUsed });
+      persistAuthSession({ ...get(), aiCredits: nextRemaining, usedAiCredits: nextUsed });
       return { allowed: true, remaining: nextRemaining, isPro: false };
     },
 
@@ -357,7 +524,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
         if (auth) {
           try {
             const result = await signInAnonymously(auth);
-            set({ user: result.user, isAuthModalOpen: false, isLoading: false, isPro: false, aiCredits: 0 });
+            persistAuthSession({ user: result.user, isPro: false, aiCredits: 0 });
+            set({ user: result.user, isAuthModalOpen: false, isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
             toast.info("Continuing in Guest Mode (30-day auto clean-up applies). Link an account to keep projects permanently.");
             return result.user;
           } catch (firebaseErr: any) {
@@ -374,7 +542,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
           email: null,
           photoURL: null,
         };
-        set({ user: guestUser, isAuthModalOpen: false, isLoading: false, isPro: false, aiCredits: 0 });
+        persistAuthSession({ user: guestUser, isPro: false, aiCredits: 0 });
+        set({ user: guestUser, isAuthModalOpen: false, isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
         toast.info("Continuing in Guest Mode. Note: Anonymous accounts are subject to 30-day auto clean-up.");
         return guestUser;
       } catch (error: any) {
@@ -386,7 +555,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
           email: null,
           photoURL: null,
         };
-        set({ user: fallbackGuest, isAuthModalOpen: false, isLoading: false, isPro: false, aiCredits: 0 });
+        persistAuthSession({ user: fallbackGuest, isPro: false, aiCredits: 0 });
+        set({ user: fallbackGuest, isAuthModalOpen: false, isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
         toast.info("Continuing in Guest Mode.");
         return fallbackGuest;
       }
@@ -411,11 +581,13 @@ export const useAuthStore = create<AuthState>((set, get) => {
         if (auth) {
           await signOut(auth);
         }
-        set({ user: null, isLoading: false, isPro: false, plan: null, subscriptionStatus: null, aiCredits: 0, usedAiCredits: 0 });
+        persistAuthSession({ user: null });
+        set({ user: null, isLoading: false, isInitialized: true, isPro: false, plan: null, subscriptionStatus: null, aiCredits: 0, usedAiCredits: 0 });
         toast.info("Signed out successfully.");
       } catch (error: any) {
         console.error("Sign-out Error:", error);
-        set({ user: null, isLoading: false, isPro: false, plan: null, subscriptionStatus: null, aiCredits: 0, usedAiCredits: 0 });
+        persistAuthSession({ user: null });
+        set({ user: null, isLoading: false, isInitialized: true, isPro: false, plan: null, subscriptionStatus: null, aiCredits: 0, usedAiCredits: 0 });
         toast.info("Signed out.");
       }
     },

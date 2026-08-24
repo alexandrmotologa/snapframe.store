@@ -22,24 +22,14 @@ export function UserMenu({ className }: UserMenuProps) {
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const { user, isLoading, isInitialized, isPro, aiCredits, setAuthModalOpen, setUpgradeModalOpen, signOutUser } = useAuthStore();
 
-  if (!mounted) {
+  if (!mounted || (isLoading && !isInitialized)) {
     return (
-      <button
-        type="button"
+      <div
         className={cn(
-          "h-8 px-3 rounded-xl bg-gradient-to-r from-indigo-500/15 via-purple-500/15 to-pink-500/15 border border-indigo-500/30 text-xs font-semibold text-foreground flex items-center gap-2 opacity-80",
+          "h-8 w-24 rounded-xl bg-secondary/40 animate-pulse border border-border/40 shrink-0",
           className
         )}
-      >
-        <UserIcon className="w-3.5 h-3.5 text-indigo-400" />
-        <span>Sign In</span>
-      </button>
-    );
-  }
-
-  if (isLoading && !isInitialized) {
-    return (
-      <div className="w-8 h-8 rounded-full bg-secondary animate-pulse shrink-0" />
+      />
     );
   }
 
