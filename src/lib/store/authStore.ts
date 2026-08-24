@@ -428,15 +428,15 @@ export const useAuthStore = create<AuthState>((set, get) => {
         return { allowed: false, remaining: 0, isPro: false };
       }
 
-      // 2. If Pro, check daily Fair-Use safety limit (50 AI calls / day)
+      // 2. If Pro, check daily Fair-Use safety limit (150 AI calls / day)
       if (state.isPro) {
         if (typeof window !== "undefined") {
           const todayStr = new Date().toISOString().split("T")[0];
           const usageKey = `sf_pro_ai_usage_${currentUser.uid}_${todayStr}`;
           const currentDailyUsage = parseInt(localStorage.getItem(usageKey) || "0", 10);
 
-          if (currentDailyUsage >= 50) {
-            toast.info("⚡ You've reached today's 50 AI generations limit (Fair Usage Policy). Resets at midnight UTC.");
+          if (currentDailyUsage >= 150) {
+            toast.info("⚡ You've reached today's 150 AI generations limit (Fair Usage Policy). Resets at midnight UTC.");
             return { allowed: false, remaining: 0, isPro: true };
           }
 

@@ -882,7 +882,7 @@ export default function ProjectsPage() {
             <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-bold">☁️ SnapFrame Pro Active:</span>
-              <span>Multi-device Cloud Sync enabled • Unlimited Projects • 500 AI Generations / mo</span>
+              <span>Multi-device Cloud Sync enabled • Unlimited Projects • 1,500 AI Generations / mo</span>
             </div>
           </div>
         )}

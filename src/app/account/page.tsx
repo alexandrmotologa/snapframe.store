@@ -573,7 +573,7 @@ export default function AccountPage() {
                   {isPro ? "Unlimited" : `${aiCredits} Credits`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {isPro ? "Fair Usage Policy applies (50/day)" : "3 complimentary credits"}
+                  {isPro ? "Fair Usage Policy applies (150/day • 1,500/mo)" : "3 complimentary credits"}
                 </p>
               </div>
 

@@ -34,7 +34,7 @@ const PRICING_FAQS = [
   },
   {
     q: "What is the difference between Free and Pro AI generations?",
-    a: "Free accounts receive 3 complimentary AI credits upon registration with Google or GitHub to test our AI Auto-Pilot and copywriter. SnapFrame Pro includes up to 500 AI generations per month under our Fair Usage Policy, covering Vision Auto-Pilot, 3D Background Cutouts, and multi-language translations in 40+ languages.",
+    a: "Free accounts receive 3 complimentary AI credits upon registration with Google or GitHub to test our AI Auto-Pilot and copywriter. SnapFrame Pro includes up to 1,500 AI generations per month (up to 150/day) under our Fair Usage Policy, covering Vision Auto-Pilot, 3D Background Cutouts, and multi-language translations in 40+ languages.",
   },
   {
     q: "Are Video / GIF and App Icon Studio exports free?",
@@ -318,7 +318,7 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span><strong>500 AI Generations / Month</strong> (Vision Auto-Pilot, Copy &amp; Tone)</span>
+                  <span><strong>1,500 AI Generations / Month</strong> (Vision Auto-Pilot, Copy &amp; Tone)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />

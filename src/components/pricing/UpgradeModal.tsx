@@ -25,8 +25,8 @@ const PRO_FEATURES = [
   },
   {
     icon: Zap,
-    title: "500 AI Generations / Month",
-    desc: "Auto-Pilot vision generation, AI copywriting & instant multi-language translation (Fair Usage).",
+    title: "1,500 AI Generations / Month",
+    desc: "Auto-Pilot vision generation, AI copywriting & instant multi-language translation (up to 150/day).",
   },
   {
     icon: Sparkles,
