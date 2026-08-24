@@ -93,8 +93,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true, warning: "Admin SDK not configured" });
     }
 
-    const uid = data?.custom_data?.user_id || data?.custom_data?.uid;
-    const userEmail = data?.custom_data?.user_email || data?.customer?.email;
+    const uid =
+      data?.custom_data?.user_id ||
+      data?.custom_data?.userId ||
+      data?.custom_data?.uid;
+    const userEmail =
+      data?.custom_data?.user_email ||
+      data?.custom_data?.userEmail ||
+      data?.customer?.email;
+
 
     let targetDocRef = uid ? adminDb.collection("users").doc(uid) : null;
 

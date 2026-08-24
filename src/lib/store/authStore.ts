@@ -347,10 +347,14 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 return;
               }
 
-              const isProVal = Boolean(verification.isPro);
-              const planVal = verification.plan || null;
-              const subStatusVal = verification.subscriptionStatus || null;
-              const creditsVal = typeof verification.aiCredits === "number" ? verification.aiCredits : (currentUser.isAnonymous ? 0 : 3);
+              const currentState = get();
+              const hasActiveLocalPro = Boolean(currentState.isPro && currentState.user?.uid === currentUser.uid);
+              const isProVal = Boolean(verification.isPro || hasActiveLocalPro);
+              const planVal = verification.plan || (isProVal ? (currentState.plan || "pro-monthly") : null);
+              const subStatusVal = verification.subscriptionStatus || (isProVal ? "active" : null);
+              const creditsVal = isProVal
+                ? 9999
+                : (typeof verification.aiCredits === "number" ? verification.aiCredits : (currentUser.isAnonymous ? 0 : 3));
               const usedVal = typeof verification.usedAiCredits === "number" ? verification.usedAiCredits : 0;
 
               persistAuthSession({
@@ -376,6 +380,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 aiCredits: creditsVal,
                 usedAiCredits: usedVal,
               });
+
 
               // Trigger multi-device cloud project sync
               if (!currentUser.isAnonymous) {

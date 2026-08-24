@@ -214,10 +214,6 @@ export async function openPaddleCheckout({
       displayMode: "overlay",
       theme: "dark",
       locale: "en",
-      successUrl:
-        typeof window !== "undefined"
-          ? `${window.location.origin}/projects?checkout=success`
-          : undefined,
     },
     items: [
       {
@@ -227,19 +223,26 @@ export async function openPaddleCheckout({
     ],
   };
 
+
   if (userEmail && userEmail.trim().includes("@")) {
     checkoutPayload.customer = { email: userEmail.trim() };
   }
 
-  const customData: Record<string, string> = { plan };
-  if (userId) customData.userId = userId;
-  if (userEmail) customData.userEmail = userEmail;
+  const customData: Record<string, string> = {
+    plan,
+    uid: userId || "",
+    userId: userId || "",
+    user_id: userId || "",
+    userEmail: userEmail || "",
+    user_email: userEmail || "",
+  };
   checkoutPayload.customData = customData;
 
   try {
     window.Paddle.Checkout.open(checkoutPayload);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Paddle Checkout error:", err);
     toast.error("Failed to open payment checkout. Please check your Paddle configuration.");
   }
 }
+

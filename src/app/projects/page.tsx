@@ -30,7 +30,9 @@ import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { BrandHeroIcon } from "@/components/ui/BrandHeroIcon";
 import { GithubIcon } from "@/components/ui/GithubIcon";
 import { toast } from "@/lib/store/toastStore";
-import { getIdTokenSafe } from "@/lib/firebase";
+import { getIdTokenSafe, getFirebaseDb } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+
 
 // ── Helper Utilities for Project Covers ───────────────────────────────────────
 
@@ -633,26 +635,55 @@ export default function ProjectsPage() {
       if (params.get("checkout") === "success") {
         useAuthStore.getState().setProStatus(true, "pro-monthly");
         toast.success("🎉 Payment successful! Welcome to SnapFrame Pro.");
-        
+
         // Clean URL query without page reload
         window.history.replaceState({}, document.title, window.location.pathname);
 
-        // Persist to user record
+        // Persist to user record both on client Firestore and via server billing API
         if (user && !user.isAnonymous) {
-          getIdTokenSafe(user).then((idToken: string) => {
-            fetch("/api/account/billing", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-              },
-              body: JSON.stringify({ action: "activate_pro" }),
-            }).catch(() => {});
-          }).catch(() => {});
+          (async () => {
+            const now = Date.now();
+            try {
+              const db = await getFirebaseDb();
+              if (db) {
+                await setDoc(
+                  doc(db, "users", user.uid),
+                  {
+                    isPro: true,
+                    plan: "pro-monthly",
+                    subscriptionStatus: "active",
+                    lastPaymentAt: now,
+                    subscriptionExpiresAt: now + 30 * 86400000,
+                    nextBilledAt: now + 30 * 86400000,
+                    billingAmount: 9,
+                    currency: "USD",
+                    aiCredits: 9999,
+                    updatedAt: now,
+                  },
+                  { merge: true }
+                );
+              }
+            } catch (dbErr) {
+              console.warn("Client Firestore Pro sync notice:", dbErr);
+            }
+
+            try {
+              const idToken = await getIdTokenSafe(user);
+              await fetch("/api/account/billing", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+                },
+                body: JSON.stringify({ action: "activate_pro", plan: "monthly" }),
+              }).catch(() => {});
+            } catch {}
+          })();
         }
       }
     }
   }, [user]);
+
 
   const [confirmModal, setConfirmModal] = useState<{
     type: "delete" | "duplicate";
