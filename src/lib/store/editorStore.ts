@@ -378,7 +378,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   updateBackground: (setId, screenId, background) => {
-    get().updateScreen(setId, screenId, { background });
+    get().updateScreenBackground(setId, screenId, background);
   },
 
   updateScreenBackground: (setId, screenId, background) => {
@@ -1054,13 +1054,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setThemeId: (themeId) => set({ themeId }),
 
   applyThemeToProject: (themeId) => {
-    get().recordHistory(true);
     const theme = themeById(themeId);
+    get().recordHistory(true);
     set((state) => ({
       themeId,
-      screenSets: state.screenSets.map(ss => ({
+      screenSets: state.screenSets.map((ss) => ({
         ...ss,
-        screens: ss.screens.map(s => ({
+        screens: ss.screens.map((s) => ({
           ...s,
           background: theme.gradient
             ? {
@@ -1073,14 +1073,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 type: "solid",
                 color: theme.bg,
               },
-          layers: s.layers.map(l => {
+          layers: s.layers.map((l) => {
             if (l.type === "text") {
               return { ...l, color: theme.fg };
             }
             return l;
           }),
-        }))
-      }))
+        })),
+      })),
     }));
   },
 
@@ -1088,9 +1088,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     get().recordHistory(true);
     set((state) => ({
       themeId: "custom",
-      screenSets: state.screenSets.map(ss => ({
+      screenSets: state.screenSets.map((ss) => ({
         ...ss,
-        screens: ss.screens.map(s => ({
+        screens: ss.screens.map((s) => ({
           ...s,
           background: palette.gradient
             ? {
@@ -1103,14 +1103,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 type: "solid",
                 color: palette.bg,
               },
-          layers: s.layers.map(l => {
+          layers: s.layers.map((l) => {
             if (l.type === "text") {
               return { ...l, color: palette.fg };
             }
             return l;
           }),
-        }))
-      }))
+        })),
+      })),
     }));
   },
 

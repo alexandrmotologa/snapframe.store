@@ -459,11 +459,20 @@ export interface Project {
   }>;
 }
 
+export type TemplateLayer = (
+  | Omit<TextLayer, "id">
+  | Omit<ImageLayer, "id">
+  | Omit<ScreenshotLayer, "id">
+  | Omit<ShapeLayer, "id">
+  | Omit<FlagLayer, "id">
+  | Omit<CharacterLayer, "id">
+) & { id?: string };
+
 // Template definition
 export interface TemplateScreen {
   name: string;
   background: Background;
-  layers: any[];
+  layers: TemplateLayer[];
 }
 
 /** Visual layout style for template previews */

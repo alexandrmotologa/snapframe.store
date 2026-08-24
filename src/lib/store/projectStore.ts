@@ -89,7 +89,7 @@ export const useProjectStore = create<ProjectStore>()(
           : BLANK_TEMPLATE.screens;
 
         const generateScreens = (): Screen[] => {
-          return baseScreens.map((ts: { background?: unknown; layers?: Layer[] }, index: number) => ({
+          return baseScreens.map((ts, index: number) => ({
             id: nanoid(),
             name: `Screen ${index + 1}`,
             width: 1290,
@@ -97,10 +97,10 @@ export const useProjectStore = create<ProjectStore>()(
             background: (ts.background && typeof ts.background === "object" && "type" in ts.background)
               ? (ts.background as Background)
               : { type: "solid" as const, color: "#0f172a" },
-            layers: (ts.layers ?? []).map((l: Layer) => ({
+            layers: (ts.layers ?? []).map((l) => ({
               ...l,
               id: nanoid(),
-            })),
+            })) as Layer[],
           }));
         };
 

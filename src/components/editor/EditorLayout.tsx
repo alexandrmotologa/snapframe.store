@@ -33,6 +33,7 @@ import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { EditorSidebar } from "@/components/editor/EditorSidebar";
 import { HorizontalCanvas } from "@/components/editor/HorizontalCanvas";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { FloatingToolbar } from "@/components/editor/FloatingToolbar";
 import { ScreenStrip } from "@/components/editor/ScreenStrip";
 import { ExportModal } from "@/components/editor/ExportModal";
@@ -673,8 +674,9 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
 
         {/* Main canvas area */}
         <div className="flex-1 flex flex-col overflow-hidden relative">
-          
-          <HorizontalCanvas />
+          <ErrorBoundary name="EditorCanvas">
+            <HorizontalCanvas />
+          </ErrorBoundary>
           {/* Bottom strip: quick screen navigation */}
           <ScreenStrip />
         </div>

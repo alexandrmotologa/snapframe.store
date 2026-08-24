@@ -8,6 +8,7 @@ import { useEditorStore } from "@/lib/store/editorStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { EditorLayout } from "@/components/editor/EditorLayout";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { TextLayer } from "@/lib/types";
 
 interface EditorPageProps {
@@ -174,5 +175,9 @@ export default function EditorPage({ params }: EditorPageProps) {
     );
   }
 
-  return <EditorLayout projectId={projectId} />;
+  return (
+    <ErrorBoundary name="Editor">
+      <EditorLayout projectId={projectId} />
+    </ErrorBoundary>
+  );
 }
