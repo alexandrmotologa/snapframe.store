@@ -101,6 +101,8 @@ export async function initializePaddle(): Promise<boolean> {
         }
 
         window.Paddle.Environment.set(config.environment);
+        let checkoutPaid = false;
+
         window.Paddle.Initialize({
           token: config.clientToken,
           eventCallback: (data: any) => {
@@ -110,12 +112,31 @@ export async function initializePaddle(): Promise<boolean> {
               console.error("[Paddle Checkout Error/Warning]:", data);
             }
 
-            if (data?.name === "checkout.completed" || data?.data?.status === "completed") {
-              toast.success("🎉 Payment successful! Welcome to SnapFrame Pro.");
+            const eventName = data?.name;
+            const status = data?.data?.status || data?.status;
+
+            const isCompleted =
+              eventName === "checkout.completed" ||
+              eventName === "checkout.payment.completed" ||
+              eventName === "checkout.payment_successful" ||
+              status === "completed" ||
+              status === "paid";
+
+            if (isCompleted) {
+              checkoutPaid = true;
+              console.log("[Paddle] Checkout completion confirmed:", data);
               if (activeSuccessHandler) {
                 activeSuccessHandler();
                 activeSuccessHandler = null;
               }
+            }
+
+            if (eventName === "checkout.closed") {
+              if (checkoutPaid && activeSuccessHandler) {
+                activeSuccessHandler();
+                activeSuccessHandler = null;
+              }
+              checkoutPaid = false;
             }
           },
         });

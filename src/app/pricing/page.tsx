@@ -73,9 +73,27 @@ export default function PricingPage() {
       plan,
       userEmail: user?.email,
       userId: user?.uid,
-      onSuccess: () => {
+      onSuccess: async () => {
         setProStatus(true, plan);
         setIsProcessing(false);
+        toast.success("🎉 Welcome to SnapFrame Pro! Your subscription is now active.");
+
+        if (user && !user.isAnonymous) {
+          try {
+            const idToken = await user.getIdToken().catch(() => "");
+            await fetch("/api/account/billing", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+              },
+              body: JSON.stringify({
+                action: "activate_pro",
+                plan,
+              }),
+            }).catch(() => {});
+          } catch {}
+        }
       },
     });
     setIsProcessing(false);

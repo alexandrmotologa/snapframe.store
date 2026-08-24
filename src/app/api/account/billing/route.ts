@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb, isAdminConfigured } from "@/lib/firebaseAdmin";
+import { getFirebaseAdmin } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/serverAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 
@@ -31,8 +31,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Missing or invalid authenticated user." }, { status: 401 });
     }
 
-    // Default response when running in local dev / without Admin SDK
-    if (!isAdminConfigured || !adminDb) {
+    const { db: adminDb, isConfigured } = getFirebaseAdmin();
+
+    // Default response when running without Admin SDK
+    if (!isConfigured || !adminDb) {
       return NextResponse.json({
         user: {
           uid,
@@ -162,10 +164,44 @@ export async function POST(req: NextRequest) {
 
     const { uid } = authResult.data;
     const body = await req.json();
-    const { action, reason } = body;
+    const { action, reason, plan, transactionId } = body;
+
+    const { db: adminDb, isConfigured } = getFirebaseAdmin();
+
+    if (action === "activate_pro") {
+      if (isConfigured && adminDb) {
+        const userRef = adminDb.collection("users").doc(uid);
+        await userRef.set(
+          {
+            isPro: true,
+            plan: plan === "annual" ? "pro-annual" : "pro-monthly",
+            subscriptionStatus: "active",
+            lastPaymentAt: Date.now(),
+            updatedAt: Date.now(),
+          },
+          { merge: true }
+        );
+
+        if (transactionId) {
+          await userRef.collection("transactions").add({
+            transactionId,
+            plan: plan || "pro-monthly",
+            timestamp: Date.now(),
+            status: "completed",
+            amount: plan === "annual" ? 69 : 9,
+          });
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        isPro: true,
+        message: "Pro subscription activated successfully.",
+      });
+    }
 
     if (action === "cancel_subscription") {
-      if (isAdminConfigured && adminDb) {
+      if (isConfigured && adminDb) {
         const userRef = adminDb.collection("users").doc(uid);
         await userRef.set(
           {

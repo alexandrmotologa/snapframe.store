@@ -60,10 +60,28 @@ export function UpgradeModal() {
       plan: billingCycle,
       userEmail: user?.email,
       userId: user?.uid,
-      onSuccess: () => {
+      onSuccess: async () => {
         setProStatus(true, billingCycle);
         setUpgradeModalOpen(false);
         setIsProcessing(false);
+        toast.success("🎉 Welcome to SnapFrame Pro! Your subscription is now active.");
+
+        if (user && !user.isAnonymous) {
+          try {
+            const idToken = await user.getIdToken().catch(() => "");
+            await fetch("/api/account/billing", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+              },
+              body: JSON.stringify({
+                action: "activate_pro",
+                plan: billingCycle,
+              }),
+            }).catch(() => {});
+          } catch {}
+        }
       },
     });
     setIsProcessing(false);

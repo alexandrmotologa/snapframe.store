@@ -624,6 +624,34 @@ export default function ProjectsPage() {
     }
   }, [mounted, isInitialized, user, router, setAuthModalOpen]);
 
+  // Handle Paddle checkout return with ?checkout=success
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("checkout") === "success") {
+        useAuthStore.getState().setProStatus(true, "pro-monthly");
+        toast.success("🎉 Payment successful! Welcome to SnapFrame Pro.");
+        
+        // Clean URL query without page reload
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Persist to user record
+        if (user && !user.isAnonymous) {
+          user.getIdToken().then((idToken: string) => {
+            fetch("/api/account/billing", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`,
+              },
+              body: JSON.stringify({ action: "activate_pro" }),
+            }).catch(() => {});
+          }).catch(() => {});
+        }
+      }
+    }
+  }, [user]);
+
   const [confirmModal, setConfirmModal] = useState<{
     type: "delete" | "duplicate";
     projectId: string;

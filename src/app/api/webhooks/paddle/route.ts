@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb, isAdminConfigured } from "@/lib/firebaseAdmin";
+import { getFirebaseAdmin } from "@/lib/firebaseAdmin";
 import crypto from "crypto";
 
 /**
@@ -75,7 +75,9 @@ export async function POST(req: NextRequest) {
       custom_data: data?.custom_data,
     });
 
-    if (!isAdminConfigured || !adminDb) {
+    const { db: adminDb, isConfigured } = getFirebaseAdmin();
+
+    if (!isConfigured || !adminDb) {
       console.warn("[Paddle Webhook] Firebase Admin not configured, skipping Firestore update");
       return NextResponse.json({ received: true, warning: "Admin SDK not configured" });
     }
@@ -118,7 +120,7 @@ export async function POST(req: NextRequest) {
         await targetDocRef.set(
           {
             isPro,
-            plan,
+            plan: plan === "annual" ? "pro-annual" : "pro-monthly",
             subscriptionStatus: status,
             paddleCustomerId: data?.customer_id || null,
             paddleSubscriptionId: data?.id || null,
