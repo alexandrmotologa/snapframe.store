@@ -9,15 +9,23 @@ let adminAuth: Auth | null = null;
 const projectId =
   process.env.FIREBASE_PROJECT_ID ||
   process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.replace(/^["']|["']$/g, "");
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
+  ? process.env.FIREBASE_CLIENT_EMAIL.trim().replace(/^["']|["']$/g, "")
+  : undefined;
 
-let rawKey = process.env.FIREBASE_PRIVATE_KEY;
-let privateKey: string | undefined = undefined;
-
-if (rawKey) {
-  rawKey = rawKey.replace(/^["']|["']$/g, "");
-  privateKey = rawKey.replace(/\\n/g, "\n");
+function formatPrivateKey(key?: string): string | undefined {
+  if (!key) return undefined;
+  let formatted = key.trim();
+  // Strip outer quotes if pasted with quotes
+  if ((formatted.startsWith('"') && formatted.endsWith('"')) || (formatted.startsWith("'") && formatted.endsWith("'"))) {
+    formatted = formatted.slice(1, -1);
+  }
+  // Replace escaped newlines
+  formatted = formatted.replace(/\\n/g, "\n").replace(/\\r/g, "");
+  return formatted;
 }
+
+const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
 export const isAdminConfigured = Boolean(projectId && clientEmail && privateKey);
 

@@ -64,10 +64,10 @@ export function getPaddleConfig() {
 
   return {
     environment,
-    clientToken,
+    clientToken: clientToken.trim(),
     prices: {
-      monthly: monthlyPriceId,
-      annual: annualPriceId,
+      monthly: monthlyPriceId.trim(),
+      annual: annualPriceId.trim(),
     },
     isLive: environment === "production",
   };
@@ -181,38 +181,42 @@ export async function openPaddleCheckout({
 
   activeSuccessHandler = onSuccess || null;
 
-  console.log("[Paddle] Opening Checkout with config:", {
+  console.log("[Paddle] Opening Checkout with payload config:", {
     environment: config.environment,
     tokenPrefix: config.clientToken.slice(0, 10),
     priceId,
     userEmail: userEmail || "(none)",
   });
 
+  const checkoutPayload: any = {
+    settings: {
+      displayMode: "overlay",
+      theme: "dark",
+      locale: "en",
+      successUrl:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/projects?checkout=success`
+          : undefined,
+    },
+    items: [
+      {
+        priceId,
+        quantity: 1,
+      },
+    ],
+  };
+
+  if (userEmail && userEmail.trim().includes("@")) {
+    checkoutPayload.customer = { email: userEmail.trim() };
+  }
+
+  const customData: Record<string, string> = { plan };
+  if (userId) customData.userId = userId;
+  if (userEmail) customData.userEmail = userEmail;
+  checkoutPayload.customData = customData;
+
   try {
-    window.Paddle.Checkout.open({
-      settings: {
-        displayMode: "overlay",
-        theme: "dark",
-        locale: "en",
-        successUrl:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/projects?checkout=success`
-            : undefined,
-      },
-      items: [
-        {
-          priceId,
-          quantity: 1,
-        },
-      ],
-      customer: userEmail ? { email: userEmail } : undefined,
-      customData: {
-        user_id: userId || "",
-        user_email: userEmail || "",
-        plan,
-        environment: config.environment,
-      },
-    });
+    window.Paddle.Checkout.open(checkoutPayload);
   } catch (err: any) {
     console.error("Paddle Checkout error:", err);
     toast.error("Failed to open payment checkout. Please check your Paddle configuration.");
