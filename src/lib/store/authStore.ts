@@ -12,7 +12,7 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase";
+import { getFirebaseAuth, getIdTokenSafe } from "@/lib/firebase";
 import { toast } from "@/lib/store/toastStore";
 import { verifyAndSyncUserEnvironment } from "@/lib/authEnvironment";
 import { syncProjectsOnLogin, stopCloudSync } from "@/lib/cloudProjectSync";
@@ -454,7 +454,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
       // 4. Consume 1 credit via API
       try {
-        const idToken = await currentUser.getIdToken().catch(() => "");
+        const idToken = await getIdTokenSafe(currentUser);
         const res = await fetch("/api/ai/consume-credit", {
           method: "POST",
           headers: {

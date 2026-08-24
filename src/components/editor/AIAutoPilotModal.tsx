@@ -9,6 +9,7 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { TextLayer, ScreenshotLayer, ImageLayer } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { getIdTokenSafe } from "@/lib/firebase";
 
 interface AIAutoPilotModalProps {
   open: boolean;
@@ -68,7 +69,7 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
         };
       });
 
-      const idToken = user ? await user.getIdToken().catch(() => "") : "";
+      const idToken = user ? await getIdTokenSafe(user) : "";
       const res = await fetch("/api/ai/vision-screens", {
         method: "POST",
         headers: {

@@ -23,6 +23,7 @@ import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { AppleStoreIcon, GooglePlayIcon, APP_STORE_LABEL, GOOGLE_PLAY_LABEL } from "@/components/icons/StoreIcons";
 import { toast } from "@/lib/store/toastStore";
+import { getIdTokenSafe } from "@/lib/firebase";
 import { TextLayer } from "@/lib/types";
 
 interface AppStoreListingData {
@@ -193,7 +194,7 @@ function StoreListingContent({
         });
       }
 
-      const idToken = user ? await user.getIdToken().catch(() => "") : "";
+      const idToken = user ? await getIdTokenSafe(user) : "";
       const res = await fetch("/api/ai/store-listing", {
         method: "POST",
         headers: {

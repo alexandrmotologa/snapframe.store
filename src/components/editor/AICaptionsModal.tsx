@@ -8,6 +8,7 @@ import { useLanguageStore, getLang } from "@/lib/store/languageStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { TextLayer } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { getIdTokenSafe } from "@/lib/firebase";
 
 // ─── AI Provider with secure server fallback chain ─────────────────────────────
 async function translateTexts(
@@ -89,7 +90,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
 
     const texts = textLayers.map((l) => l.content);
     const langs = Array.from(selectedLangs);
-    const idToken = user ? await user.getIdToken().catch(() => "") : "";
+    const idToken = user ? await getIdTokenSafe(user) : "";
 
     try {
       for (const lang of langs) {
@@ -157,7 +158,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
 
     const texts = textLayers.map((l) => l.content);
     const langs = Array.from(selectedLangs).length > 0 ? Array.from(selectedLangs) : ["en"];
-    const idToken = user ? await user.getIdToken().catch(() => "") : "";
+    const idToken = user ? await getIdTokenSafe(user) : "";
 
     try {
       for (const lang of langs) {

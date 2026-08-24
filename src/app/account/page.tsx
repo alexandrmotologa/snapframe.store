@@ -34,6 +34,7 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
+import { getIdTokenSafe } from "@/lib/firebase";
 import {
   Dialog,
   DialogContent,
@@ -95,7 +96,7 @@ export default function AccountPage() {
 
     try {
       setIsLoading(true);
-      const idToken = await user.getIdToken().catch(() => "");
+      const idToken = await getIdTokenSafe(user);
       const res = await fetch(`/api/account/billing?uid=${user.uid}`, {
         headers: {
           ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
@@ -119,7 +120,7 @@ export default function AccountPage() {
     async function load() {
       try {
         setIsLoading(true);
-        const idToken = await user.getIdToken().catch(() => "");
+        const idToken = await getIdTokenSafe(user);
         const res = await fetch(`/api/account/billing?uid=${user.uid}`, {
           headers: {
             ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
@@ -155,7 +156,7 @@ export default function AccountPage() {
     setIsCanceling(true);
 
     try {
-      const idToken = await user.getIdToken().catch(() => "");
+      const idToken = await getIdTokenSafe(user);
       const res = await fetch("/api/account/billing", {
         method: "POST",
         headers: {
@@ -199,7 +200,7 @@ export default function AccountPage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       {/* Top Header */}
       <header className="border-b border-border/50 bg-card/60 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group cursor-pointer">
             <SnapFrameLogo size={32} withText textClassName="text-lg font-bold" />
           </Link>
@@ -220,7 +221,7 @@ export default function AccountPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8 sm:py-12 space-y-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 sm:py-12 space-y-8">
         {/* Profile Banner */}
         <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card/80 to-secondary/30 p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">

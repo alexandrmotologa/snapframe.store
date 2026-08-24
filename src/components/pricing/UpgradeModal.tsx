@@ -6,6 +6,7 @@ import { Sparkles, Zap, Shield, Crown, Film, Globe, Image as ImageIcon, ArrowRig
 import { useAuthStore } from "@/lib/store/authStore";
 import { openPaddleCheckout } from "@/lib/paddle";
 import { toast } from "@/lib/store/toastStore";
+import { getIdTokenSafe } from "@/lib/firebase";
 
 const PRO_FEATURES = [
   {
@@ -68,7 +69,7 @@ export function UpgradeModal() {
 
         if (user && !user.isAnonymous) {
           try {
-            const idToken = await user.getIdToken().catch(() => "");
+            const idToken = await getIdTokenSafe(user);
             await fetch("/api/account/billing", {
               method: "POST",
               headers: {

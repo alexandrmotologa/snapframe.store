@@ -22,6 +22,7 @@ import { Footer } from "@/components/dashboard/Footer";
 import { useAuthStore } from "@/lib/store/authStore";
 import { openPaddleCheckout } from "@/lib/paddle";
 import { toast } from "@/lib/store/toastStore";
+import { getIdTokenSafe } from "@/lib/firebase";
 
 const PRICING_FAQS = [
   {
@@ -80,7 +81,7 @@ export default function PricingPage() {
 
         if (user && !user.isAnonymous) {
           try {
-            const idToken = await user.getIdToken().catch(() => "");
+            const idToken = await getIdTokenSafe(user);
             await fetch("/api/account/billing", {
               method: "POST",
               headers: {
@@ -103,7 +104,7 @@ export default function PricingPage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group cursor-pointer">
             <SnapFrameLogo size={32} withText textClassName="text-lg" />
           </Link>
@@ -123,7 +124,7 @@ export default function PricingPage() {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-12 sm:py-16 space-y-16">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12 sm:py-16 space-y-16">
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider shadow-xs">

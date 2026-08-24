@@ -111,27 +111,29 @@ export default function AppStoreScreenshotSizesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20">
       {/* ── Top Header ── */}
-      <header className="h-16 border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-40 flex items-center px-4 sm:px-8 justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <SnapFrameLogo size={28} />
-          </Link>
-          <span className="text-muted-foreground/40 text-sm hidden sm:inline">/</span>
-          <span className="text-xs sm:text-sm font-semibold text-muted-foreground hidden sm:inline">
-            App Store Screenshot Sizes 2026 Guide
-          </span>
-        </div>
+      <header className="border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+              <SnapFrameLogo size={28} />
+            </Link>
+            <span className="text-muted-foreground/40 text-sm hidden sm:inline">/</span>
+            <span className="text-xs sm:text-sm font-semibold text-muted-foreground hidden sm:inline">
+              App Store Screenshot Sizes 2026 Guide
+            </span>
+          </div>
 
-        <div className="flex items-center gap-2.5">
-          <ThemeToggle />
-          <UserMenu />
-          <Link
-            href="/projects"
-            className="h-9 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-semibold text-xs flex items-center gap-1.5 shadow-sm shadow-primary/30 active:scale-95"
-          >
-            <span>Open Studio</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <ThemeToggle />
+            <UserMenu />
+            <Link
+              href="/projects"
+              className="h-9 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-semibold text-xs flex items-center gap-1.5 shadow-sm shadow-primary/30 active:scale-95"
+            >
+              <span>Open Studio</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       </header>
 

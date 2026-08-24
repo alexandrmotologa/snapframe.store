@@ -111,6 +111,33 @@ export async function getFirebaseDb(): Promise<Firestore | null> {
   return db;
 }
 
+/**
+ * Safely retrieves an ID token from a Firebase User or the current active Firebase Auth instance.
+ * Gracefully handles plain JSON cached user objects and prevents TypeError exceptions.
+ */
+export async function getIdTokenSafe(userObj?: any): Promise<string> {
+  if (userObj && typeof userObj.getIdToken === "function") {
+    try {
+      const token = await userObj.getIdToken();
+      if (typeof token === "string" && token) return token;
+    } catch {
+      // Fallback to live auth instance
+    }
+  }
+
+  try {
+    const { auth: liveAuth } = await getFirebaseAuth();
+    if (liveAuth?.currentUser && typeof liveAuth.currentUser.getIdToken === "function") {
+      const token = await liveAuth.currentUser.getIdToken();
+      if (typeof token === "string" && token) return token;
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+}
+
 export const isFirebaseConfigured = Boolean(
   inlineFirebaseConfig.apiKey && inlineFirebaseConfig.projectId
 );

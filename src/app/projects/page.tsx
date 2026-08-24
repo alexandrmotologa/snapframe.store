@@ -29,6 +29,7 @@ import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { BrandHeroIcon } from "@/components/ui/BrandHeroIcon";
 import { GithubIcon } from "@/components/ui/GithubIcon";
 import { toast } from "@/lib/store/toastStore";
+import { getIdTokenSafe } from "@/lib/firebase";
 
 // ── Helper Utilities for Project Covers ───────────────────────────────────────
 
@@ -637,12 +638,12 @@ export default function ProjectsPage() {
 
         // Persist to user record
         if (user && !user.isAnonymous) {
-          user.getIdToken().then((idToken: string) => {
+          getIdTokenSafe(user).then((idToken: string) => {
             fetch("/api/account/billing", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
+                ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
               },
               body: JSON.stringify({ action: "activate_pro" }),
             }).catch(() => {});
@@ -882,7 +883,7 @@ export default function ProjectsPage() {
             <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-bold">☁️ SnapFrame Pro Active:</span>
-              <span>Multi-device Cloud Sync enabled • Unlimited Projects • 1,500 AI Generations / mo</span>
+              <span>Multi-device Cloud Sync enabled • Unlimited Projects</span>
             </div>
           </div>
         )}

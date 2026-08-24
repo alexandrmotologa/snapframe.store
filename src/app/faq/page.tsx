@@ -82,7 +82,7 @@ export default function FaqPage() {
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group cursor-pointer">
             <SnapFrameLogo size={32} withText textClassName="text-lg" />
           </Link>
