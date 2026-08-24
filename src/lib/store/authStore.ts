@@ -16,7 +16,9 @@ import { getFirebaseAuth, getIdTokenSafe } from "@/lib/firebase";
 import { toast } from "@/lib/store/toastStore";
 import { verifyAndSyncUserEnvironment } from "@/lib/authEnvironment";
 import { syncProjectsOnLogin, stopCloudSync } from "@/lib/cloudProjectSync";
+import { switchProjectUser } from "@/lib/store/projectStore";
 import { DEFAULT_FREE_AI_CREDITS } from "@/lib/constants";
+
 
 interface AuthState {
   user: User | any | null;
@@ -207,6 +209,10 @@ async function handleProviderAuth(
         usedAiCredits: usedVal,
       });
 
+      const prevUser = get().user;
+      const wasGuest = !prevUser || Boolean(prevUser.isAnonymous);
+      switchProjectUser(result.user.uid, Boolean(result.user.isAnonymous), isLinking || wasGuest);
+
       set({
         user: result.user,
         isAuthModalOpen: false,
@@ -219,6 +225,7 @@ async function handleProviderAuth(
         aiCredits: creditsVal,
         usedAiCredits: usedVal,
       });
+
 
       const welcomeName = result.user.displayName || result.user.email || (providerName === "github" ? "Developer" : "Creator");
       toast.success(isLinking ? `Account linked! Welcome, ${welcomeName}!` : `Welcome, ${welcomeName}!`);
@@ -355,6 +362,10 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 usedAiCredits: usedVal,
               });
 
+              const prevUser = get().user;
+              const wasGuest = !prevUser || Boolean(prevUser.isAnonymous);
+              switchProjectUser(currentUser.uid, Boolean(currentUser.isAnonymous), wasGuest);
+
               set({
                 user: currentUser,
                 isLoading: false,
@@ -379,12 +390,14 @@ export const useAuthStore = create<AuthState>((set, get) => {
               const currentLocalUser = get().user;
               if (!currentLocalUser?.isAnonymous || currentLocalUser?.email) {
                 persistAuthSession({ user: null });
+                switchProjectUser(null, true, false);
                 set({ user: null, isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
               } else {
                 set({ isLoading: false, isInitialized: true, isPro: false, aiCredits: 0 });
               }
             }
           });
+
         } else {
           set({ isLoading: false, isInitialized: true });
         }
@@ -599,19 +612,25 @@ export const useAuthStore = create<AuthState>((set, get) => {
     signOutUser: async () => {
       try {
         set({ isLoading: true });
+        try {
+          stopCloudSync();
+        } catch {}
         const { auth } = await getFirebaseAuth();
         if (auth) {
           await signOut(auth);
         }
         persistAuthSession({ user: null });
+        switchProjectUser(null, true, false);
         set({ user: null, isLoading: false, isInitialized: true, isPro: false, plan: null, subscriptionStatus: null, aiCredits: 0, usedAiCredits: 0 });
         toast.info("Signed out successfully.");
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Sign-out Error:", error);
         persistAuthSession({ user: null });
+        switchProjectUser(null, true, false);
         set({ user: null, isLoading: false, isInitialized: true, isPro: false, plan: null, subscriptionStatus: null, aiCredits: 0, usedAiCredits: 0 });
         toast.info("Signed out.");
       }
     },
+
   };
 });

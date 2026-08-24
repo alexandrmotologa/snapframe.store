@@ -21,8 +21,11 @@ import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { Footer } from "@/components/dashboard/Footer";
 import { useAuthStore } from "@/lib/store/authStore";
 import { openPaddleCheckout } from "@/lib/paddle";
+import { getIdTokenSafe, getFirebaseDb } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { toast } from "@/lib/store/toastStore";
-import { getIdTokenSafe } from "@/lib/firebase";
+
+
 
 const PRICING_FAQS = [
   {
@@ -81,6 +84,36 @@ export default function PricingPage() {
         toast.success("🎉 Welcome to SnapFrame Pro! Your subscription is now active.");
 
         if (user && !user.isAnonymous) {
+          const isAnnual = plan === "annual";
+          const durationMs = isAnnual ? 365 * 86400000 : 30 * 86400000;
+          const now = Date.now();
+
+          // 1. Direct client-side Firestore resilience
+          try {
+            const db = await getFirebaseDb();
+            if (db) {
+              await setDoc(
+                doc(db, "users", user.uid),
+                {
+                  isPro: true,
+                  plan: isAnnual ? "pro-annual" : "pro-monthly",
+                  subscriptionStatus: "active",
+                  lastPaymentAt: now,
+                  subscriptionExpiresAt: now + durationMs,
+                  nextBilledAt: now + durationMs,
+                  billingAmount: isAnnual ? 69 : 9,
+                  currency: "USD",
+                  aiCredits: 9999,
+                  updatedAt: now,
+                },
+                { merge: true }
+              );
+            }
+          } catch (dbErr) {
+            console.warn("Client Firestore Pro sync notice:", dbErr);
+          }
+
+          // 2. Server API sync
           try {
             const idToken = await getIdTokenSafe(user);
             await fetch("/api/account/billing", {
@@ -98,6 +131,7 @@ export default function PricingPage() {
         }
       },
     });
+
     setIsProcessing(false);
   };
 
