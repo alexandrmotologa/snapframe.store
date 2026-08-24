@@ -43,7 +43,7 @@ export type ShapeType =
   | "hexagon"
   | "diamond"
   | "crescent"
-  | "arrowRight"
+  | "arrow-right"
   | "arrow-left"
   | "arrow-up"
   | "arrow-down"

@@ -1364,7 +1364,7 @@ const SHAPE_PRESETS: BlockPreset[] = [
     },
   },
   {
-    id: "arrowRight",
+    id: "arrow-right",
     name: "Arrow Callout",
     category: "shapes",
     keywords: ["arrow", "pointer", "callout", "indigo"],
@@ -1377,7 +1377,7 @@ const SHAPE_PRESETS: BlockPreset[] = [
       const sizeW = Math.round(sw * 0.55);
       const sizeH = Math.round(sw * 0.24);
       return [{
-        type: "shape", shape: "arrowRight", fill: "#6366F1", stroke: "transparent", strokeWidth: 0, cornerRadius: 0,
+        type: "shape", shape: "arrow-right", fill: "#6366F1", stroke: "transparent", strokeWidth: 0, cornerRadius: 0,
         width: sizeW, height: sizeH, x: Math.round((sw - sizeW) / 2), y: Math.round((sh - sizeH) / 2), rotation: 0, opacity: 1,
       } as any];
     },
