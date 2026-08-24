@@ -15,52 +15,42 @@ export function getPaddleConfig() {
   const isBrowser = typeof window !== "undefined";
   const hostname = isBrowser ? window.location.hostname : "";
 
-  // Auto-detect sandbox on develop.snapframe.store, localhost, or Vercel preview URLs
-  const isDevelopOrLocal =
-    hostname.includes("develop.snapframe.store") ||
-    hostname.includes("localhost") ||
-    hostname.includes("127.0.0.1") ||
-    hostname.includes("vercel.app");
-
-  // Determine active environment
-  const forcedEnv = process.env.NEXT_PUBLIC_PADDLE_ENV?.toLowerCase();
-  const environment: "sandbox" | "production" =
-    forcedEnv === "production"
-      ? "production"
-      : forcedEnv === "sandbox"
-      ? "sandbox"
-      : isDevelopOrLocal
-      ? "sandbox"
-      : "production";
-
-  // Resolve Client Token
+  // 1. Resolve Client Token from environment variables
   const clientToken =
-    environment === "sandbox"
-      ? process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN ||
-        process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
-        ""
-      : process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
-        process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN ||
-        "";
+    process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ||
+    process.env.NEXT_PUBLIC_PADDLE_SANDBOX_CLIENT_TOKEN ||
+    "";
 
-  // Resolve Price IDs
+  // 2. Resolve Price IDs from environment variables
   const monthlyPriceId =
-    environment === "sandbox"
-      ? process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY ||
-        process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY ||
-        ""
-      : process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY ||
-        process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY ||
-        "";
+    process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY ||
+    process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_MONTHLY ||
+    "";
 
   const annualPriceId =
-    environment === "sandbox"
-      ? process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL ||
-        process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL ||
-        ""
-      : process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL ||
-        process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL ||
-        "";
+    process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL ||
+    process.env.NEXT_PUBLIC_PADDLE_SANDBOX_PRICE_ANNUAL ||
+    "";
+
+  // 3. Determine Paddle Environment
+  const forcedEnv = process.env.NEXT_PUBLIC_PADDLE_ENV?.toLowerCase();
+  let environment: "sandbox" | "production" = "production";
+
+  if (forcedEnv === "production") {
+    environment = "production";
+  } else if (forcedEnv === "sandbox") {
+    environment = "sandbox";
+  } else if (clientToken.startsWith("live_")) {
+    environment = "production";
+  } else if (clientToken.startsWith("test_")) {
+    environment = "sandbox";
+  } else if (
+    hostname.includes("develop.snapframe.store") ||
+    hostname.includes("localhost") ||
+    hostname.includes("127.0.0.1")
+  ) {
+    environment = "sandbox";
+  }
 
   return {
     environment,
@@ -83,7 +73,10 @@ export async function initializePaddle(): Promise<boolean> {
   if (typeof window === "undefined") return false;
 
   const config = getPaddleConfig();
-  if (!config.clientToken) return false;
+  if (!config.clientToken) {
+    console.warn("[Paddle] Missing client token in environment");
+    return false;
+  }
 
   if (paddleInitialized && window.Paddle) {
     return true;
@@ -116,18 +109,18 @@ export async function initializePaddle(): Promise<boolean> {
         paddleInitialized = true;
         resolve(true);
       } catch (e) {
-        console.warn("[Paddle Init Warning]:", e);
+        console.warn("[Paddle Init Error]:", e);
         resolve(false);
       }
     };
 
-    // If Paddle script is already present
+    // If Paddle script is already loaded on page
     if (window.Paddle) {
       initInstance();
       return;
     }
 
-    // Load Paddle.js dynamically
+    // Load Paddle.js CDN script dynamically
     const script = document.createElement("script");
     script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
     script.async = true;
@@ -148,7 +141,7 @@ export interface CheckoutOptions {
 }
 
 /**
- * Opens Paddle Checkout Overlay for Subscription Upgrade
+ * Opens Official Paddle Checkout Overlay for Subscription Upgrade
  */
 export async function openPaddleCheckout({
   plan,
@@ -161,7 +154,7 @@ export async function openPaddleCheckout({
 
   if (!config.clientToken || !priceId) {
     toast.error(
-      "Paddle payment keys are not configured. Please set NEXT_PUBLIC_PADDLE_CLIENT_TOKEN and Price IDs in environment variables."
+      "Paddle payment keys are not configured. Please verify NEXT_PUBLIC_PADDLE_CLIENT_TOKEN and Price IDs in your Vercel project settings."
     );
     return;
   }
@@ -202,6 +195,6 @@ export async function openPaddleCheckout({
     });
   } catch (err: any) {
     console.error("Paddle Checkout error:", err);
-    toast.error("Failed to open payment checkout. Please verify your Paddle credentials.");
+    toast.error("Failed to open payment checkout. Please check your Paddle configuration.");
   }
 }
