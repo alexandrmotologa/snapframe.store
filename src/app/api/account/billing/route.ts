@@ -82,6 +82,24 @@ export async function GET(req: NextRequest) {
     }
 
     const userData = userDoc.data() || {};
+    const now = Date.now();
+
+    // Determine if Pro is still active (active subscription or canceled but before period expiration)
+    const isPeriodValid = userData.subscriptionExpiresAt ? userData.subscriptionExpiresAt > now : true;
+    const isPro = Boolean(userData.isPro && isPeriodValid);
+
+    // If subscription has expired past its period end, update Firestore status
+    if (userData.isPro && userData.subscriptionExpiresAt && userData.subscriptionExpiresAt <= now) {
+      await userRef.set(
+        {
+          isPro: false,
+          subscriptionStatus: "expired",
+          aiCredits: 3,
+          updatedAt: now,
+        },
+        { merge: true }
+      );
+    }
 
     // Fetch latest 50 credit spending logs
     let creditLogs: CreditLogEntry[] = [];
@@ -130,13 +148,16 @@ export async function GET(req: NextRequest) {
         email: userData.email,
         displayName: userData.displayName,
         photoURL: userData.photoURL,
-        isPro: Boolean(userData.isPro),
-        plan: userData.plan || (userData.isPro ? "pro-monthly" : "free"),
-        subscriptionStatus: userData.subscriptionStatus || (userData.isPro ? "active" : "free"),
+        isPro,
+        plan: userData.plan || (isPro ? "pro-monthly" : "free"),
+        subscriptionStatus: isPro
+          ? (userData.subscriptionStatus || "active")
+          : (userData.subscriptionStatus === "canceled" ? "expired" : "free"),
+        subscriptionExpiresAt: userData.subscriptionExpiresAt || null,
         paddleCustomerId: userData.paddleCustomerId || null,
         paddleSubscriptionId: userData.paddleSubscriptionId || null,
         createdAt: userData.createdAt || Date.now(),
-        aiCredits: typeof userData.aiCredits === "number" ? userData.aiCredits : 3,
+        aiCredits: isPro ? (typeof userData.aiCredits === "number" ? userData.aiCredits : 9999) : Math.min(typeof userData.aiCredits === "number" ? userData.aiCredits : 3, 3),
         usedAiCredits: typeof userData.usedAiCredits === "number" ? userData.usedAiCredits : 0,
         canceledAt: userData.canceledAt || null,
         cancelReason: userData.cancelReason || null,
@@ -169,15 +190,24 @@ export async function POST(req: NextRequest) {
     const { db: adminDb, isConfigured } = getFirebaseAdmin();
 
     if (action === "activate_pro") {
+      const isAnnual = plan === "annual" || plan === "pro-annual";
+      const durationMs = isAnnual ? 365 * 86400000 : 30 * 86400000;
+      const now = Date.now();
+      const expiresAt = now + durationMs;
+
       if (isConfigured && adminDb) {
         const userRef = adminDb.collection("users").doc(uid);
         await userRef.set(
           {
             isPro: true,
-            plan: plan === "annual" ? "pro-annual" : "pro-monthly",
+            plan: isAnnual ? "pro-annual" : "pro-monthly",
             subscriptionStatus: "active",
-            lastPaymentAt: Date.now(),
-            updatedAt: Date.now(),
+            lastPaymentAt: now,
+            subscriptionExpiresAt: expiresAt,
+            aiCredits: 9999,
+            canceledAt: null,
+            cancelReason: null,
+            updatedAt: now,
           },
           { merge: true }
         );
@@ -185,10 +215,10 @@ export async function POST(req: NextRequest) {
         if (transactionId) {
           await userRef.collection("transactions").add({
             transactionId,
-            plan: plan || "pro-monthly",
-            timestamp: Date.now(),
+            plan: isAnnual ? "pro-annual" : "pro-monthly",
+            timestamp: now,
             status: "completed",
-            amount: plan === "annual" ? 69 : 9,
+            amount: isAnnual ? 69 : 9,
           });
         }
       }
@@ -201,15 +231,37 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "cancel_subscription") {
+      const now = Date.now();
+      let expiresAt = now + 30 * 86400000;
+
       if (isConfigured && adminDb) {
         const userRef = adminDb.collection("users").doc(uid);
+        const userSnap = await userRef.get();
+        const userData = userSnap.data() || {};
+
+        const isAnnual = userData.plan?.includes("annual");
+        const periodDuration = isAnnual ? 365 * 86400000 : 30 * 86400000;
+        const lastPayment = userData.lastPaymentAt || userData.createdAt || now;
+
+        // Preserve current billing period end date
+        if (userData.subscriptionExpiresAt && userData.subscriptionExpiresAt > now) {
+          expiresAt = userData.subscriptionExpiresAt;
+        } else {
+          expiresAt = lastPayment + periodDuration;
+          if (expiresAt <= now) {
+            expiresAt = now + 30 * 86400000; // Guarantee at least current cycle
+          }
+        }
+
+        // Set status to canceled, but keep isPro: true until the billing period expires!
         await userRef.set(
           {
             subscriptionStatus: "canceled",
-            isPro: false,
-            canceledAt: Date.now(),
+            isPro: expiresAt > now,
+            subscriptionExpiresAt: expiresAt,
+            canceledAt: now,
             cancelReason: reason || "User requested cancellation via account dashboard",
-            updatedAt: Date.now(),
+            updatedAt: now,
           },
           { merge: true }
         );
@@ -217,7 +269,10 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: "Your subscription has been canceled. You retain access until the end of your billing period.",
+        isPro: true,
+        subscriptionStatus: "canceled",
+        subscriptionExpiresAt: expiresAt,
+        message: `Your subscription has been canceled. You retain full Pro access until ${new Date(expiresAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}.`,
         paddlePortalUrl: "https://paddle.net",
       });
     }

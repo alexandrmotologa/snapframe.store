@@ -78,7 +78,7 @@ interface BillingDetails {
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, isPro, aiCredits, usedAiCredits, plan, subscriptionStatus, setAuthModalOpen, setUpgradeModalOpen, signOutUser } = useAuthStore();
+  const { user, isInitialized, isPro, aiCredits, usedAiCredits, plan, subscriptionStatus, setAuthModalOpen, setUpgradeModalOpen, signOutUser } = useAuthStore();
   const [activeTab, setActiveTab] = useState<"subscription" | "credits" | "invoices">("subscription");
   const [billingData, setBillingData] = useState<BillingDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -144,6 +144,12 @@ export default function AccountPage() {
     };
   }, [user, isGuest]);
 
+  useEffect(() => {
+    if (!isLoading && isInitialized && !user) {
+      router.push("/");
+    }
+  }, [user, isLoading, isInitialized, router]);
+
   const handleCancelSubscription = async () => {
     if (!user) return;
     setIsCanceling(true);
@@ -167,6 +173,10 @@ export default function AccountPage() {
         const result = await res.json();
         toast.success(result.message || "Subscription canceled successfully.");
         setShowCancelModal(false);
+        useAuthStore.setState({
+          subscriptionStatus: "canceled",
+          isPro: true,
+        });
         fetchBillingInfo();
       } else {
         toast.error("Could not cancel subscription. Please check your connection or contact support.");
@@ -286,7 +296,10 @@ export default function AccountPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => signOutUser()}
+                  onClick={async () => {
+                    await signOutUser();
+                    router.push("/");
+                  }}
                   className="h-9 px-3.5 rounded-xl bg-secondary/80 hover:bg-rose-500/10 hover:text-rose-400 border border-border/60 text-xs font-semibold text-muted-foreground transition-all cursor-pointer"
                   title="Sign out of current account"
                 >

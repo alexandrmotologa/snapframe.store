@@ -132,18 +132,36 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      case "subscription.canceled":
-      case "subscription.past_due": {
+      case "subscription.canceled": {
+        const periodEndsAt = data?.current_billing_period?.ends_at
+          ? new Date(data.current_billing_period.ends_at).getTime()
+          : (data?.scheduled_change?.effective_at
+            ? new Date(data.scheduled_change.effective_at).getTime()
+            : Date.now() + 30 * 86400000);
+        const isStillValid = periodEndsAt > Date.now();
+
         await targetDocRef.set(
           {
-            isPro: false,
-            subscriptionStatus: data?.status || "canceled",
+            isPro: isStillValid,
+            subscriptionStatus: "canceled",
+            subscriptionExpiresAt: periodEndsAt,
             canceledAt: Date.now(),
             updatedAt: Date.now(),
           },
           { merge: true }
         );
-        console.log(`[Paddle Webhook] User subscription canceled / downgraded`);
+        console.log(`[Paddle Webhook] User subscription canceled (active until: ${new Date(periodEndsAt).toISOString()})`);
+        break;
+      }
+
+      case "subscription.past_due": {
+        await targetDocRef.set(
+          {
+            subscriptionStatus: "past_due",
+            updatedAt: Date.now(),
+          },
+          { merge: true }
+        );
         break;
       }
 

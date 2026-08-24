@@ -75,13 +75,18 @@ export async function POST(req: NextRequest) {
         { merge: true }
       );
 
+      const now = Date.now();
+      const isPeriodValid = data.subscriptionExpiresAt ? data.subscriptionExpiresAt > now : true;
+      const isPro = Boolean(data.isPro && isPeriodValid);
+
       return NextResponse.json({
         allowed: true,
         registeredEnvironment: registeredEnv || environment,
-        isPro: Boolean(data.isPro),
+        isPro,
         plan: data.plan || null,
-        subscriptionStatus: data.subscriptionStatus || null,
-        aiCredits: typeof data.aiCredits === "number" ? data.aiCredits : 3,
+        subscriptionStatus: isPro ? (data.subscriptionStatus || "active") : (data.subscriptionStatus === "canceled" ? "expired" : "free"),
+        subscriptionExpiresAt: data.subscriptionExpiresAt || null,
+        aiCredits: isPro ? (typeof data.aiCredits === "number" ? data.aiCredits : 9999) : Math.min(typeof data.aiCredits === "number" ? data.aiCredits : 3, 3),
         usedAiCredits: typeof data.usedAiCredits === "number" ? data.usedAiCredits : 0,
       });
     }
