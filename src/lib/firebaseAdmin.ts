@@ -1,10 +1,8 @@
 import { initializeApp, getApps, cert, App } from "firebase-admin/app";
 import { getFirestore, Firestore, FieldValue } from "firebase-admin/firestore";
-import { getAuth, Auth } from "firebase-admin/auth";
 
 let adminApp: App | null = null;
 let adminDb: Firestore | null = null;
-let adminAuth: Auth | null = null;
 
 function formatPrivateKey(key?: string): string | undefined {
   if (!key) return undefined;
@@ -19,11 +17,10 @@ function formatPrivateKey(key?: string): string | undefined {
 export function getFirebaseAdmin(): {
   app: App | null;
   db: Firestore | null;
-  auth: Auth | null;
   isConfigured: boolean;
 } {
-  if (adminApp && adminDb && adminAuth) {
-    return { app: adminApp, db: adminDb, auth: adminAuth, isConfigured: true };
+  if (adminApp && adminDb) {
+    return { app: adminApp, db: adminDb, isConfigured: true };
   }
 
   const projectId =
@@ -36,7 +33,7 @@ export function getFirebaseAdmin(): {
 
   const isConfigured = Boolean(projectId && clientEmail && privateKey);
   if (!isConfigured) {
-    return { app: null, db: null, auth: null, isConfigured: false };
+    return { app: null, db: null, isConfigured: false };
   }
 
   try {
@@ -52,18 +49,32 @@ export function getFirebaseAdmin(): {
       adminApp = getApps()[0];
     }
     adminDb = getFirestore(adminApp);
-    adminAuth = getAuth(adminApp);
   } catch (error: any) {
     console.error("[Firebase Admin] Initialization error:", error?.message || error);
-    return { app: null, db: null, auth: null, isConfigured: false };
+    return { app: null, db: null, isConfigured: false };
   }
 
   return {
     app: adminApp,
     db: adminDb,
-    auth: adminAuth,
-    isConfigured: Boolean(adminApp && adminDb && adminAuth),
+    isConfigured: Boolean(adminApp && adminDb),
   };
+}
+
+let cachedAuth: any = null;
+export async function getAdminAuth() {
+  if (cachedAuth) return cachedAuth;
+  try {
+    const { getAuth } = await import("firebase-admin/auth");
+    const { app } = getFirebaseAdmin();
+    if (app) {
+      cachedAuth = getAuth(app);
+      return cachedAuth;
+    }
+  } catch (err) {
+    console.warn("[Firebase Admin] Auth dynamic module load:", err);
+  }
+  return null;
 }
 
 export const isAdminConfigured = Boolean(
@@ -72,7 +83,6 @@ export const isAdminConfigured = Boolean(
   process.env.FIREBASE_PRIVATE_KEY
 );
 
-// Lazy proxies for backward compatibility
 export const adminDbProxy = new Proxy({} as Firestore, {
   get(_target, prop) {
     const { db } = getFirebaseAdmin();
@@ -81,11 +91,13 @@ export const adminDbProxy = new Proxy({} as Firestore, {
   },
 });
 
-export const adminAuthProxy = new Proxy({} as Auth, {
+export const adminAuthProxy = new Proxy({} as any, {
   get(_target, prop) {
-    const { auth } = getFirebaseAdmin();
-    if (!auth) throw new Error("Firebase Admin Auth is not initialized.");
-    return (auth as any)[prop];
+    return async (...args: any[]) => {
+      const auth = await getAdminAuth();
+      if (!auth) throw new Error("Firebase Admin Auth is not initialized.");
+      return (auth as any)[prop](...args);
+    };
   },
 });
 
