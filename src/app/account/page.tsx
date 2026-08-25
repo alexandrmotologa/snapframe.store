@@ -19,6 +19,11 @@ import {
   LogOut,
   RefreshCw,
   XCircle,
+  Star,
+  MessageSquare,
+  Shield,
+  Send,
+  Rocket,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -29,6 +34,7 @@ import { UpgradeModal } from "@/components/pricing/UpgradeModal";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { getIdTokenSafe } from "@/lib/firebase";
+import { anonymizeName } from "@/lib/anonymize";
 import {
   Dialog,
   DialogContent,
@@ -91,14 +97,126 @@ export default function AccountPage() {
   const mounted = useMounted();
   const [now] = useState(() => Date.now());
   const { user, isInitialized, isPro, aiCredits, usedAiCredits, plan, subscriptionStatus, setAuthModalOpen, setUpgradeModalOpen, signOutUser } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<"subscription" | "credits" | "invoices">("subscription");
+  const [activeTab, setActiveTab] = useState<"subscription" | "credits" | "invoices" | "review">("subscription");
   const [billingData, setBillingData] = useState<BillingDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("No longer needed");
   const [isCanceling, setIsCanceling] = useState(false);
 
+  // Review Form States
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const PREDEFINED_ROLES = [
+    "iOS Indie Developer",
+    "Android & Kotlin Lead",
+    "Flutter & React Native Creator",
+    "Mobile UI/UX Designer",
+    "ASO & App Growth Specialist",
+    "Indie App Founder",
+  ];
+
+  const [reviewBody, setReviewBody] = useState("");
+  const [reviewRole, setReviewRole] = useState("iOS Indie Developer");
+  const [customRole, setCustomRole] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [myExistingReview, setMyExistingReview] = useState<any | null>(null);
+  const [isLoadingReview, setIsLoadingReview] = useState(false);
+
   const isGuest = Boolean(!user || user.isAnonymous);
+
+  const fetchMyReview = async () => {
+    if (!user || isGuest) return;
+    try {
+      setIsLoadingReview(true);
+      const token = await getIdTokenSafe(user);
+      if (!token) return;
+      const res = await fetch("/api/reviews?mine=true", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.review) {
+          setMyExistingReview(data.review);
+          setReviewRating(data.review.rating || 5);
+          setReviewTitle(data.review.title || "");
+          setReviewBody(data.review.body || "");
+          const existingRole = data.review.authorRole || "iOS Indie Developer";
+          if (PREDEFINED_ROLES.includes(existingRole)) {
+            setReviewRole(existingRole);
+            setCustomRole("");
+          } else {
+            setReviewRole("Other");
+            setCustomRole(existingRole);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load user review:", e);
+    } finally {
+      setIsLoadingReview(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "review" && user && !isGuest) {
+      fetchMyReview();
+    }
+  }, [activeTab, user]);
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || isGuest) {
+      setAuthModalOpen(true);
+      return;
+    }
+
+    if (!reviewBody.trim() || reviewBody.trim().length < 10) {
+      toast.error("Please write at least 10 characters for your review feedback.");
+      return;
+    }
+
+    try {
+      setIsSubmittingReview(true);
+      const token = await getIdTokenSafe(user);
+      if (!token) {
+        toast.error("Authentication required. Please sign in again.");
+        return;
+      }
+
+      const effectiveRole =
+        reviewRole === "Other"
+          ? customRole.trim() || "Verified Creator"
+          : reviewRole;
+
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          rating: reviewRating,
+          title: reviewTitle.trim() || "Great screenshot design studio",
+          reviewText: reviewBody.trim(),
+          role: effectiveRole,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit review");
+      }
+
+      setMyExistingReview(data.review);
+      toast.success("Thank you! Your verified review has been published.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const fetchBillingInfo = async () => {
     if (!user || isGuest) {
@@ -482,6 +600,25 @@ export default function AccountPage() {
           >
             <Receipt className="w-4 h-4" />
             <span>Invoices &amp; Receipts</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("review")}
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all cursor-pointer shrink-0 ${
+              activeTab === "review"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Star className="w-4 h-4 text-amber-500 fill-amber-500/20" />
+            <span>Community Review</span>
+            {myExistingReview && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                <CheckCircle2 className="w-2.5 h-2.5" />
+                <span>Published</span>
+              </span>
+            )}
           </button>
         </div>
 
@@ -988,6 +1125,259 @@ export default function AccountPage() {
                   <p className="text-xs text-muted-foreground">
                     When you upgrade to SnapFrame Pro, all invoices with complete VAT receipts will be accessible here and via paddle.net.
                   </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: Community Review */}
+        {activeTab === "review" && (
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/40">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                      <Star className="w-5 h-5 fill-amber-500" />
+                    </span>
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-bold text-foreground">Verified Creator Review</h2>
+                      <p className="text-xs text-muted-foreground">
+                        Share your feedback to help indie developers and mobile creators discover SnapFrame.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {myExistingReview && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Published &amp; Verified in Firestore</span>
+                  </div>
+                )}
+              </div>
+
+              {isGuest ? (
+                <div className="p-8 text-center space-y-4 max-w-md mx-auto">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto border border-primary/20">
+                    <ShieldCheck className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h3 className="text-base font-bold text-foreground">Sign In to Leave a Verified Review</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      To keep reviews 100% authentic and spam-free, only authenticated creators can submit reviews.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => setAuthModalOpen(true)}
+                    className="gap-2 font-semibold text-xs rounded-xl"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Sign In with Google or GitHub</span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  {/* Left Column: Form */}
+                  <form onSubmit={handleSubmitReview} className="lg:col-span-7 space-y-5">
+                    {/* Privacy Guarantee Box */}
+                    <div className="p-4 rounded-xl bg-secondary/50 border border-border/60 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                        <Shield className="w-4 h-4 text-emerald-500" />
+                        <span>Strict Privacy &amp; Anonymization Guarantee</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        Your identity will be displayed publicly as{" "}
+                        <strong className="text-foreground font-mono bg-card px-1.5 py-0.5 rounded border border-border/60">
+                          {anonymizeName(displayName)}
+                        </strong>
+                        . Your full surname, email address, and workplace company are strictly hidden.
+                      </p>
+                    </div>
+
+                    {/* Rating Selector */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-foreground flex items-center justify-between">
+                        <span>Overall Rating</span>
+                        <span className="text-xs text-amber-500 font-semibold">
+                          {reviewRating} of 5 Stars
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isFilled = (hoverRating || reviewRating) >= star;
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              onClick={() => setReviewRating(star)}
+                              className="p-2 rounded-xl hover:bg-secondary transition-all cursor-pointer group"
+                              aria-label={`Rate ${star} star`}
+                            >
+                              <Star
+                                className={`w-6 h-6 transition-transform group-hover:scale-110 ${
+                                  isFilled
+                                    ? "text-amber-500 fill-amber-500"
+                                    : "text-muted-foreground/40"
+                                }`}
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Role Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-foreground">
+                        Your Creator Profile / Role
+                      </label>
+                      <select
+                        value={reviewRole}
+                        onChange={(e) => setReviewRole(e.target.value)}
+                        className="w-full h-10 px-3 rounded-xl bg-secondary/80 border border-border/60 text-xs font-medium text-foreground outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                      >
+                        {PREDEFINED_ROLES.map((r) => (
+                          <option key={r} value={r}>
+                            {r}
+                          </option>
+                        ))}
+                        <option value="Other">✍️ Other / Custom Role (Specify below)</option>
+                      </select>
+
+                      {reviewRole === "Other" && (
+                        <div className="pt-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                          <input
+                            type="text"
+                            value={customRole}
+                            onChange={(e) => setCustomRole(e.target.value)}
+                            placeholder="e.g. Unity Game Developer, Solo Founder, Tech Lead..."
+                            maxLength={50}
+                            className="w-full h-10 px-3 rounded-xl bg-secondary/80 border border-border/60 text-xs font-medium text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
+                          />
+                          <p className="text-[10px] text-muted-foreground mt-1">
+                            Enter your custom role or position title.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Review Title */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-foreground">
+                        Review Headline
+                      </label>
+                      <input
+                        type="text"
+                        value={reviewTitle}
+                        onChange={(e) => setReviewTitle(e.target.value)}
+                        placeholder="e.g. Cut our screenshot release time from 4h to 5 minutes"
+                        maxLength={100}
+                        className="w-full h-10 px-3 rounded-xl bg-secondary/80 border border-border/60 text-xs font-medium text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
+                      />
+                    </div>
+
+                    {/* Review Body */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-foreground flex items-center justify-between">
+                        <span>Your Feedback / Review</span>
+                        <span className="text-[11px] text-muted-foreground font-normal">
+                          {reviewBody.length} / 1000 characters
+                        </span>
+                      </label>
+                      <textarea
+                        value={reviewBody}
+                        onChange={(e) => setReviewBody(e.target.value)}
+                        rows={4}
+                        placeholder="What do you like about SnapFrame? (e.g. Continuous panoramic flows, Fastlane export, 3D device frames, multi-language localization)..."
+                        maxLength={1000}
+                        className="w-full p-3 rounded-xl bg-secondary/80 border border-border/60 text-xs font-medium text-foreground outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground resize-none leading-relaxed"
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      disabled={isSubmittingReview || reviewBody.trim().length < 10}
+                      className="w-full sm:w-auto gap-2 rounded-xl text-xs font-bold px-6 py-2.5 shadow-sm active:scale-95 transition-all"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>
+                        {isSubmittingReview
+                          ? "Submitting to Firestore..."
+                          : myExistingReview
+                          ? "Update My Verified Review"
+                          : "Submit Verified Review"}
+                      </span>
+                    </Button>
+                  </form>
+
+                  {/* Right Column: Live Testimonial Preview */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Live Preview on Homepage
+                      </span>
+                      <p className="text-xs text-muted-foreground">
+                        This is how your review will appear to other mobile creators:
+                      </p>
+                    </div>
+
+                    <div className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-md flex flex-col justify-between relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-3 flex items-center gap-1.5">
+                        {myExistingReview?.beta_user && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-2xs">
+                            <Rocket className="w-2.5 h-2.5 text-amber-500" />
+                            <span>Beta Tester</span>
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Verified Creator</span>
+                        </span>
+                      </div>
+
+                      <div className="space-y-3 pt-2">
+                        <div className="flex items-center gap-1 text-amber-500">
+                          {[...Array(reviewRating)].map((_, i) => (
+                            <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
+                          ))}
+                        </div>
+
+                        {reviewTitle ? (
+                          <h4 className="text-xs font-bold text-foreground">
+                            &ldquo;{reviewTitle}&rdquo;
+                          </h4>
+                        ) : null}
+
+                        <p className="text-xs text-muted-foreground leading-relaxed italic">
+                          &ldquo;
+                          {reviewBody.trim() ||
+                            "SnapFrame makes creating App Store and Google Play screenshots effortless with 3D device frames and 40+ language export."}
+                          &rdquo;
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-border/40 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+                          {displayName.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-xs font-bold text-foreground truncate font-mono">
+                            {anonymizeName(displayName)}
+                          </h4>
+                          <p className="text-[11px] text-muted-foreground truncate">
+                            {reviewRole === "Other"
+                              ? customRole.trim() || "Verified Creator"
+                              : reviewRole}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

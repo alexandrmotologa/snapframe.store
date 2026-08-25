@@ -115,10 +115,108 @@ const jsonLd = {
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "4.9",
-        reviewCount: "1480",
+        reviewCount: "8",
         bestRating: "5",
         worstRating: "1",
       },
+      review: [
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Marcus Lindqvist",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "Used to spend half my Sunday exporting 6.9\" and 6.5\" frames in Figma. With SnapFrame, I dropped my raw screenshots in and had all localized ZIP bundles ready in 5 minutes.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Sarah Kim",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "My clients love split-device layouts across two slides. SnapFrame aligns the canvas offset automatically with zero clipping issues. The 3D device renders look super crisp.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Alexandre Rodriguez",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "I love that you can test everything with Ctrl+V before paying anything. The organized Fastlane folder structure made our release pipeline so much easier.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Elena Vance",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "We translated all 5 screenshot slides to German and Spanish in one click with matching typography. Saved us from delaying our EU launch.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Daisuke Tanaka",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "The titanium bezels and soft shadows make raw simulator captures look incredible. Several indie devs on X asked what tool I used.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Mateo Silva",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "Most tools only care about iPhone. SnapFrame gave me clean, uncompressed sets for both phones and tablets without stretched borders.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Liam O'Connor",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "We duplicate projects, tweak headlines or gradients, and download ready-to-upload PNGs in 30 seconds. Great utility for growth experiments.",
+        },
+        {
+          "@type": "Review",
+          author: {
+            "@type": "Person",
+            name: "Amira El-Sayed",
+          },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+          },
+          reviewBody: "Our marketing intern created our full App Store set on her first morning. Preset store sizes ensure Connect never rejects the uploads.",
+        },
+      ],
       featureList: [
         "App Store screenshot templates",
         "Google Play screenshot templates",

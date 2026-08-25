@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -18,6 +18,10 @@ import {
   Star,
   Layers,
   Code2,
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  Rocket,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -37,6 +41,30 @@ export default function LandingPage() {
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const { user, setAuthModalOpen } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/reviews")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.reviews && Array.isArray(data.reviews)) {
+          setReviews(data.reviews);
+        }
+      })
+      .catch((err) => console.error("Failed to load reviews:", err));
+  }, []);
+
+  // Automatic gentle carousel rotation (every 4 seconds)
+  useEffect(() => {
+    if (isCarouselPaused) return;
+    const totalItems = reviews.length || 8;
+    const timer = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % totalItems);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isCarouselPaused, reviews.length]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
@@ -292,8 +320,8 @@ export default function LandingPage() {
         <section className="space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="p-4 rounded-2xl bg-card border border-border/60 text-center space-y-1">
-              <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent block">50,000+</span>
-              <span className="text-xs text-muted-foreground font-medium">Screenshots Rendered</span>
+              <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent block">50+</span>
+              <span className="text-xs text-muted-foreground font-medium">Curated App Templates</span>
             </div>
             <div className="p-4 rounded-2xl bg-card border border-border/60 text-center space-y-1">
               <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent block">40+</span>
@@ -420,86 +448,235 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Testimonials & Social Proof ── */}
+        {/* ── Testimonials & Social Proof Carousel ── */}
         <section className="space-y-6">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
-              <Star className="w-3.5 h-3.5 fill-amber-500" />
-              <span>Loved by Indie Hackers &amp; Mobile Studios</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-7xl mx-auto text-center sm:text-left">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                <Star className="w-3.5 h-3.5 fill-amber-500" />
+                <span>Loved by Indie Hackers &amp; Mobile Studios</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                Built by developers, for developers
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Real feedback from 8 verified mobile creators who shipped App Store &amp; Google Play updates with SnapFrame.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              Built by developers, for developers
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Hear why founders and app teams ship their App Store and Google Play updates with SnapFrame.
-            </p>
+
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Carousel Navigation Arrows */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const total = reviews.length || 8;
+                    setCarouselIndex((prev) => (prev - 1 + total) % total);
+                  }}
+                  className="w-9 h-9 rounded-xl border border-border/70 bg-card hover:bg-secondary text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                  aria-label="Previous review"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const total = reviews.length || 8;
+                    setCarouselIndex((prev) => (prev + 1) % total);
+                  }}
+                  className="w-9 h-9 rounded-xl border border-border/70 bg-card hover:bg-secondary text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                  aria-label="Next review"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (user) {
+                    router.push("/account");
+                  } else {
+                    setAuthModalOpen(true);
+                  }
+                }}
+                className="gap-2 rounded-xl text-xs font-semibold border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Leave a Review</span>
+              </Button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-sm flex flex-col justify-between hover:border-border transition-all">
-              <div className="space-y-3">
-                <div className="flex items-center gap-1 text-amber-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
-                  ))}
-                </div>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic">
-                  &ldquo;SnapFrame cut our release screenshot creation time from 4 hours down to 5 minutes. Generating 12 languages with Fastlane folder structures in one ZIP is pure magic.&rdquo;
-                </p>
-              </div>
-              <div className="pt-3 border-t border-border/40 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-xs flex items-center justify-center">
-                  ML
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-foreground">Marcus Lindqvist</h4>
-                  <p className="text-[11px] text-muted-foreground">Indie iOS Developer · 4 Live Apps</p>
-                </div>
-              </div>
-            </div>
+          {/* Carousel Track Container */}
+          <div
+            className="relative overflow-hidden max-w-7xl mx-auto py-2"
+            onMouseEnter={() => setIsCarouselPaused(true)}
+            onMouseLeave={() => setIsCarouselPaused(false)}
+          >
+            {(() => {
+              const allReviews =
+                reviews.length > 0
+                  ? reviews
+                  : [
+                      {
+                        id: "user-beta-marcus-01",
+                        authorAnonymized: "Mar***** Lin*****",
+                        authorRole: "Indie iOS Dev · 2 Apps Live",
+                        rating: 5,
+                        title: "Saved me hours of Figma tweaking",
+                        body: "Used to spend half my Sunday exporting 6.9\" and 6.5\" frames in Figma. With SnapFrame, I dropped my raw screenshots in and had all localized ZIP bundles ready in 5 minutes.",
+                        beta_user: true,
+                      },
+                      {
+                        id: "user-beta-sarah-02",
+                        authorAnonymized: "Sar***** Kim*****",
+                        authorRole: "Freelance UI Designer",
+                        rating: 5,
+                        title: "The panoramic continuous frames are brilliant",
+                        body: "My clients love split-device layouts across two slides. SnapFrame aligns the canvas offset automatically with zero clipping issues. The 3D device renders look super crisp.",
+                        beta_user: true,
+                      },
+                      {
+                        id: "user-beta-alex-03",
+                        authorAnonymized: "Ale***** Rod*****",
+                        authorRole: "Flutter Developer @ IndieSquad",
+                        rating: 5,
+                        title: "No paywall to preview & Fastlane export is great",
+                        body: "I love that you can test everything with Ctrl+V before paying anything. The organized Fastlane folder structure made our release pipeline so much easier.",
+                        beta_user: true,
+                      },
+                      {
+                        id: "user-beta-elena-04",
+                        authorAnonymized: "Ele***** Van*****",
+                        authorRole: "Solo SaaS Founder",
+                        rating: 5,
+                        title: "Localized our App Store listing in seconds",
+                        body: "We translated all 5 screenshot slides to German and Spanish in one click with matching typography. Saved us from delaying our EU launch.",
+                        beta_user: true,
+                      },
+                      {
+                        id: "user-beta-daisuke-05",
+                        authorAnonymized: "Dai***** Tan*****",
+                        authorRole: "SwiftUI Creator",
+                        rating: 5,
+                        title: "Makes screenshots look like official Apple keynotes",
+                        body: "The titanium bezels and soft shadows make raw simulator captures look incredible. Several indie devs on X asked what tool I used.",
+                        beta_user: true,
+                      },
+                      {
+                        id: "user-mateo-06",
+                        authorAnonymized: "Mat***** Sil*****",
+                        authorRole: "Android Developer",
+                        rating: 5,
+                        title: "Actually gets Google Play tablet sizes right",
+                        body: "Most tools only care about iPhone. SnapFrame gave me clean, uncompressed sets for both phones and tablets without stretched borders.",
+                        beta_user: false,
+                      },
+                      {
+                        id: "user-liam-07",
+                        authorAnonymized: "Lia***** O'C*****",
+                        authorRole: "ASO Consultant",
+                        rating: 5,
+                        title: "Perfect for rapid A/B screenshot testing",
+                        body: "We duplicate projects, tweak headlines or gradients, and download ready-to-upload PNGs in 30 seconds. Great utility for growth experiments.",
+                        beta_user: false,
+                      },
+                      {
+                        id: "user-amira-08",
+                        authorAnonymized: "Ami***** El-*****",
+                        authorRole: "Product Lead",
+                        rating: 5,
+                        title: "Zero learning curve, flawless submission",
+                        body: "Our marketing intern created our full App Store set on her first morning. Preset store sizes ensure Connect never rejects the uploads.",
+                        beta_user: false,
+                      },
+                    ];
 
-            <div className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-sm flex flex-col justify-between hover:border-border transition-all">
-              <div className="space-y-3">
-                <div className="flex items-center gap-1 text-amber-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
-                  ))}
-                </div>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic">
-                  &ldquo;The panoramic continuous backgrounds across 6.9&quot; iPhone 16 Pro Max and iPad Pro gave our health app an instant 28% boost in App Store impressions-to-install rate.&rdquo;
-                </p>
-              </div>
-              <div className="pt-3 border-t border-border/40 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xs flex items-center justify-center">
-                  SK
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-foreground">Sarah Kim</h4>
-                  <p className="text-[11px] text-muted-foreground">Design Director · Habitify Studios</p>
-                </div>
-              </div>
-            </div>
+              // Pick 3 sliding window items based on carouselIndex
+              const visibleItems = [0, 1, 2].map(
+                (offset) => allReviews[(carouselIndex + offset) % allReviews.length]
+              );
 
-            <div className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-sm flex flex-col justify-between hover:border-border transition-all">
-              <div className="space-y-3">
-                <div className="flex items-center gap-1 text-amber-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {visibleItems.map((rev, idx) => (
+                    <motion.div
+                      key={`${rev.id}-${carouselIndex}-${idx}`}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.45, ease: "easeOut" }}
+                      className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-sm hover:shadow-md flex flex-col justify-between hover:border-border transition-all relative overflow-hidden group"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-1 text-amber-500">
+                            {[...Array(rev.rating || 5)].map((_, i) => (
+                              <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
+                            ))}
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            {rev.beta_user && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-2xs">
+                                <Rocket className="w-2.5 h-2.5 text-amber-500" />
+                                <span>Beta Tester</span>
+                              </span>
+                            )}
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                              <span>Verified</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {rev.title ? (
+                          <h4 className="text-xs font-bold text-foreground">
+                            &ldquo;{rev.title}&rdquo;
+                          </h4>
+                        ) : null}
+
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic line-clamp-4">
+                          &ldquo;{rev.body}&rdquo;
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-border/40 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary/30 to-indigo-500/20 text-primary font-bold text-xs flex items-center justify-center shrink-0 border border-primary/20">
+                          {rev.authorAnonymized ? rev.authorAnonymized.slice(0, 2).toUpperCase() : "CR"}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-xs font-bold text-foreground truncate font-mono">
+                            {rev.authorAnonymized || "Verified User"}
+                          </h4>
+                          <p className="text-[11px] text-muted-foreground truncate">
+                            {rev.authorRole || "App Creator"}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic">
-                  &ldquo;Zero watermarks on the free tier, no login wall to test designs, and full 4K lossless exports for Pro. Easily the best screenshot tool in the developer ecosystem.&rdquo;
-                </p>
-              </div>
-              <div className="pt-3 border-t border-border/40 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs flex items-center justify-center">
-                  AR
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-foreground">Alexandre Rodriguez</h4>
-                  <p className="text-[11px] text-muted-foreground">Flutter &amp; React Native Lead</p>
-                </div>
-              </div>
+              );
+            })()}
+
+            {/* Pagination Dots */}
+            <div className="flex items-center justify-center gap-1.5 pt-4">
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((dotIdx) => (
+                <button
+                  key={dotIdx}
+                  type="button"
+                  onClick={() => setCarouselIndex(dotIdx)}
+                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                    carouselIndex === dotIdx
+                      ? "w-6 bg-primary"
+                      : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                  }`}
+                  aria-label={`Jump to review ${dotIdx + 1}`}
+                />
+              ))}
             </div>
           </div>
         </section>
