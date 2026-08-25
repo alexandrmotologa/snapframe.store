@@ -359,12 +359,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ review: { ...data, id: userReviewDoc.id } });
     }
 
+    const fallbackAverage = Number(
+      (SEED_APPROVED_REVIEWS.reduce((sum, r) => sum + (r.rating || 5), 0) / SEED_APPROVED_REVIEWS.length).toFixed(1)
+    );
+
     // Public list: Approved reviews
     if (!db) {
       return NextResponse.json({
         reviews: SEED_APPROVED_REVIEWS,
         totalCount: SEED_APPROVED_REVIEWS.length,
-        averageRating: 4.8,
+        averageRating: fallbackAverage,
       });
     }
 
@@ -382,7 +386,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         reviews: SEED_APPROVED_REVIEWS,
         totalCount: SEED_APPROVED_REVIEWS.length,
-        averageRating: 4.8,
+        averageRating: fallbackAverage,
       });
     }
 
@@ -404,11 +408,14 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("[Reviews API] GET error:", error?.message || error);
+    const fallbackAverage = Number(
+      (SEED_APPROVED_REVIEWS.reduce((sum, r) => sum + (r.rating || 5), 0) / SEED_APPROVED_REVIEWS.length).toFixed(1)
+    );
     // Graceful fallback to seed reviews
     return NextResponse.json({
       reviews: SEED_APPROVED_REVIEWS,
       totalCount: SEED_APPROVED_REVIEWS.length,
-      averageRating: 4.8,
+      averageRating: fallbackAverage,
     });
   }
 }

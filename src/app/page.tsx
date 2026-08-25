@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect, useMemo, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -43,6 +43,7 @@ export default function LandingPage() {
   const { user, setAuthModalOpen } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [apiAverageRating, setApiAverageRating] = useState<number | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
@@ -53,9 +54,29 @@ export default function LandingPage() {
         if (data?.reviews && Array.isArray(data.reviews)) {
           setReviews(data.reviews);
         }
+        if (typeof data?.averageRating === "number") {
+          setApiAverageRating(data.averageRating);
+        }
       })
       .catch((err) => console.error("Failed to load reviews:", err));
   }, []);
+
+  // Filter only approved reviews for rating metrics
+  const approvedReviews = useMemo(() => {
+    return reviews.filter((r) => r.status === "approved" || r.status === undefined);
+  }, [reviews]);
+
+  // Compute live average rating strictly from approved reviews
+  const displayRating = useMemo(() => {
+    if (approvedReviews.length > 0) {
+      const sum = approvedReviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
+      return (sum / approvedReviews.length).toFixed(1);
+    }
+    if (apiAverageRating !== null) {
+      return apiAverageRating.toFixed(1);
+    }
+    return "4.9";
+  }, [approvedReviews, apiAverageRating]);
 
   // Automatic gentle carousel rotation (every 4 seconds)
   useEffect(() => {
@@ -333,7 +354,7 @@ export default function LandingPage() {
               <span className="text-xs text-muted-foreground font-medium">Languages Localized</span>
             </div>
             <div className="p-4 rounded-2xl bg-card border border-border/60 text-center space-y-1">
-              <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-500 to-emerald-500 bg-clip-text text-transparent block">4.9 / 5</span>
+              <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-500 to-emerald-500 bg-clip-text text-transparent block">{displayRating} / 5</span>
               <span className="text-xs text-muted-foreground font-medium flex items-center justify-center gap-1">
                 <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 inline" />
                 <span>Developer Rating</span>
@@ -465,7 +486,7 @@ export default function LandingPage() {
                 Built by developers, for developers
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Real feedback from 8 verified mobile creators who shipped App Store &amp; Google Play updates with SnapFrame.
+                Real feedback from {approvedReviews.length || 8} verified mobile creators who shipped App Store &amp; Google Play updates with SnapFrame.
               </p>
             </div>
 
