@@ -20,6 +20,7 @@ import {
   Sliders,
   CheckCircle2,
   TrendingUp,
+  LayoutGrid,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -190,6 +191,13 @@ export default function PricingPage() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/templates"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+              <span>Templates</span>
+            </Link>
             <Link
               href="/projects"
               className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"

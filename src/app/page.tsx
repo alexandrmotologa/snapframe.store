@@ -52,6 +52,13 @@ export default function LandingPage() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-2">
             <Link
+              href="/templates"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary flex items-center gap-1.5"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+              <span>Templates</span>
+            </Link>
+            <Link
               href="/pricing"
               className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary flex items-center gap-1.5"
             >
@@ -123,6 +130,17 @@ export default function LandingPage() {
               className="md:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl px-6 py-4 space-y-3 overflow-hidden shadow-2xl"
             >
               <div className="flex flex-col space-y-2 text-sm font-medium">
+                <Link
+                  href="/templates"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LayoutGrid className="w-4 h-4 text-primary" />
+                    <span>50+ Screenshot Templates</span>
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
                 <Link
                   href="/pricing"
                   onClick={() => setMobileMenuOpen(false)}

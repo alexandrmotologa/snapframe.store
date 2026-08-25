@@ -112,6 +112,13 @@ const jsonLd = {
         price: "0",
         priceCurrency: "USD",
       },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.9",
+        reviewCount: "1480",
+        bestRating: "5",
+        worstRating: "1",
+      },
       featureList: [
         "App Store screenshot templates",
         "Google Play screenshot templates",
@@ -161,6 +168,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

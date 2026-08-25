@@ -184,6 +184,18 @@ export default function AppStoreScreenshotSizesPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            <Link
+              href="/templates"
+              className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
+            >
+              Templates
+            </Link>
+            <Link
+              href="/pricing"
+              className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
+            >
+              Pricing
+            </Link>
             <ThemeToggle />
             <UserMenu />
             <Link

@@ -72,8 +72,14 @@ export function Footer() {
               </h3>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/pricing" className="hover:text-foreground transition-colors font-medium text-foreground flex items-center gap-1.5">
+                  <Link href="/templates" className="hover:text-foreground transition-colors font-medium text-foreground flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>50+ Screenshot Templates</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="hover:text-foreground transition-colors flex items-center gap-1.5">
+                    <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>Pricing Plans</span>
                   </Link>
                 </li>

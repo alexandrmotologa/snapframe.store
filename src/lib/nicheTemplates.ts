@@ -1023,4 +1023,534 @@ export const NICHE_TEMPLATES: Template[] = [
       },
     ],
   },
+
+  // 7. MIND & MEDITATION (CALM SAGE & ZEN MIST)
+  {
+    id: "niche-mind-meditation",
+    name: "Mind & Meditation Zen Sage",
+    description: "Soothing sage green and warm mist tones with breathing exercise widgets and sleep soundscapes.",
+    category: "Health & Fitness",
+    previewColor: "#06281e",
+    previewGradient: ["#042018", "#0f3e30", "#10b981"],
+    layout: "screenshot-bottom",
+    tags: ["meditation", "mindfulness", "calm", "sleep", "wellness", "sage", "zen"],
+    screens: [
+      {
+        name: "Zen Breathwork",
+        background: {
+          type: "mesh",
+          mesh: { topLeft: "#042018", topRight: "#0d3b2e", bottomLeft: "#02120e", bottomRight: "#064e3b" },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.26), 110, 600, 90, "rgba(16, 185, 129, 0.15)", {
+            stroke: "rgba(52, 211, 153, 0.6)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🌿 2M+ MINDFUL HEARTS", Math.round(W * 0.26), 126, 600, 90, {
+            fontSize: 40, fontWeight: 800, color: "#6ee7b7", letterSpacing: 2,
+          }),
+          textLayer("Find Your Inner\nCalm Everyday", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Scientifically proven breathwork routines to dissolve stress in 3 minutes.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#a7f3d0",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Meditation Screen"),
+        ],
+      },
+      {
+        name: "Deep Sleep Soundscapes",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#06181f", position: 0 }, { color: "#020b0e", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(56, 189, 248, 0.15)", {
+            stroke: "rgba(125, 211, 252, 0.6)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🌙 100+ SOUNDSCAPES", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 40, fontWeight: 800, color: "#7dd3fc", letterSpacing: 2,
+          }),
+          textLayer("Fall Asleep in\nUnder 10 Minutes", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Drift off effortlessly with spatial binaural beats and rain audio.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#bae6fd",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Sleep Screen"),
+        ],
+      },
+      {
+        name: "Daily Habit Streaks",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#064e3b", position: 0 }, { color: "#022c22", position: 100 }],
+            direction: "to-br",
+          },
+        },
+        layers: [
+          textLayer("Build Lasting\nMindful Habits", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Track your daily streaks and emotional balance over time.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#d1fae5",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Habit Screen"),
+        ],
+      },
+    ],
+  },
+
+  // 8. ULTRA-MINIMALIST TITANIUM OLED (DARK STUDIO PRO)
+  {
+    id: "niche-minimalist-oled",
+    name: "Ultra-Minimalist Titanium OLED",
+    description: "Pure #000000 pitch-black studio aesthetic with titanium silver accents and Apple-level typography.",
+    category: "Productivity",
+    previewColor: "#000000",
+    previewGradient: ["#000000", "#18181b", "#27272a"],
+    layout: "screenshot-bottom",
+    tags: ["oled", "minimalist", "titanium", "dark", "developer", "clean", "apple"],
+    screens: [
+      {
+        name: "Speed & Power",
+        background: {
+          type: "solid",
+          color: "#000000",
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.32), 110, 460, 90, "rgba(255, 255, 255, 0.08)", {
+            stroke: "rgba(255, 255, 255, 0.3)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("⚡ 10X FASTER", Math.round(W * 0.32), 126, 460, 90, {
+            fontSize: 42, fontWeight: 800, color: "#ffffff", letterSpacing: 3,
+          }),
+          textLayer("Engineered for\nPower Users", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 125, fontWeight: 900, color: "#ffffff", letterSpacing: -2,
+          }),
+          textLayer("Zero latency. Instant offline search. 100% native performance.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 400, color: "#71717a",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop App Screen"),
+        ],
+      },
+      {
+        name: "Security & Encryption",
+        background: {
+          type: "solid",
+          color: "#000000",
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(255, 255, 255, 0.08)", {
+            stroke: "rgba(255, 255, 255, 0.3)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🔒 ZERO KNOWLEDGE", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 40, fontWeight: 800, color: "#ffffff", letterSpacing: 3,
+          }),
+          textLayer("Your Private Data\nStays on Device", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff", letterSpacing: -2,
+          }),
+          textLayer("End-to-end encrypted with Secure Enclave hardware isolation.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 400, color: "#71717a",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Privacy Screen"),
+        ],
+      },
+      {
+        name: "Cloud Sync",
+        background: {
+          type: "solid",
+          color: "#000000",
+        },
+        layers: [
+          textLayer("Seamless Sync\nEverywhere", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff", letterSpacing: -2,
+          }),
+          textLayer("Available across iPhone, iPad, Mac, and Apple Watch.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 400, color: "#71717a",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Ecosystem Screen"),
+        ],
+      },
+    ],
+  },
+
+  // 9. GAMING & ESPORTS CYBERPUNK (NEON OVERDRIVE)
+  {
+    id: "niche-gaming-esports",
+    name: "Gaming & Esports Cyber Overdrive",
+    description: "High-octane neon magenta and electric cyan with competitive rank badges and 120 FPS high-refresh rate style.",
+    category: "Games",
+    previewColor: "#050518",
+    previewGradient: ["#090014", "#3b0764", "#06b6d4"],
+    layout: "screenshot-bottom",
+    tags: ["gaming", "esports", "cyberpunk", "neon", "action", "competitive", "fps"],
+    screens: [
+      {
+        name: "Rank Arena",
+        background: {
+          type: "mesh",
+          mesh: { topLeft: "#090014", topRight: "#3b0764", bottomLeft: "#050518", bottomRight: "#083344" },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(236, 72, 153, 0.25)", {
+            stroke: "rgba(244, 114, 182, 0.7)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🏆 #1 GLOBAL ARENA", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 40, fontWeight: 900, color: "#f472b6", letterSpacing: 2,
+          }),
+          textLayer("Dominate The\nGlobal Leaderboard", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Compete in ranked 5v5 tournaments against top players worldwide.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#67e8f9",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Game Arena Screen"),
+        ],
+      },
+      {
+        name: "Ultra Graphics",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#1e1b4b", position: 0 }, { color: "#06b6d4", position: 100 }],
+            direction: "to-br",
+          },
+        },
+        layers: [
+          textLayer("Console Quality\nAt 120 FPS", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Unreal 5 graphics engine with ray-traced shadows on mobile.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#e0e7ff",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Graphics Screen"),
+        ],
+      },
+      {
+        name: "Rare Loot",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#311042", position: 0 }, { color: "#090014", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          textLayer("Unlock Legendary\nWeapons & Skins", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Customise your loadout with exclusive battle pass cosmetics.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#f5d0fe",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Gear Screen"),
+        ],
+      },
+    ],
+  },
+
+  // 10. FOOD & RECIPES COOKING STUDIO (WARM SAFFRON & TERRACOTTA)
+  {
+    id: "niche-food-recipes",
+    name: "Food & Recipes Cooking Studio",
+    description: "Appetizing warm terracotta and golden saffron with macro nutrition cards and smart grocery lists.",
+    category: "Food & Drink",
+    previewColor: "#451a03",
+    previewGradient: ["#451a03", "#9a3412", "#f97316"],
+    layout: "screenshot-bottom",
+    tags: ["food", "recipes", "cooking", "chef", "meal plan", "saffron", "kitchen"],
+    screens: [
+      {
+        name: "Chef Recipes",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#451a03", position: 0 }, { color: "#1c0a00", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(249, 115, 22, 0.2)", {
+            stroke: "rgba(251, 146, 60, 0.7)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("👨‍🍳 5,000+ CHEF RECIPES", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 40, fontWeight: 900, color: "#fdba74", letterSpacing: 2,
+          }),
+          textLayer("Cook Gourmet In\nUnder 20 Minutes", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Step-by-step video instructions created by Michelin-star chefs.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#fed7aa",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Recipe Screen"),
+        ],
+      },
+      {
+        name: "Smart Grocery",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#7c2d12", position: 0 }, { color: "#431407", position: 100 }],
+            direction: "to-br",
+          },
+        },
+        layers: [
+          textLayer("1-Click Smart\nGrocery Lists", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Ingredients auto-sorted by aisle so you breeze through the supermarket.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#ffedd5",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Grocery Screen"),
+        ],
+      },
+      {
+        name: "Macro Tracking",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#064e3b", position: 0 }, { color: "#022c22", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          textLayer("Track Calories &\nMacros Perfectly", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Keep your nutrition balanced with automated nutritional breakdowns.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#a7f3d0",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Macros Screen"),
+        ],
+      },
+    ],
+  },
+
+  // 11. EDUCATION & LANGUAGE LEARNING (VIVID PLAYFUL LIME)
+  {
+    id: "niche-education-learning",
+    name: "Education & Language Mastery",
+    description: "Vibrant lime and playful sunshine yellow with gamified streak flames and interactive quiz cards.",
+    category: "Education",
+    previewColor: "#14532d",
+    previewGradient: ["#14532d", "#16a34a", "#84cc16"],
+    layout: "screenshot-bottom",
+    tags: ["education", "language", "learning", "gamified", "quiz", "duolingo", "playful"],
+    screens: [
+      {
+        name: "Gamified Lessons",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#14532d", position: 0 }, { color: "#052e16", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(132, 204, 22, 0.25)", {
+            stroke: "rgba(163, 230, 53, 0.7)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🔥 15 MIN / DAY", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 42, fontWeight: 900, color: "#bef264", letterSpacing: 2,
+          }),
+          textLayer("Master 40+ Languages\nThrough Play", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Bite-sized interactive exercises designed for rapid conversational fluency.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#d9f99d",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Lesson Screen"),
+        ],
+      },
+      {
+        name: "Native Speech",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#1e3a8a", position: 0 }, { color: "#0f172a", position: 100 }],
+            direction: "to-br",
+          },
+        },
+        layers: [
+          textLayer("Real-Time Speech\nFeedback & Audio", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("AI speech recognition perfects your accent from day one.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#bfdbfe",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Speech Screen"),
+        ],
+      },
+      {
+        name: "Streak Quests",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#713f12", position: 0 }, { color: "#1c1917", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          textLayer("Stay Motivated\nWith Daily Streaks", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Compete in weekly leaderboards and earn verifiable certificates.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#fde68a",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Streak Screen"),
+        ],
+      },
+    ],
+  },
+
+  // 12. MUSIC & PODCAST STREAMING (SPOTIFY ELECTRIC AURORA)
+  {
+    id: "niche-music-streaming",
+    name: "Music & Podcast Hi-Res Aurora",
+    description: "Deep obsidian dark background with vivid emerald neon audio waves, lossless badges, and live lyrics.",
+    category: "Entertainment",
+    previewColor: "#05160e",
+    previewGradient: ["#020b07", "#064e3b", "#10b981"],
+    layout: "screenshot-bottom",
+    tags: ["music", "podcast", "streaming", "audio", "spotify", "lossless", "neon"],
+    screens: [
+      {
+        name: "Lossless Audio",
+        background: {
+          type: "mesh",
+          mesh: { topLeft: "#020b07", topRight: "#064e3b", bottomLeft: "#02120e", bottomRight: "#047857" },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(16, 185, 129, 0.2)", {
+            stroke: "rgba(52, 211, 153, 0.7)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🎧 24-BIT LOSSLESS HD", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 40, fontWeight: 900, color: "#6ee7b7", letterSpacing: 2,
+          }),
+          textLayer("100 Million Songs\n& Top Podcasts", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Studio-master audio quality with immersive spatial Dolby Atmos.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#a7f3d0",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Player Screen"),
+        ],
+      },
+      {
+        name: "Smart Mixes",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#1e1b4b", position: 0 }, { color: "#064e3b", position: 100 }],
+            direction: "to-br",
+          },
+        },
+        layers: [
+          textLayer("Daily Mixes\nMade Just For You", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Discover fresh indie artists and viral tracks personalized every morning.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#c7d2fe",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Mix Screen"),
+        ],
+      },
+      {
+        name: "Offline Listening",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#0f172a", position: 0 }, { color: "#020617", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          textLayer("Listen Offline\nAnywhere You Go", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Download unlimited albums and episodes with zero cellular data usage.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#94a3b8",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Offline Screen"),
+        ],
+      },
+    ],
+  },
+
+  // 13. SMART MOBILITY & EV AUTO (COBALT DRIVE)
+  {
+    id: "niche-smart-mobility",
+    name: "Smart Mobility & EV Dashboard",
+    description: "Deep automotive cobalt and dark asphalt with live battery metrics, remote climate, and digital key cards.",
+    category: "Travel",
+    previewColor: "#021526",
+    previewGradient: ["#021526", "#032b44", "#0284c7"],
+    layout: "screenshot-bottom",
+    tags: ["automotive", "ev", "car", "tesla", "mobility", "digital key", "cobalt"],
+    screens: [
+      {
+        name: "Vehicle Control",
+        background: {
+          type: "mesh",
+          mesh: { topLeft: "#021526", topRight: "#03395c", bottomLeft: "#010b14", bottomRight: "#0284c7" },
+        },
+        layers: [
+          shapeLayer("rounded-rectangle", Math.round(W * 0.28), 110, 560, 90, "rgba(2, 132, 199, 0.2)", {
+            stroke: "rgba(56, 189, 248, 0.7)", strokeWidth: 2, cornerRadius: 100,
+          }),
+          textLayer("🚗 REMOTE VEHICLE KEY", Math.round(W * 0.28), 126, 560, 90, {
+            fontSize: 40, fontWeight: 900, color: "#38bdf8", letterSpacing: 2,
+          }),
+          textLayer("Your Vehicle In\nYour Pocket", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Pre-heat cabin, check live battery charge, and auto-unlock hands-free.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#bae6fd",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Vehicle Screen"),
+        ],
+      },
+      {
+        name: "Supercharger Map",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#0c4a6e", position: 0 }, { color: "#082f49", position: 100 }],
+            direction: "to-br",
+          },
+        },
+        layers: [
+          textLayer("Real-Time Charger\n& Trip Planning", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Intelligent route navigation with live stall availability and battery pre-conditioning.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#e0f2fe",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Nav Screen"),
+        ],
+      },
+      {
+        name: "Efficiency Analytics",
+        background: {
+          type: "gradient",
+          gradient: {
+            stops: [{ color: "#0f172a", position: 0 }, { color: "#020617", position: 100 }],
+            direction: "to-b",
+          },
+        },
+        layers: [
+          textLayer("Track Efficiency &\nEnergy Savings", Math.round(W * 0.08), 240, Math.round(W * 0.84), 320, {
+            fontSize: 120, fontWeight: 900, color: "#ffffff",
+          }),
+          textLayer("Detailed kWh consumption history, tire pressure diagnostics, and cost savings.", Math.round(W * 0.1), 580, Math.round(W * 0.8), 160, {
+            fontSize: 56, fontWeight: 500, color: "#94a3b8",
+          }),
+          screenshotWithFrame(Math.round(W * 0.08), 820, Math.round(W * 0.84), 1900, "Drop Stats Screen"),
+        ],
+      },
+    ],
+  },
 ];
