@@ -1351,7 +1351,7 @@ export function createRubikTemplate(config: {
     description,
     category: "Community",
     layout: "screenshot-bottom",
-    tags: ["community", "rubik", "modern", "10 screens", "app store", "google play"],
+    tags: ["community", "studio", "modern", "10 screens", "app store", "google play"],
     previewColor,
     previewGradient,
     screens: [
@@ -2269,8 +2269,8 @@ export const COMMUNITY_TEMPLATES: Template[] = [
   },
   createRubikTemplate({
     id: "community-rubik-dark",
-    name: "Rubik Modern Dark",
-    description: "Sleek dark gradient theme inspired by Community Figma kit (10 Screens)",
+    name: "Studio Modern Dark",
+    description: "Sleek dark gradient theme with panoramic flow and modern typography (10 Screens)",
     previewColor: "#18181b",
     previewGradient: ["#1e1e1e", "#3f3f46"],
     bg: {
@@ -2287,7 +2287,7 @@ export const COMMUNITY_TEMPLATES: Template[] = [
   }),
   createRubikTemplate({
     id: "community-rubik-light",
-    name: "Rubik Clean Light",
+    name: "Studio Clean Light",
     description: "Clean minimalist light palette with crisp typography (10 Screens)",
     previewColor: "#f8fafc",
     previewGradient: ["#f8fafc", "#e2e8f0"],
@@ -2305,7 +2305,7 @@ export const COMMUNITY_TEMPLATES: Template[] = [
   }),
   createRubikTemplate({
     id: "community-rubik-vibrant",
-    name: "Rubik Vibrant Sunset",
+    name: "Studio Vibrant Sunset",
     description: "Rich sunset gradient with bold presence and high contrast (10 Screens)",
     previewColor: "#312e81",
     previewGradient: ["#312e81", "#701a75"],

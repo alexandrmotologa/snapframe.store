@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -34,6 +34,7 @@ import { GithubIcon } from "@/components/ui/GithubIcon";
 
 export default function LandingPage() {
   const router = useRouter();
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const { user, setAuthModalOpen } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -80,7 +81,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {user && (
+            {mounted && user && (
               <Button
                 variant="outline"
                 size="sm"
@@ -215,6 +216,7 @@ export default function LandingPage() {
               <BrandHeroIcon size="xl" />
             </div>
 
+            {/* Superpowers Suite Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-6 shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
               <span>AI-Powered App Store &amp; Google Play Screenshot Studio</span>
@@ -248,7 +250,7 @@ export default function LandingPage() {
 
             {/* Action CTA */}
             <div className="flex flex-col sm:flex-row items-center gap-3.5">
-              {user ? (
+              {mounted && user ? (
                 <Button
                   size="lg"
                   onClick={() => router.push("/projects")}
