@@ -262,14 +262,15 @@ export default function LandingPage() {
             </p>
 
             {/* Feature Pills */}
-            <div className="flex flex-wrap gap-2 justify-center mb-10 max-w-2xl">
+            <div className="flex flex-wrap gap-2 justify-center mb-10 max-w-3xl">
               {[
+                "⚡ Prompt-to-Deck JSON Studio",
+                "🎨 Instant Color Harmony (0 Credits)",
                 "📸 Instant Ctrl+V Paste",
-                "📱 3D & 2D Device Mockups",
+                "📱 3D & Flat Vector Mockups",
                 "🎨 Continuous Panorama Flows",
                 "🤖 Vision AI Auto-Pilot",
-                "📐 Custom Canvas & Social Presets",
-                "🌙 Dual Theme Matching Sets",
+                "💾 Native Desktop File Save Picker",
                 "⚡ Fastlane Deliverfile ZIP",
                 "🌐 40+ Languages i18n",
                 "📱 Live Store & Tablet Simulator",

@@ -4,7 +4,7 @@
 
 // AI & Credit Limits
 export const DEFAULT_FREE_AI_CREDITS = 3;
-export const PRO_MONTHLY_AI_CREDITS = 500;
+export const PRO_MONTHLY_AI_CREDITS = 1500;
 
 // Project & Screen Limits
 export const FREE_MAX_PROJECTS = 3;

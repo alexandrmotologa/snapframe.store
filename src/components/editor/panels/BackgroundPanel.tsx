@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { toast } from "@/lib/store/toastStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,7 +10,8 @@ import { GradientDirection } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ColorInput } from "@/components/ui/color-input";
 import { BrandKitPalette } from "@/components/editor/BrandKitPalette";
-import { Upload, Sparkles, Paintbrush, Blend, Grid3X3, Link2 } from "lucide-react";
+import { Upload, Sparkles, Paintbrush, Blend, Grid3X3, Link2, Wand2, Check } from "lucide-react";
+import { extractPaletteFromImageUrl, generateHarmoniousThemes, type ExtractedPalette, type HarmoniousThemeVariant } from "@/lib/utils/colorTheory";
 
 type Tab = "color" | "gradient" | "mesh" | "panoramic" | "ai_magic";
 
@@ -234,9 +235,46 @@ export const BackgroundPanel = memo(function BackgroundPanel() {
   const [patternOpacity, setPatternOpacity] = useState(0.15);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [extractedPalette, setExtractedPalette] = useState<ExtractedPalette | null>(null);
+  const [paletteThemes, setPaletteThemes] = useState<HarmoniousThemeVariant[]>([]);
+  const [isExtracting, setIsExtracting] = useState(false);
+
   const set = getActiveSet();
   const screen = getActiveScreen();
   const bg = screen?.background;
+
+  // Find active screenshot or uploaded image
+  const screenshotLayer = screen?.layers.find(
+    (l) => (l.type === "screenshot" || l.type === "image") && (l as { src?: string }).src
+  ) as { src?: string } | undefined;
+  const screenshotSrc = screenshotLayer?.src;
+
+  useEffect(() => {
+    if (!screenshotSrc) {
+      setExtractedPalette(null);
+      setPaletteThemes([]);
+      return;
+    }
+    let isMounted = true;
+    setIsExtracting(true);
+    extractPaletteFromImageUrl(screenshotSrc)
+      .then((pal) => {
+        if (!isMounted) return;
+        setExtractedPalette(pal);
+        setPaletteThemes(generateHarmoniousThemes(pal));
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setExtractedPalette(null);
+        setPaletteThemes([]);
+      })
+      .finally(() => {
+        if (isMounted) setIsExtracting(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [screenshotSrc]);
 
   const applyBg = (newBg: Parameters<typeof updateScreenBackground>[2]) => {
     if (!set || !screen) return;
@@ -605,18 +643,119 @@ export const BackgroundPanel = memo(function BackgroundPanel() {
 
         {tab === "ai_magic" && (
           <div className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/30 space-y-2">
+            {/* ── Instant Screenshot Color Harmony Engine ── */}
+            <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wand2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+                  <div>
+                    <span className="text-xs font-bold text-foreground">Instant Screenshot Harmony</span>
+                    <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                      0 Credits · 100% Offline
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {screenshotSrc && extractedPalette ? (
+                <div className="space-y-2.5">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Extracted colors &amp; harmonious schemes calculated automatically from your uploaded screenshot.
+                  </p>
+
+                  {/* 5 Extracted Swatches */}
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                    {[
+                      { label: "Dominant", color: extractedPalette.dominant },
+                      { label: "Vibrant", color: extractedPalette.vibrant },
+                      { label: "Dark Vibrant", color: extractedPalette.darkVibrant },
+                      { label: "Light Vibrant", color: extractedPalette.lightVibrant },
+                      { label: "Muted", color: extractedPalette.muted },
+                    ].map((swatch) => (
+                      <button
+                        key={swatch.label}
+                        type="button"
+                        onClick={() => {
+                          applyBg({ type: "solid", color: swatch.color });
+                          useEditorStore.getState().recordHistory();
+                          toast.success(`Applied ${swatch.label} (${swatch.color})`);
+                        }}
+                        className="group relative flex items-center gap-1.5 px-2 py-1 rounded-lg bg-secondary/60 hover:bg-secondary border border-border/50 text-[10px] font-mono cursor-pointer transition-all hover:scale-105"
+                        title={`Click to set solid background to ${swatch.color}`}
+                      >
+                        <div
+                          className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-2xs shrink-0"
+                          style={{ backgroundColor: swatch.color }}
+                        />
+                        <span className="text-foreground/80">{swatch.color}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* 6 Harmonious Theme Cards */}
+                  <div className="space-y-2 pt-2">
+                    <Label className="text-[11px] font-semibold text-foreground/90 block">Harmonious Color Schemes</Label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {paletteThemes.map((scheme) => (
+                        <button
+                          key={scheme.id}
+                          type="button"
+                          onClick={() => {
+                            if (scheme.gradientStops && scheme.gradientStops.length >= 2) {
+                              applyBg({
+                                type: "gradient",
+                                gradient: {
+                                  direction: "to-br",
+                                  stops: scheme.gradientStops,
+                                },
+                              });
+                            } else {
+                              applyBg({
+                                type: "solid",
+                                color: scheme.background,
+                              });
+                            }
+                            useEditorStore.getState().recordHistory();
+                            toast.success(`Applied "${scheme.label}" palette theme!`);
+                          }}
+                          className="w-full text-left rounded-xl p-2.5 border border-border/60 hover:border-emerald-500/60 transition-all flex items-center justify-between group cursor-pointer shadow-xs overflow-hidden relative"
+                          style={{ background: scheme.background }}
+                        >
+                          <div className="relative z-10">
+                            <p className="text-xs font-bold text-white drop-shadow-md">{scheme.label}</p>
+                            <p className="text-[9.5px] text-white/80 drop-shadow-sm">{scheme.description}</p>
+                          </div>
+                          <div className="relative z-10 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[9px] font-semibold text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Apply Scheme
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : isExtracting ? (
+                <p className="text-[11px] text-muted-foreground animate-pulse">
+                  Analyzing screenshot pixel palette...
+                </p>
+              ) : (
+                <div className="text-[11px] text-muted-foreground space-y-1">
+                  <p>Drop or paste an app screenshot onto the canvas to unlock 6 instant zero-cost harmonious themes.</p>
+                </div>
+              )}
+            </div>
+
+            {/* ── Curated App Store Themes ── */}
+            <div className="p-3 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/30 space-y-2">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-indigo-400" />
-                <span className="text-xs font-bold text-foreground">AI Curated Theme Matcher</span>
+                <span className="text-xs font-bold text-foreground">Curated App Store Gradients</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
-                App Store-optimized visual themes designed for maximum conversion. Click any theme to apply it across your screenshots.
+                App Store-optimized visual themes designed for maximum conversion.
               </p>
             </div>
 
             <div className="space-y-2.5">
-              <Label className="text-xs text-muted-foreground block">Curated App Store Themes</Label>
               <div className="grid grid-cols-1 gap-2.5">
                 {AI_THEMES_LIST.map((theme) => {
                   const gradientCss = `linear-gradient(135deg, ${theme.gradient.stops[0].color}, ${theme.gradient.stops[1].color})`;
@@ -632,7 +771,7 @@ export const BackgroundPanel = memo(function BackgroundPanel() {
                         useEditorStore.getState().recordHistory();
                         toast.success(`Applied "${theme.name}" theme!`);
                       }}
-                      className="w-full h-16 rounded-xl border border-border/60 hover:border-primary/60 hover:ring-1 hover:ring-primary/40 relative overflow-hidden transition-all text-left p-3 flex items-center justify-between group cursor-pointer shadow-xs"
+                      className="w-full h-14 rounded-xl border border-border/60 hover:border-primary/60 hover:ring-1 hover:ring-primary/40 relative overflow-hidden transition-all text-left p-3 flex items-center justify-between group cursor-pointer shadow-xs"
                       style={{ background: gradientCss }}
                     >
                       <div className="relative z-10">

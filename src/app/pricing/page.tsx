@@ -36,6 +36,7 @@ import { openPaddleCheckout } from "@/lib/paddle";
 import { getIdTokenSafe, getFirebaseDb } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "@/lib/store/toastStore";
+import { PRO_MONTHLY_AI_CREDITS, DEFAULT_FREE_AI_CREDITS } from "@/lib/constants";
 
 const PRICING_FAQS = [
   {
@@ -48,7 +49,7 @@ const PRICING_FAQS = [
   },
   {
     q: "What is the difference between Free and Pro AI generations?",
-    a: "Free accounts receive 3 complimentary AI credits upon registration with Google or GitHub to test our AI Auto-Pilot and copywriter. SnapFrame Pro includes up to 1,500 AI generations per month (up to 150/day) under our Fair Usage Policy, covering Vision Auto-Pilot, 3D Background Cutouts, and multi-language translations in 40+ languages.",
+    a: `Free accounts receive ${DEFAULT_FREE_AI_CREDITS} complimentary AI credits upon registration with Google or GitHub to test our AI Auto-Pilot and copywriter. SnapFrame Pro includes unlimited AI generations under our generous Fair Usage Policy (up to ${PRO_MONTHLY_AI_CREDITS.toLocaleString()} generations/month), covering Vision Auto-Pilot, 3D Background Cutouts, and multi-language translations in 40+ languages.`,
   },
   {
     q: "Are Video / GIF and App Icon Studio exports free?",
@@ -478,7 +479,7 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span><strong>1,500 AI Generations / Month</strong> (Vision Auto-Pilot, Copy &amp; Tone)</span>
+                  <span><strong>Unlimited AI Generations</strong> (Fair Usage: {PRO_MONTHLY_AI_CREDITS.toLocaleString()}/mo)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -550,8 +551,8 @@ export default function PricingPage() {
                   </tr>
                   <tr>
                     <td className="py-3.5 px-6 text-foreground font-medium">AI Auto-Pilot &amp; Copywriter</td>
-                    <td className="py-3.5 px-4 text-center text-muted-foreground">3 Free Generations</td>
-                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">1,500 Generations / mo</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">{DEFAULT_FREE_AI_CREDITS} Free Generations</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">Unlimited (Fair Usage: {PRO_MONTHLY_AI_CREDITS >= 1000 ? `${PRO_MONTHLY_AI_CREDITS / 1000}k` : PRO_MONTHLY_AI_CREDITS}/mo)</td>
                   </tr>
                   <tr>
                     <td className="py-3.5 px-6 text-foreground font-medium">ASO A/B Testing Variant Generator</td>

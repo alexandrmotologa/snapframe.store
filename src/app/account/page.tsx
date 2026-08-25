@@ -36,6 +36,7 @@ import { toast } from "@/lib/store/toastStore";
 import { getIdTokenSafe } from "@/lib/firebase";
 import { anonymizeName } from "@/lib/anonymize";
 import { RatingStars } from "@/components/ui/RatingStars";
+import { PRO_MONTHLY_AI_CREDITS, DEFAULT_FREE_AI_CREDITS } from "@/lib/constants";
 import {
   Dialog,
   DialogContent,
@@ -808,7 +809,7 @@ export default function AccountPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>{isPro ? "1,500 AI Generations / Month (up to 150/day)" : "3 Free AI Credits included"}</span>
+                      <span>{isPro ? `Unlimited AI Generations (Fair Usage: ${PRO_MONTHLY_AI_CREDITS.toLocaleString()}/mo)` : `${DEFAULT_FREE_AI_CREDITS} Free AI Credits included`}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -934,7 +935,7 @@ export default function AccountPage() {
                   {isPro ? "Unlimited" : `${aiCredits} Credits`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {isPro ? "Fair Usage Policy applies (150/day • 1,500/mo)" : "3 complimentary credits"}
+                  {isPro ? `Fair Usage Policy applies (Up to ${PRO_MONTHLY_AI_CREDITS.toLocaleString()} generations / month)` : `${DEFAULT_FREE_AI_CREDITS} complimentary credits`}
                 </p>
               </div>
 

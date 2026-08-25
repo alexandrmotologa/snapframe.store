@@ -11,6 +11,8 @@ import { getIdTokenSafe, getFirebaseDb } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
 
+import { PRO_MONTHLY_AI_CREDITS } from "@/lib/constants";
+
 const PRO_FEATURES = [
   {
     icon: Crown,
@@ -29,8 +31,8 @@ const PRO_FEATURES = [
   },
   {
     icon: Zap,
-    title: "1,500 AI Generations / Month",
-    desc: "Auto-Pilot vision generation, AI copywriting & instant multi-language translation (up to 150/day).",
+    title: "Unlimited AI Generations",
+    desc: `Auto-Pilot vision, AI copywriting & instant translations (Fair Usage Policy applies: up to ${PRO_MONTHLY_AI_CREDITS.toLocaleString()}/mo).`,
   },
   {
     icon: Sparkles,

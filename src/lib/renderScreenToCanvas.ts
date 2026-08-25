@@ -651,12 +651,34 @@ export async function renderScreenToCanvas(
           ctx.strokeStyle = isDarkBg ? "rgba(0, 0, 0, 0.85)" : "rgba(255, 255, 255, 0.85)";
           ctx.stroke();
 
-        } else if (mockup.frameType === "2d") {
+        } else if (mockup.frameType === "2d" || mockup.frameType === "flat") {
+          // Flat / Minimalist Vector Frame
+          if (device.buttons) {
+            ctx.fillStyle = baseHex;
+            device.buttons.forEach((btn: any) => {
+              const isTop = btn.side === "top";
+              const btnY = isTop ? y - (btn.thickness || 1) * (Math.min(w, h) * 0.006) + 1 : y + h * btn.yOffset;
+              const btnH = isTop ? (btn.thickness || 1) * (Math.min(w, h) * 0.006) : h * btn.height;
+              const btnW = isTop ? w * btn.height : (btn.thickness || 1) * (Math.min(w, h) * 0.006);
+              const btnX = isTop ? x + w * btn.yOffset : (btn.side === "left" ? x - btnW + 1 : x + w - 1);
+              const btnRadius = Math.min(btnW, btnH) / 2;
+              ctx.beginPath();
+              ctx.roundRect(btnX, btnY, btnW, btnH, [btnRadius, btnRadius, btnRadius, btnRadius]);
+              ctx.fill();
+            });
+          }
+
           ctx.beginPath();
           if (r > 0) ctx.roundRect(x, y, w, h, r);
           else ctx.rect(x, y, w, h);
           ctx.fillStyle = baseHex;
           ctx.fill();
+
+          // Clean flat vector outer border
+          const isDarkFrame = baseHex === "#1a1a1c" || baseHex === "#000000" || baseHex === "#111111";
+          ctx.lineWidth = Math.max(1.5, bezel * 0.2);
+          ctx.strokeStyle = isDarkFrame ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)";
+          ctx.stroke();
 
         } else {
           // 3D Realistic

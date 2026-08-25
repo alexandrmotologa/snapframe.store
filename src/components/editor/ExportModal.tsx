@@ -14,6 +14,7 @@ import { renderScreenToCanvas } from "@/lib/renderScreenToCanvas";
 import { cn } from "@/lib/utils";
 import { AppleStoreIcon, GooglePlayIcon } from "@/components/icons/StoreIcons";
 import { ALL_DEVICES, isTabletDevice } from "@/lib/devices";
+import { downloadFileWithPicker } from "@/lib/utils/fileExport";
 import type JSZip from "jszip";
 
 
@@ -423,12 +424,8 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
 
     if (zip) {
       const blob = await zip.generateAsync({ type: "blob" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${appName}_screenshots_@${scale}x.zip`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const suggestedName = `${appName}_screenshots_@${scale}x.zip`;
+      await downloadFileWithPicker(blob, suggestedName);
     }
 
     setDone(true);

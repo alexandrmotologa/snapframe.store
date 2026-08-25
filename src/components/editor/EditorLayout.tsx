@@ -17,6 +17,7 @@ import {
   Check,
   Lightbulb,
   Download,
+  Code2,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/lib/store/toastStore";
@@ -34,6 +35,7 @@ import { GifExportModal } from "@/components/editor/GifExportModal";
 import { StoreAssetsStudioModal } from "@/components/editor/StoreAssetsStudioModal";
 import { StorePreviewModal } from "@/components/editor/StorePreviewModal";
 import { AIAutoPilotModal } from "@/components/editor/AIAutoPilotModal";
+import { JsonPromptStudioModal } from "@/components/editor/JsonPromptStudioModal";
 import { KeyboardShortcutsModal } from "@/components/editor/KeyboardShortcutsModal";
 import { QuickTipsModal } from "@/components/editor/QuickTipsModal";
 import { UpgradeModal } from "@/components/pricing/UpgradeModal";
@@ -97,6 +99,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
   const [showAssetsStudio, setShowAssetsStudio] = useState(false);
   const [showStorePreview, setShowStorePreview] = useState(false);
   const [showAIAutoPilot, setShowAIAutoPilot] = useState(false);
+  const [showJsonStudio, setShowJsonStudio] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showTips, setShowTips] = useState(() => {
     if (typeof window !== "undefined") {
@@ -747,6 +750,9 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
             }
             setShowAIAutoPilot(true);
           }}
+          onOpenJsonStudio={() => {
+            setShowJsonStudio(true);
+          }}
           onOpenStorePreview={() => {
             if (isGuest) {
               setAuthModalOpen(true);
@@ -804,6 +810,14 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
           open={showStorePreview}
           onOpenChange={setShowStorePreview}
           appName={project?.name || "My Awesome App"}
+        />
+      )}
+      {/* JSON & AI Prompt Studio modal */}
+      {showJsonStudio && (
+        <JsonPromptStudioModal
+          open={showJsonStudio}
+          onOpenChange={setShowJsonStudio}
+          appName={project?.name || "SnapFrame"}
         />
       )}
       {/* Export modal */}

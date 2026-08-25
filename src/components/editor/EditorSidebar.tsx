@@ -6,7 +6,7 @@ import {
   Cpu, Upload, Grid3X3, X, Palette, Smile, Globe, User,
   Smartphone, LayoutList, LayoutTemplate,
   Sparkles, Eye, Film, Layers2, Lock,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, Code2
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/lib/store/authStore";
@@ -126,6 +126,7 @@ function renderPanel(panel: NonNullable<PanelId>) {
 interface EditorSidebarProps {
   onOpenStorePreview?: () => void;
   onOpenAIAutoPilot?: () => void;
+  onOpenJsonStudio?: () => void;
   onOpenAssetsStudio?: () => void;
   onOpenGif?: () => void;
 }
@@ -133,6 +134,7 @@ interface EditorSidebarProps {
 export const EditorSidebar = memo(function EditorSidebar({
   onOpenStorePreview,
   onOpenAIAutoPilot,
+  onOpenJsonStudio,
   onOpenAssetsStudio,
   onOpenGif,
 }: EditorSidebarProps) {
@@ -239,6 +241,23 @@ export const EditorSidebar = memo(function EditorSidebar({
                 </TooltipTrigger>
                 <TooltipContent side="right" sideOffset={8} className="text-xs font-medium">
                   ✨ AI Vision Auto-Pilot
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            {/* JSON & AI Prompt Studio */}
+            {onOpenJsonStudio && (
+              <Tooltip>
+                <TooltipTrigger
+                  id="sidebar-json-studio"
+                  type="button"
+                  onClick={onOpenJsonStudio}
+                  className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all bg-secondary/80 hover:bg-secondary text-indigo-400 hover:text-indigo-300 border border-border/70 hover:border-indigo-500/50 shadow-xs hover:scale-105 active:scale-95 outline-none cursor-pointer"
+                >
+                  <Code2 className="w-4 h-4 text-indigo-400" />
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8} className="text-xs font-medium">
+                  ⚡ JSON &amp; AI Prompt Studio (Prompt-to-Deck)
                 </TooltipContent>
               </Tooltip>
             )}

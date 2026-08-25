@@ -7,12 +7,13 @@
 ## ✨ Key Features
 
 ### 🤖 AI Superpowers Suite (5-Provider Failover Engine)
+- **⚡ JSON & AI Prompt-to-Deck Studio:** Generate, import, and export complete multi-slide screenshot projects as structured JSON. Includes 1-click ready-to-use prompts for ChatGPT, Claude 3.7, and Gemini to generate full 5-10 slide screenshot decks with headline copy and badge pills in seconds. See [`docs/JSON_SCHEMA.md`](./docs/JSON_SCHEMA.md).
 - **✨ 1-Click Project Auto-Pilot:** Powered by Multimodal AI Vision (`gemini-3.6-flash`, `gpt-4o-mini`, `groq-llama-3.2-vision`, `mistral-pixtral`, `grok-2-vision`). Analyzes your uploaded app screenshots and automatically populates high-converting headlines, benefit subtitles, and panoramic matching color gradients across all screens in 1 click.
 - **📈 AI Store Listing & ASO Generator:** Generates full, compliant App Store and Google Play metadata in any target language with strict store character limit enforcement:
   - *iOS:* App Name (≤ 30c), Subtitle (≤ 30c), Promotional Text (≤ 170c), Keywords Bank (≤ 100c), Description & What's New.
   - *Android:* App Title (≤ 30c), Short Description (≤ 80c), Full Description & What's New.
 - **🪄 AI Copywriter & Tone Switcher:** Instant tone adaptations (🚀 *High Energy*, ✨ *Minimalist*, 🎯 *Benefit-Driven*, 🔥 *FOMO / Social Proof*, 💼 *B2B Enterprise*), auto-shorten under 30 characters, and 5 alternative headline suggestions.
-- **🎨 AI Magic Theme Matcher:** 1-click curated and generated App Store color palettes (*OLED Midnight*, *Clean Cupertino*, *Vibrant Sunset*, *Cyber Neon*, *Pastel Aurora*, *Emerald Matrix*).
+- **🎨 Instant Client-Side Color Harmony & AI Palette:** Zero-latency, zero-token local color quantization (median-cut & HSL color harmony) that instantly extracts screenshot palettes (*Screenshot Harmony*, *Vivid Glow*, *Moody Muted*, *Bold Spectrum*, *Clean Light*, *OLED Pitch Black*), backed by Gemini AI Vision for deep contextual suggestions.
 - **🧼 Smart Clean Status Bar:** Automatically overlays a crisp vector status bar (9:41 AM, 100% battery, 5G, 4 signal bars) with light/dark theme toggle, ensuring 100% compliance with Apple Store guidelines.
 - **🌍 Native Cultural Localization:** Contextual, idiom-aware marketing translations across 60+ languages & regional dialects with strict length constraints.
 - **🔒 Enterprise Security & Rate Limiting:** All AI endpoints enforce Firebase ID token verification, in-memory sliding window rate limiting, anti-SSRF protections, and secure server-managed keys.
@@ -47,11 +48,8 @@
 ---
 
 ### 📦 Pro Export Suite & Store Submission
-- **Structured Multi-Platform ZIP:** Dedicated non-colliding folders:
-  - `App Store (iPhone)/`
-  - `App Store (iPad)/`
-  - `Google Play (Phone)/`
-  - `Google Play (Tablet)/`
+- **Structured Multi-Platform ZIP:** Dedicated non-colliding folders (`App Store (iPhone)/`, `App Store (iPad)/`, `Google Play (Phone)/`, `Google Play (Tablet)/`).
+- **💾 Native File System Access API (`showSaveFilePicker`):** Direct desktop folder destination selection dialog on Chromium browsers (Chrome, Edge, Opera, Brave) with graceful instant fallback for Firefox and Safari.
 - **⚡ ASO A/B Testing Variant Generator:** 1-click generation of alternative test sets (High-Contrast Dark, Minimalist Clean Studio, Vibrant Glow, Bold Conversion Focus).
 - **Fastlane `Deliverfile` & App Store Connect Package:** Includes an automated `Deliverfile` ready for `fastlane deliver`, `README-FASTLANE.md` instructions, and structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`, etc.).
 - **Multi-Format Export Control:** Choose between **PNG Lossless (4K)**, **WebP (Optimized, <8MB)**, and **JPEG (High Quality 90%)** for App Store upload compliance.
@@ -67,7 +65,7 @@
 | **Max Projects** | 1 Active Session Project | **3 Projects** (Stored locally on device) | **Unlimited Projects** |
 | **Cloud Synchronization** | ❌ Local Browser Only | ❌ Local Browser Only | **☁️ Multi-Device Real-Time Cloud Sync** (Google Firestore) |
 | **Upgrade Migration** | N/A | Local projects automatically migrate to Cloud on Pro upgrade | Instant multi-device sync across Mac, PC, iPad |
-| **AI Generations** | 🔒 Sign in required | **3 Complimentary AI Credits** | **1,500 AI Generations / Month** (Fair Usage) |
+| **AI Generations** | 🔒 Sign in required | **3 Complimentary AI Credits** | **Unlimited AI Generations** (Fair Usage: 1,500/mo) |
 | **Batch Captions Editor** | 🔒 Sign in required | **Screens 1 to 3** | **All 10 Screens + 1-Click AI Batch Rewrite** |
 | **Brand Kit Palette** | 1 Color Slot | **3 Saved Brand Colors** | **12 Saved Brand Colors** |
 | **1-Click Clipboard Copy** | ✅ Included (Screens 1–3) | ✅ Included (Screens 1–3) | **✅ Lossless Copy on all 10 screens** |

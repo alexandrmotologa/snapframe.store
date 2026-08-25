@@ -217,7 +217,7 @@ SnapFrame enforces a conversion-optimized 3-tier architecture:
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **👤 Guest** | 1 Active Session Project | 1-Click Clipboard Copy only (ZIP prompts free sign-in) | Standard Store Sizes only | Active Screen only | 🔒 Locked (Prompts sign-in) | 🔒 Locked (Prompts sign-in) | ❌ Local memory | $0 (No sign-in) |
 | **🟢 Free Registered** | Up to 3 Local Projects | Up to 3 screens per set (1 device platform, 1 language) | Standard Store Sizes only | Screens 1 to 3 | Phone Simulator (iPhone & Android) | 3 Complimentary Credits | ❌ LocalStorage | $0 (Google / GitHub) |
-| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless, Dual Theme | Freeform W × H, Product Hunt, Twitter, IG, Web Hero & Mockup Scale (50%–150%) | All 10 screens lossless | Phone & Tablet Simulator (iPad Pro 13" & Tabs) | 1,500 Credits / Month | ✅ Google Firestore | $9/mo or $69/yr ($5.75/mo billed annually) |
+| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless, Dual Theme | Freeform W × H, Product Hunt, Twitter, IG, Web Hero & Mockup Scale (50%–150%) | All 10 screens lossless | Phone & Tablet Simulator (iPad Pro 13" & Tabs) | Unlimited AI (Fair Usage: 1,500/mo) | ✅ Google Firestore | $9/mo or $69/yr ($5.75/mo billed annually) |
 
 
 

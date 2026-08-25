@@ -13,6 +13,7 @@ import { UserMenu } from "@/components/auth/UserMenu";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Footer } from "@/components/dashboard/Footer";
 import { motion, AnimatePresence } from "framer-motion";
+import { PRO_MONTHLY_AI_CREDITS, DEFAULT_FREE_AI_CREDITS } from "@/lib/constants";
 
 interface FaqItem {
   category: "Account & Sync" | "AI & Features" | "Pricing & Refunds" | "Store Assets";
@@ -24,7 +25,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     category: "Account & Sync",
     question: "What is the difference between Guest, Free Registered, and Pro accounts?",
-    answer: "• Guest Mode (Unregistered): 1 session project with 1-click clipboard PNG copying for the active screen (ZIP packages require signing in).\n• Free Registered (Google/GitHub): Stores up to 3 projects locally on your device, 3 complimentary AI credits, free ZIP export of up to 3 screens per set (1 platform), 1-click clipboard copy for screens 1–3, Phone Live Store simulator, standard 2D & Titanium frames, and 100% free unlimited Video/GIF & Store Icon Studio exports.\n• SnapFrame Pro ($9/mo or $69/yr): Unlimited projects with real-time Multi-Device Cloud Sync (Firestore), full 10-screen multi-platform ZIP packages (iOS + iPad + Android + Tablet), Custom Canvas Dimensions (freeform W×H), Social Media Presets (Product Hunt, Twitter, Instagram 1:1, Web Hero), Mockup Frame Scaling (50%–150%), 1-click clipboard copy on all 10 screens, Dual Theme Generator (Light & Dark sets in 1-click), iPad Pro & Tablet Store Simulator, all luxury 3D mockup frames (Clay, Glass, Neon, Wireframe), batch 40+ language localizations, Fastlane metadata suite, 4K lossless exports, and 1,500 AI generations/month (up to 150/day).",
+    answer: `• Guest Mode (Unregistered): 1 session project with 1-click clipboard PNG copying for the active screen (ZIP packages require signing in).\n• Free Registered (Google/GitHub): Stores up to 3 projects locally on your device, ${DEFAULT_FREE_AI_CREDITS} complimentary AI credits, free ZIP export of up to 3 screens per set (1 platform), 1-click clipboard copy for screens 1–3, Phone Live Store simulator, standard 2D & Titanium frames, and 100% free unlimited Video/GIF & Store Icon Studio exports.\n• SnapFrame Pro ($9/mo or $69/yr): Unlimited projects with real-time Multi-Device Cloud Sync (Firestore), full 10-screen multi-platform ZIP packages (iOS + iPad + Android + Tablet), Custom Canvas Dimensions (freeform W×H), Social Media Presets (Product Hunt, Twitter, Instagram 1:1, Web Hero), Mockup Frame Scaling (50%–150%), 1-click clipboard copy on all 10 screens, Dual Theme Generator (Light & Dark sets in 1-click), iPad Pro & Tablet Store Simulator, all luxury 3D mockup frames (Clay, Glass, Neon, Wireframe), batch 40+ language localizations, Fastlane metadata suite, 4K lossless exports, and Unlimited AI Generations under our Fair Usage Policy (~${PRO_MONTHLY_AI_CREDITS.toLocaleString()}/month).`,
   },
   {
     category: "Account & Sync",
@@ -38,8 +39,8 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     category: "AI & Features",
-    question: "What is the 1,500 AI Generations / Month Fair Usage Policy?",
-    answer: "SnapFrame Pro includes up to 1,500 AI calls per month (up to 150/day). This covers AI Auto-Pilot Vision analysis, AI copywriting, 3D background element pop-out, and multi-language translations across 40+ languages. 1,500 monthly calls is more than enough for active indie developers and agencies publishing dozens of app updates each month.",
+    question: "How does the Unlimited AI Generations Fair Usage Policy work?",
+    answer: `SnapFrame Pro is built to give human developers and creators unlimited, uninterrupted creative workflow. To protect our infrastructure from automated scraper bots and abuse, a generous Fair Usage threshold of ~${PRO_MONTHLY_AI_CREDITS.toLocaleString()} AI generations per month is applied. This covers AI Auto-Pilot Vision analysis, AI copywriting, 3D background pop-outs, and multi-language translations in 40+ languages—far more than needed even for active agencies managing dozens of client apps.`,
   },
   {
     category: "AI & Features",
