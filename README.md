@@ -29,6 +29,8 @@
 
 ### 🎨 Design & Canvas Capabilities
 - **Global Clipboard Paste (`Ctrl+V` / `Cmd+V`):** Paste screenshots directly from your system clipboard (`Win+Shift+S` / `Cmd+Shift+4`) straight into the selected device mockup frame without saving files or opening disk dialogs.
+- **🧲 Smart Magnetic Snapping & Alignment Guides:** Intelligent multi-point alignment snapping (screen center, safe margins, and sibling layer boundaries) with real-time glowing cyan and magenta guide lines.
+- **🔍 Native EyeDropper Color Picker:** 1-click screen color sampling directly from screenshots using `window.EyeDropper` API across background, text, and shape inspectors.
 - **Continuous Panoramic Flow:** Connect seamless backgrounds, waves, gradients, or custom uploaded ultra-wide panoramas across multiple screens.
 - **30+ Drag-and-Drop Block Elements:** Dynamic Islands, Live Activity workouts, iOS Toggle switches, Push Notification banners, Editors' Choice laurels, 30-Day Guarantee seals, Growth stats (+142%), and Before/After comparison cards.
 - **Responsive & Adaptable Studio UI:** Built-in horizontal scroll rails with interactive chevrons, vertical-to-horizontal mouse wheel conversion, and automatic tab centering across all category filters (Templates, Block Elements, Color Themes, Stickers, Languages).
@@ -46,12 +48,13 @@
   - `App Store (iPad)/`
   - `Google Play (Phone)/`
   - `Google Play (Tablet)/`
+- **⚡ ASO A/B Testing Variant Generator:** 1-click generation of alternative test sets (High-Contrast Dark, Minimalist Clean Studio, Vibrant Glow, Bold Conversion Focus).
 - **Fastlane `Deliverfile` & App Store Connect Package:** Includes an automated `Deliverfile` ready for `fastlane deliver`, `README-FASTLANE.md` instructions, and structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`, etc.).
 - **Multi-Format Export Control:** Choose between **PNG Lossless (4K)**, **WebP (Optimized, <8MB)**, and **JPEG (High Quality 90%)** for App Store upload compliance.
 - **Live Store Simulator:** Interactive Apple App Store and Google Play preview with device switching and instant multi-language preview.
 - **GIF Animator:** Export animated showcase GIFs of your screenshot sets.
 - **1-Click 4K PNG Clipboard Copy:** Instantly copy active screens to clipboard for Figma, Slack, or Notion.
-- **App Store Screenshot Sizes Guide:** Built-in 2026 developer reference guide at `/app-store-screenshot-sizes`.
+- **App Store & Google Play Screenshot Guides:** Built-in 2026 developer reference guides at `/app-store-screenshot-sizes` and `/google-play-screenshot-sizes`.
 
 ### 💎 Account Tiers & Architecture
 
@@ -60,13 +63,15 @@
 | **Max Projects** | 1 Active Session Project | **3 Projects** (Stored locally on device) | **Unlimited Projects** |
 | **Cloud Synchronization** | ❌ Local Browser Only | ❌ Local Browser Only | **☁️ Multi-Device Real-Time Cloud Sync** (Google Firestore) |
 | **Upgrade Migration** | N/A | Local projects automatically migrate to Cloud on Pro upgrade | Instant multi-device sync across Mac, PC, iPad |
-| **AI Generations** | 🔒 Sign in required | **3 Complimentary AI Credits** | **500 AI Generations / Month** (Fair Usage) |
+| **AI Generations** | 🔒 Sign in required | **3 Complimentary AI Credits** | **1,500 AI Generations / Month** (Fair Usage) |
 | **1-Click Clipboard Copy** | ✅ Included (Screens 1–3) | ✅ Included (Screens 1–3) | **✅ Lossless Copy on all 10 screens** |
 | **Screenshot Export (ZIP)** | 🔒 Sign in required | **Up to 3 screens per set (1 platform)** | **All 10 screens per set (All platforms)** |
 | **Multi-Platform Batch** | 🔒 Sign in required | 1 Platform (e.g. iPhone only) | **Full Multi-Platform ZIP (iOS + iPad + Android + Tablet)** |
 | **Multi-Language Batch** | 🔒 Sign in required | 1 Active Language | **Batch 40+ Languages in organized folders** |
 | **Fastlane & ASO Package** | 🔒 Sign in required | ❌ Not included (raw images only) | **✅ Complete Fastlane (`.txt`, `.json`) suite** |
 | **Custom Canvas & Social Presets** | ❌ Standard store sizes only | Standard store sizes only | **✅ Freeform W × H + Product Hunt / Twitter / IG / Web Presets** |
+| **A/B Testing Variant Generator** | ❌ Not included | ❌ Not included | **✅ 4 Conversion Strategies (Dark, Clean, Glow, Bold)** |
+| **Smart Alignment Guides** | ✅ Included | ✅ Included | **✅ Included** |
 | **Mockup Frame Scaling** | 100% Fixed Scale | 100% Fixed Scale | **✅ Custom Mockup Scaling (50% to 150%)** |
 | **Dual Theme Generator** | 🔒 Sign in required | ❌ Not included | **✅ 1-Click matching Light & Dark sets** |
 | **Live Store Simulator** | 🔒 Sign in required | **Phone Simulator (iPhone & Android)** | **Phone & Tablet Simulator (iPad Pro 13" & Tabs)** |

@@ -95,7 +95,13 @@ export function Footer() {
                 <li>
                   <Link href="/app-store-screenshot-sizes" className="hover:text-foreground transition-colors flex items-center gap-1.5">
                     <Smartphone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <span>2026 Screenshot Sizes</span>
+                    <span>App Store iOS Specs</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/google-play-screenshot-sizes" className="hover:text-foreground transition-colors flex items-center gap-1.5">
+                    <Smartphone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Google Play Specs</span>
                   </Link>
                 </li>
                 <li>
