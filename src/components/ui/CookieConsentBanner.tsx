@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import posthog from "posthog-js";
 
 const CONSENT_STORAGE_KEY = "snapframe-cookie-consent";
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
@@ -22,24 +23,27 @@ export function CookieConsentBanner() {
       return () => clearTimeout(timer);
     } else if (consent === "essential") {
       // Respect previous choice: disable analytics
-      if (typeof window !== "undefined" && posthog.__loaded) {
-        posthog.opt_out_capturing();
+      if (typeof window !== "undefined") {
+        if (GA_ID) (window as any)[`ga-disable-${GA_ID}`] = true;
+        if (posthog.__loaded) posthog.opt_out_capturing();
       }
     }
   }, []);
 
   const handleAcceptAll = () => {
     localStorage.setItem(CONSENT_STORAGE_KEY, "all");
-    if (typeof window !== "undefined" && posthog.__loaded) {
-      posthog.opt_in_capturing();
+    if (typeof window !== "undefined") {
+      if (GA_ID) (window as any)[`ga-disable-${GA_ID}`] = false;
+      if (posthog.__loaded) posthog.opt_in_capturing();
     }
     setVisible(false);
   };
 
   const handleEssentialOnly = () => {
     localStorage.setItem(CONSENT_STORAGE_KEY, "essential");
-    if (typeof window !== "undefined" && posthog.__loaded) {
-      posthog.opt_out_capturing();
+    if (typeof window !== "undefined") {
+      if (GA_ID) (window as any)[`ga-disable-${GA_ID}`] = true;
+      if (posthog.__loaded) posthog.opt_out_capturing();
     }
     setVisible(false);
   };
