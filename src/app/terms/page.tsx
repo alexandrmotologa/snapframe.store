@@ -184,6 +184,16 @@ export default function TermsOfServicePage() {
                   The SnapFrame software, user interface design, device frame models, curated layout engines, code, logos, and trademarks are the proprietary intellectual property of <strong>MTLG Labs (Alexandr Motologa)</strong>. The underlying source code is made available under the Business Source License 1.1 (BSL 1.1), permitting evaluation and personal testing while strictly prohibiting the unauthorized hosting of competing commercial screenshot generation services.
                 </p>
               </div>
+
+              <div className="p-4 rounded-xl bg-card border border-border/70 space-y-1.5">
+                <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  User Reviews &amp; Community Feedback
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  When you voluntarily submit a rating or testimonial via your Account Dashboard, you grant SnapFrame a non-exclusive, royalty-free license to display your anonymized review, role title, and rating on our public website and marketing materials. You retain full control to edit, update, or delete your review at any time directly from your Account Settings.
+                </p>
+              </div>
             </div>
           </section>
 

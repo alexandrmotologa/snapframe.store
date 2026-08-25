@@ -84,13 +84,14 @@
 | **Video & Animated GIF Studio** | 🔒 Sign in required | **100% Free & Unlimited** (60fps MP4/WebM/GIF) | **100% Free & Unlimited** |
 | **Store App Icon & Dev Packs** | 🔒 Sign in required | **100% Free & Unlimited** (Xcode & Android zips) | **100% Free & Unlimited** |
 | **4K Lossless Master Exports** | ❌ Standard 1x/2x | Standard 1x/2x | **✅ 4K Ultra-HD Lossless Exports (@3x)** |
-| **Templates** | Standard templates | Standard templates | **All 6+ Pro Industry Niche Templates** |
+| **Templates** | Standard templates | Standard templates | **All 12+ Pro Niche Showcases + 55+ Curated Kits** |
+| **Templates SEO Gallery** | ✅ Included (`/templates`) | ✅ Included (`/templates`) | **✅ 1-Click Launch from `/templates`** |
 | **Commercial License** | ✅ Included | ✅ Included | ✅ Included |
 
 ---
 
 ### 💳 Subscriptions & Account Dashboard
-- **Dedicated Account & Billing Dashboard (`/account`):** View active subscriptions, renewal dates, detailed AI credit spending logs, and payment receipts.
+- **Dedicated Account & Billing Dashboard (`/account`):** View active subscriptions, renewal dates, detailed AI credit spending logs, community review submission, and payment receipts.
 - **Merchant of Record:** Paddle.com processes all transactions securely worldwide with automatic invoice generation and VAT calculation.
 - **Paddle Buyer Hub:** Manage cards, update tax/VAT IDs, and download VAT invoice PDFs directly via `paddle.net`.
 - **14-Day Money-Back Guarantee:** Eligible for unutilized accounts within 14 calendar days of initial purchase.
@@ -103,7 +104,7 @@
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Icons:** [Lucide Icons](https://lucide.dev/)
-- **Testing:** [Vitest](https://vitest.dev/) automated unit test suite with 55+ tests and 100% path-alias resolution
+- **Testing:** [Vitest](https://vitest.dev/) automated unit test suite with 65+ tests and 100% path-alias resolution
 - **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) with modular slices (selection, ui, history, content), undo/redo history stack & local persistence
 - **Canvas Rendering:** Native HTML5 Canvas 2D with high-DPI supersampling & LRU cache eviction
 - **Export & Compression:** [JSZip](https://stuk.github.io/jszip/) & FileSaver

@@ -4,7 +4,7 @@ import { TemplatesClient } from "./TemplatesClient";
 export const metadata: Metadata = {
   title: "App Store & Google Play Screenshot Templates (2026) | SnapFrame",
   description:
-    "Explore 50+ professionally designed App Store and Google Play screenshot templates. Ready-to-use layouts for Fintech, AI, Health, Gaming, Productivity, and E-commerce.",
+    "Explore 55+ professionally designed App Store and Google Play screenshot templates. Ready-to-use layouts for Fintech, AI, Health, Gaming, Productivity, and E-commerce.",
   keywords: [
     "app store screenshot templates",
     "google play screenshot templates",

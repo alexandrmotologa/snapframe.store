@@ -148,7 +148,10 @@ export default function PrivacyPolicyPage() {
                 <strong className="text-foreground">Uploaded Screenshots & Images:</strong> App screenshots and media uploaded to the canvas are rendered client-side in HTML5 Canvas. If cloud sync or asset hosting is active, image assets are stored securely in encrypted object storage.
               </li>
               <li>
-                <strong className="text-foreground">Telemetry & Usage Diagnostics:</strong> Anonymized interaction events (e.g. template clicks, export trigger counts) collected via privacy-configured PostHog analytics to diagnose application performance and improve usability.
+                <strong className="text-foreground">Voluntary Community Reviews &amp; Testimonials:</strong> If you choose to submit a rating or product feedback via your Account Settings, we store your review text, chosen role title, rating, and verified status in Google Cloud Firestore. To protect your personal privacy, full names are automatically anonymized for public display (e.g. <code className="text-foreground">Mar***** Lin*****</code>) to prevent public web scraping while showcasing genuine verified community feedback. You may edit or delete your review at any time from your Account Dashboard.
+              </li>
+              <li>
+                <strong className="text-foreground">Telemetry & Usage Diagnostics:</strong> Anonymized interaction events (e.g. template clicks, export trigger counts) collected via privacy-configured analytics to diagnose application performance and improve usability.
               </li>
             </ul>
           </section>
