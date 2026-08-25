@@ -3614,11 +3614,13 @@ export function mapFigmaTemplates(templates: import("./figmaTemplates").FigmaTem
 }
 
 import { NICHE_TEMPLATES } from "./nicheTemplates";
-export { NICHE_TEMPLATES };
+import { PREMIUM_SHOWCASE_TEMPLATES } from "./premiumShowcaseTemplates";
+export { NICHE_TEMPLATES, PREMIUM_SHOWCASE_TEMPLATES };
 
 // Base templates available synchronously at runtime
 export const BASE_TEMPLATES: Template[] = [
   BLANK_TEMPLATE,
+  ...PREMIUM_SHOWCASE_TEMPLATES,
   ...NICHE_TEMPLATES,
   ...COMMUNITY_TEMPLATES,
   ...CORE_TEMPLATES,
@@ -3627,7 +3629,7 @@ export const BASE_TEMPLATES: Template[] = [
 let cachedAllTemplates: Template[] | null = null;
 
 /**
- * Lazily loads all 50+ templates including the 27 heavy Figma kits (10-screen sets)
+ * Lazily loads all 55+ templates including the 27 heavy Figma kits (10-screen sets)
  * on demand without bloating the initial application bundle.
  */
 export async function getAllTemplates(): Promise<Template[]> {
@@ -3637,6 +3639,7 @@ export async function getAllTemplates(): Promise<Template[]> {
     const mapped = mapFigmaTemplates(FIGMA_TEMPLATES);
     cachedAllTemplates = [
       BLANK_TEMPLATE,
+      ...PREMIUM_SHOWCASE_TEMPLATES,
       ...NICHE_TEMPLATES,
       ...COMMUNITY_TEMPLATES,
       ...mapped,
