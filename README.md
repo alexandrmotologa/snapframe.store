@@ -32,6 +32,7 @@
 - **🎨 Project Brand Kit & Saved Colors:** Save custom corporate and app brand colors (HEX) per project with 1-click application across backgrounds, text typography, and graphic shapes.
 - **🪄 Quick AI Text Actions:** 1-click optimization chips (✂️ *Shorten <30c*, 🔥 *Add Emojis*, 🎯 *Benefit-Driven*, 🚀 *High Energy*, ✨ *Rewrite Tone*, 💡 *5 Alternatives*) with strict App Store length limits.
 - **Global Clipboard Paste (`Ctrl+V` / `Cmd+V`):** Paste screenshots directly from your system clipboard (`Win+Shift+S` / `Cmd+Shift+4`) straight into the selected device mockup frame without saving files or opening disk dialogs.
+- **⚡ Pro Keyboard Shortcuts:** Quick-create layers with single keystrokes (`T` for Text, `S` for Shape, `M` for Mockup, `V` for Select/Deselect), pixel-perfect arrow nudge (`1px` or `10px` with Shift), duplicate (`Ctrl+D`), undo/redo (`Ctrl+Z` / `Ctrl+Y`), and instant cheat sheet (`?`).
 - **🧲 Smart Magnetic Snapping & Alignment Guides:** Intelligent multi-point alignment snapping (screen center, safe margins, and sibling layer boundaries) with real-time glowing cyan and magenta guide lines.
 - **🔍 Native EyeDropper Color Picker:** 1-click screen color sampling directly from screenshots using `window.EyeDropper` API across background, text, and shape inspectors.
 - **Continuous Panoramic Flow:** Connect seamless backgrounds, waves, gradients, or custom uploaded ultra-wide panoramas across multiple screens.

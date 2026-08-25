@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFirebaseAdmin } from "@/lib/firebaseAdmin";
 import { anonymizeName } from "@/lib/anonymize";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimiter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -418,6 +419,12 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateLimit = checkRateLimit(`reviews_post:${ip}`, { limit: 10, windowMs: 60000, keyPrefix: "reviews_post" });
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many review submissions. Please wait a moment." }, { status: 429 });
+    }
+
     const authHeader = req.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Authentication required to submit a review" }, { status: 401 });
@@ -465,9 +472,16 @@ export async function POST(req: NextRequest) {
     const reviewDocRef = db.collection("reviews").doc(uid);
     const existingDoc = await reviewDocRef.get();
 
-    // Check user beta_user flag in Firestore
+    // Check user account details in Firestore
     const userDoc = await db.collection("users").doc(uid).get();
-    const isBetaUser = Boolean(userDoc.exists && userDoc.data()?.beta_user);
+    const userData = userDoc.exists ? userDoc.data() : null;
+    const isBetaUser = Boolean(userData?.beta_user);
+    const isProUser = Boolean(userData?.isPro);
+    const wasPreviouslyApproved = Boolean(existingDoc.exists && existingDoc.data()?.status === "approved");
+
+    // Auto-approve only if beta user, Pro subscriber, or previously approved creator
+    const isAutoApproved = isBetaUser || isProUser || wasPreviouslyApproved;
+    const status: "approved" | "pending" = isAutoApproved ? "approved" : "pending";
 
     const reviewItem: ReviewItem = {
       id: uid,
@@ -478,7 +492,7 @@ export async function POST(req: NextRequest) {
       title: cleanTitle || "Great screenshot design studio",
       body: cleanBody,
       createdAt: existingDoc.exists ? (existingDoc.data()?.createdAt || Date.now()) : Date.now(),
-      status: "approved",
+      status,
       isVerifiedUser: true,
       beta_user: isBetaUser,
     };
@@ -488,7 +502,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       review: reviewItem,
-      message: "Thank you! Your verified review has been published.",
+      message: isAutoApproved
+        ? "Thank you! Your verified review has been published."
+        : "Thank you! Your review has been submitted for moderation.",
     });
   } catch (error: any) {
     console.error("[Reviews API] POST error:", error?.message || error);

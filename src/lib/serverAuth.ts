@@ -108,8 +108,20 @@ export async function verifyAuth(
     };
   }
 
-  // Resilient token validation fallback when Admin SDK service credentials are not configured
-  console.warn("[ServerAuth] Notice: Firebase Admin credentials not loaded. Using fallback JWT structure validator.");
+  // In production, require cryptographic verification via Admin SDK
+  if (process.env.NODE_ENV === "production") {
+    console.error("[ServerAuth] Firebase Admin Auth credentials not configured on server in production.");
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: "Authentication service unavailable. Missing Firebase Admin credentials." },
+        { status: 500 }
+      ),
+    };
+  }
+
+  // Development-only token validation fallback when Admin SDK service credentials are not configured locally
+  console.warn("[ServerAuth] Notice: Firebase Admin credentials not loaded. Using dev fallback JWT structure validator.");
   const validated = decodeAndValidateJwt(idToken);
   if (!validated) {
     return {

@@ -41,6 +41,7 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number | null>(null);
   const cachedCanvasesRef = useRef<HTMLCanvasElement[]>([]);
+  const isCancelledRef = useRef(false);
 
   const activeSet = screenSets.find((s) => s.id === selectedSet) || screenSets[0];
   const screens = useMemo(() => activeSet?.screens ?? [], [activeSet]);
@@ -197,6 +198,10 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
         const totalFrames = Math.round((totalDuration / 1000) * fpsRate);
 
         for (let frame = 0; frame <= totalFrames; frame++) {
+          if (isCancelledRef.current) {
+            recorder.stop();
+            return;
+          }
           const currentTime = (frame / fpsRate) * 1000;
           const currentIndex = Math.min(
             masterCanvases.length - 1,
@@ -523,6 +528,21 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
                 />
               </div>
               <p className="text-xs font-mono font-bold text-foreground">{progress}%</p>
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    isCancelledRef.current = true;
+                    setStep("config");
+                    toast.info("Export cancelled");
+                  }}
+                  className="border-border/60 text-muted-foreground hover:text-foreground text-xs"
+                >
+                  Cancel Export
+                </Button>
+              </div>
             </div>
           )}
 

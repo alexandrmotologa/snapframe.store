@@ -181,6 +181,18 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     }
   };
 
+  // ── Unsaved changes prompt on window navigation ──────────────────────────
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (saveStatus === "saving") {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [saveStatus]);
+
   // ── Auto-save thumbnail (debounced, 3 s after last change) ────────────────
   const generateThumbnail = useCallback(async () => {
     const firstSet = screenSets[0];
@@ -352,10 +364,83 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
         e.preventDefault();
         setShowShortcuts((prev) => !prev);
       }
+
+      // ── Tool Shortcuts (V, T, S, M) when no modifier is pressed ──
+      if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.key === "v" || e.key === "V") {
+          useEditorStore.getState().clearAllSelection();
+        } else if (e.key === "t" || e.key === "T") {
+          const set = getActiveSet();
+          const screen = getActiveScreen();
+          if (set && screen) {
+            e.preventDefault();
+            addLayer(set.id, screen.id, {
+              type: "text",
+              content: "Your Text Here",
+              x: Math.round(screen.width / 2 - 300),
+              y: Math.round(screen.height / 4),
+              width: 600,
+              height: 120,
+              fontSize: 80,
+              fontFamily: "Inter",
+              fontWeight: 700,
+              color: "#ffffff",
+              align: "center",
+              lineHeight: 1.2,
+              letterSpacing: 0,
+              rotation: 0,
+              opacity: 1,
+            } as any);
+            useEditorStore.getState().recordHistory();
+            toast.success("Added text layer");
+          }
+        } else if (e.key === "s" || e.key === "S") {
+          const set = getActiveSet();
+          const screen = getActiveScreen();
+          if (set && screen) {
+            e.preventDefault();
+            addLayer(set.id, screen.id, {
+              type: "shape",
+              shape: "rounded-rectangle",
+              x: Math.round(screen.width / 2 - 150),
+              y: Math.round(screen.height / 2 - 80),
+              width: 300,
+              height: 160,
+              fill: "#6366f1",
+              cornerRadius: 24,
+              rotation: 0,
+              opacity: 1,
+            } as any);
+            useEditorStore.getState().recordHistory();
+            toast.success("Added shape layer");
+          }
+        } else if (e.key === "m" || e.key === "M") {
+          const set = getActiveSet();
+          const screen = getActiveScreen();
+          if (set && screen) {
+            e.preventDefault();
+            addLayer(set.id, screen.id, {
+              type: "screenshot",
+              x: Math.round(screen.width / 2 - 500),
+              y: Math.round(screen.height / 2 - 900),
+              width: 1000,
+              height: 1800,
+              rotation: 0,
+              opacity: 1,
+              objectFit: "cover",
+              cornerRadius: 55,
+              showDeviceFrame: true,
+              label: "Drop your screenshot here",
+            } as any);
+            useEditorStore.getState().recordHistory();
+            toast.success("Added device mockup layer");
+          }
+        }
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, getActiveSet, getActiveLayer, getActiveScreen]);
+  }, [zoom, activeLayerId, activeSetId, activeScreenId, undo, redo, setZoom, deleteLayer, duplicateLayer, updateLayer, setActiveLayer, addLayer, getActiveSet, getActiveLayer, getActiveScreen]);
 
 
 

@@ -35,7 +35,7 @@ export const ourFileRouter = {
             if (adminAuth) {
               const decoded = await adminAuth.verifyIdToken(token);
               userId = decoded.uid;
-            } else {
+            } else if (process.env.NODE_ENV !== "production") {
               const parts = token.split(".");
               if (parts.length === 3) {
                 const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));

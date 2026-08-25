@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Background } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

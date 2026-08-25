@@ -212,7 +212,9 @@ function formatFeatureName(rawFeature?: string): string {
         paddleCustomerId: userData.paddleCustomerId || null,
         paddleSubscriptionId: userData.paddleSubscriptionId || null,
         createdAt: userData.createdAt || Date.now(),
-        aiCredits: isPro ? (typeof userData.aiCredits === "number" ? userData.aiCredits : 9999) : Math.min(typeof userData.aiCredits === "number" ? userData.aiCredits : 3, 3),
+        aiCredits: isPro
+          ? (typeof userData.aiCredits === "number" ? userData.aiCredits : 9999)
+          : (typeof userData.aiCredits === "number" ? userData.aiCredits : 3),
         usedAiCredits: typeof userData.usedAiCredits === "number" ? userData.usedAiCredits : 0,
         canceledAt: userData.canceledAt || null,
         cancelReason: userData.cancelReason || null,
@@ -252,6 +254,15 @@ export async function POST(req: NextRequest) {
     const { db: adminDb, isConfigured } = getFirebaseAdmin();
 
     if (action === "activate_pro") {
+      // In production, direct client activation without signed Paddle Webhook is strictly forbidden
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          { error: "Direct client Pro activation is disabled. Pro subscriptions are provisioned automatically via verified Paddle payment webhooks." },
+          { status: 403 }
+        );
+      }
+
+      // Development / test environment only:
       const isAnnual = plan === "annual" || plan === "pro-annual";
       const durationMs = isAnnual ? 365 * 86400000 : 30 * 86400000;
       const now = Date.now();

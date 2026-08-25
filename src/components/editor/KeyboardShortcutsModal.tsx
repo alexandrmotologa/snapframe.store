@@ -17,6 +17,15 @@ interface Props {
 
 const SHORTCUT_GROUPS = [
   {
+    name: "Quick Tool Creation",
+    shortcuts: [
+      { key: "T", label: "Add Text Layer" },
+      { key: "S", label: "Add Shape Layer" },
+      { key: "M", label: "Add Device Mockup Layer" },
+      { key: "V / Esc", label: "Select Mode / Deselect" },
+    ],
+  },
+  {
     name: "General & Canvas",
     shortcuts: [
       { key: "Ctrl + Z", label: "Undo last change" },
@@ -24,7 +33,7 @@ const SHORTCUT_GROUPS = [
       { key: "Ctrl + =", label: "Zoom In" },
       { key: "Ctrl + -", label: "Zoom Out" },
       { key: "Ctrl + 0", label: "Reset Zoom (Fit)" },
-      { key: "Esc", label: "Deselect layer" },
+      { key: "?", label: "Show Keyboard Shortcuts" },
     ],
   },
   {
