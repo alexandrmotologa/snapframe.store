@@ -60,8 +60,10 @@ If a provider encounters a **Rate Limit (429)**, timeout, or quota exhaustion, t
   - `b2b`: Professional, enterprise credibility (e.g. "Bank-Grade Security").
 - **Actions:**
   - `rewrite`: Rewrites text in selected tone.
-  - `shorten`: Condenses text guaranteed to fit under 30 characters for mobile canvas widths.
-  - `punchy`: Increases emotional appeal and CTA power.
+  - `shorten`: Condenses text guaranteed to fit under 28–30 characters for mobile canvas widths.
+  - `emojis`: Contextual emoji insertion for click-through rate optimization.
+  - `benefit`: Conversion from technical feature description to customer-centric benefit proposition.
+  - `punchy`: Increases emotional appeal and CTA power with active verbs.
   - `ideas`: Generates 5 distinct headline variations with character length meters.
 
 ### 4️⃣ AI Magic Theme Matcher (`/api/ai/palette`)
