@@ -485,21 +485,23 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-transparent border border-emerald-500/30 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                    <Zap className="w-4 h-4" />
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-transparent border border-emerald-500/30 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 shrink-0">
+                    <Zap className="w-4 h-4 shrink-0" />
                     <span>With SnapFrame Pro:</span>
                   </span>
-                  <span className="text-xs font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded">
+                  <span className="text-xs font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2.5 py-0.5 rounded-md border border-emerald-500/30 shrink-0">
                     45 SECONDS
                   </span>
                 </div>
-                <div className="flex items-baseline justify-between pt-1 border-t border-emerald-500/20">
-                  <span className="text-xs text-muted-foreground">Estimated Freelancer Savings:</span>
-                  <strong className="text-xl font-black text-foreground font-mono">
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-emerald-500/20">
+                  <span className="text-xs text-muted-foreground truncate">
+                    Estimated Annual Savings:
+                  </span>
+                  <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap shrink-0">
                     Save ${netSavings.toLocaleString()} / yr
-                  </strong>
+                  </span>
                 </div>
               </div>
             </div>
