@@ -31,6 +31,7 @@ import { isUserAdmin } from "@/lib/adminAuth";
 import { toast } from "@/lib/store/toastStore";
 import { CustomTemplate } from "@/lib/customTemplates";
 import { cn } from "@/lib/utils";
+import { RatingStars } from "@/components/ui/RatingStars";
 
 interface AdminReview {
   id: string;
@@ -453,16 +454,11 @@ export default function AdminConsolePage() {
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-0.5 text-amber-500">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={cn(
-                                "w-4 h-4",
-                                i < rev.rating ? "fill-amber-500" : "text-muted-foreground/30"
-                              )}
-                            />
-                          ))}
+                        <div className="flex items-center gap-1.5 text-amber-500">
+                          <RatingStars rating={rev.rating || 5} size="w-4 h-4" />
+                          <span className="text-xs font-mono font-bold text-amber-500/90 ml-0.5">
+                            {Number(rev.rating || 5).toFixed(1)}
+                          </span>
                         </div>
                         <h4 className="text-sm font-bold text-foreground">{rev.title}</h4>
                       </div>

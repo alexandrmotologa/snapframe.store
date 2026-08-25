@@ -35,6 +35,7 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { getIdTokenSafe } from "@/lib/firebase";
 import { anonymizeName } from "@/lib/anonymize";
+import { RatingStars } from "@/components/ui/RatingStars";
 import {
   Dialog,
   DialogContent,
@@ -1197,37 +1198,43 @@ export default function AccountPage() {
                     </div>
 
                     {/* Rating Selector */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-foreground flex items-center justify-between">
-                        <span>Overall Rating</span>
-                        <span className="text-xs text-amber-500 font-semibold">
-                          {reviewRating} of 5 Stars
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-foreground">Overall Rating</label>
+                        <span className="text-xs text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                          {Number(reviewRating).toFixed(1)} / 5.0 Stars
                         </span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        {[1, 2, 3, 4, 5].map((star) => {
-                          const isFilled = (hoverRating || reviewRating) >= star;
-                          return (
-                            <button
-                              key={star}
-                              type="button"
-                              onMouseEnter={() => setHoverRating(star)}
-                              onMouseLeave={() => setHoverRating(0)}
-                              onClick={() => setReviewRating(star)}
-                              className="p-2 rounded-xl hover:bg-secondary transition-all cursor-pointer group"
-                              aria-label={`Rate ${star} star`}
-                            >
-                              <Star
-                                className={`w-6 h-6 transition-transform group-hover:scale-110 ${
-                                  isFilled
-                                    ? "text-amber-500 fill-amber-500"
-                                    : "text-muted-foreground/40"
-                                }`}
-                              />
-                            </button>
-                          );
-                        })}
                       </div>
+
+                      <div className="flex flex-wrap items-center gap-4 p-3 rounded-2xl bg-secondary/50 border border-border/60">
+                        <RatingStars
+                          rating={reviewRating}
+                          size="w-7 h-7"
+                          interactive
+                          onRatingChange={(newR) => setReviewRating(newR)}
+                        />
+
+                        {/* Quick Half-Star Preset Chips */}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {[3.0, 3.5, 4.0, 4.5, 5.0].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setReviewRating(preset)}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                                reviewRating === preset
+                                  ? "bg-amber-500 text-amber-950 font-bold shadow-xs scale-105"
+                                  : "bg-secondary hover:bg-secondary/80 text-muted-foreground hover:text-foreground border border-border/50"
+                              }`}
+                            >
+                              {preset.toFixed(1)} ★
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        Hover on the left or right half of any star to select half (0.5) ratings.
+                      </p>
                     </div>
 
                     {/* Role Selector */}
@@ -1341,10 +1348,11 @@ export default function AccountPage() {
                       </div>
 
                       <div className="space-y-3 pt-2">
-                        <div className="flex items-center gap-1 text-amber-500">
-                          {[...Array(reviewRating)].map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
-                          ))}
+                        <div className="flex items-center gap-1.5 text-amber-500">
+                          <RatingStars rating={reviewRating} size="w-3.5 h-3.5" />
+                          <span className="text-[11px] font-bold text-amber-500/90 ml-0.5">
+                            {Number(reviewRating).toFixed(1)}
+                          </span>
                         </div>
 
                         {reviewTitle ? (

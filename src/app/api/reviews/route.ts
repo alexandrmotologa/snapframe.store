@@ -81,7 +81,7 @@ export const SEED_COMMUNITY_USERS: SeedUser[] = [
     beta_user: true,
     review: {
       authorRole: "Freelance UI Designer",
-      rating: 5,
+      rating: 4.5,
       title: "The panoramic continuous frames are brilliant",
       body: "My clients love split-device layouts across two slides. SnapFrame aligns the canvas offset automatically with zero clipping issues. The 3D device renders look super crisp.",
     },
@@ -103,7 +103,7 @@ export const SEED_COMMUNITY_USERS: SeedUser[] = [
     beta_user: true,
     review: {
       authorRole: "Flutter Developer @ IndieSquad",
-      rating: 5,
+      rating: 5.0,
       title: "No paywall to preview & Fastlane export is great",
       body: "I love that you can test everything with Ctrl+V before paying anything. The organized Fastlane folder structure made our release pipeline so much easier.",
     },
@@ -126,7 +126,7 @@ export const SEED_COMMUNITY_USERS: SeedUser[] = [
     beta_user: true,
     review: {
       authorRole: "Solo SaaS Founder",
-      rating: 5,
+      rating: 4.5,
       title: "Localized our App Store listing in seconds",
       body: "We translated all 5 screenshot slides to German and Spanish in one click with matching typography. Saved us from delaying our EU launch.",
     },
@@ -148,7 +148,7 @@ export const SEED_COMMUNITY_USERS: SeedUser[] = [
     beta_user: true,
     review: {
       authorRole: "SwiftUI Creator",
-      rating: 5,
+      rating: 5.0,
       title: "Makes screenshots look like official Apple keynotes",
       body: "The titanium bezels and soft shadows make raw simulator captures look incredible. Several indie devs on X asked what tool I used.",
     },
@@ -171,7 +171,7 @@ export const SEED_COMMUNITY_USERS: SeedUser[] = [
     beta_user: false,
     review: {
       authorRole: "Android Developer",
-      rating: 5,
+      rating: 4.0,
       title: "Actually gets Google Play tablet sizes right",
       body: "Most tools only care about iPhone. SnapFrame gave me clean, uncompressed sets for both phones and tablets without stretched borders.",
     },
@@ -363,7 +363,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         reviews: SEED_APPROVED_REVIEWS,
         totalCount: SEED_APPROVED_REVIEWS.length,
-        averageRating: 5.0,
+        averageRating: 4.8,
       });
     }
 
@@ -381,7 +381,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         reviews: SEED_APPROVED_REVIEWS,
         totalCount: SEED_APPROVED_REVIEWS.length,
-        averageRating: 5.0,
+        averageRating: 4.8,
       });
     }
 
@@ -407,7 +407,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       reviews: SEED_APPROVED_REVIEWS,
       totalCount: SEED_APPROVED_REVIEWS.length,
-      averageRating: 5.0,
+      averageRating: 4.8,
     });
   }
 }
@@ -444,8 +444,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { rating, title, reviewText, role } = body;
 
-    // Validation
-    const numericRating = Math.min(5, Math.max(1, Math.round(Number(rating) || 5)));
+    // Validation (supports 0.5 half-star increments: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0)
+    const rawRating = Number(rating) || 5;
+    const numericRating = Math.min(5, Math.max(1, Math.round(rawRating * 2) / 2));
     const cleanTitle = String(title || "").trim().slice(0, 120);
     const cleanBody = String(reviewText || "").trim().slice(0, 1000);
     const cleanRole = String(role || "Verified Creator").trim().slice(0, 60);

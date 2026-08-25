@@ -88,7 +88,7 @@ export async function PATCH(req: NextRequest) {
     if (beta_user !== undefined) updateData.beta_user = Boolean(beta_user);
     if (title !== undefined) updateData.title = title;
     if (reviewBody !== undefined) updateData.body = reviewBody;
-    if (rating !== undefined) updateData.rating = Number(rating);
+    if (rating !== undefined) updateData.rating = Math.min(5, Math.max(1, Math.round(Number(rating) * 2) / 2));
     if (authorRole !== undefined) updateData.authorRole = authorRole;
 
     await db.collection("reviews").doc(id).set(updateData, { merge: true });

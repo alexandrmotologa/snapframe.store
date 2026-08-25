@@ -35,6 +35,7 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { BrandHeroIcon } from "@/components/ui/BrandHeroIcon";
 import { GithubIcon } from "@/components/ui/GithubIcon";
+import { RatingStars } from "@/components/ui/RatingStars";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -525,7 +526,7 @@ export default function LandingPage() {
                         id: "user-beta-marcus-01",
                         authorAnonymized: "Mar***** Lin*****",
                         authorRole: "Indie iOS Dev · 2 Apps Live",
-                        rating: 5,
+                        rating: 5.0,
                         title: "Saved me hours of Figma tweaking",
                         body: "Used to spend half my Sunday exporting 6.9\" and 6.5\" frames in Figma. With SnapFrame, I dropped my raw screenshots in and had all localized ZIP bundles ready in 5 minutes.",
                         beta_user: true,
@@ -534,7 +535,7 @@ export default function LandingPage() {
                         id: "user-beta-sarah-02",
                         authorAnonymized: "Sar***** Kim*****",
                         authorRole: "Freelance UI Designer",
-                        rating: 5,
+                        rating: 4.5,
                         title: "The panoramic continuous frames are brilliant",
                         body: "My clients love split-device layouts across two slides. SnapFrame aligns the canvas offset automatically with zero clipping issues. The 3D device renders look super crisp.",
                         beta_user: true,
@@ -543,7 +544,7 @@ export default function LandingPage() {
                         id: "user-beta-alex-03",
                         authorAnonymized: "Ale***** Rod*****",
                         authorRole: "Flutter Developer @ IndieSquad",
-                        rating: 5,
+                        rating: 5.0,
                         title: "No paywall to preview & Fastlane export is great",
                         body: "I love that you can test everything with Ctrl+V before paying anything. The organized Fastlane folder structure made our release pipeline so much easier.",
                         beta_user: true,
@@ -552,7 +553,7 @@ export default function LandingPage() {
                         id: "user-beta-elena-04",
                         authorAnonymized: "Ele***** Van*****",
                         authorRole: "Solo SaaS Founder",
-                        rating: 5,
+                        rating: 4.5,
                         title: "Localized our App Store listing in seconds",
                         body: "We translated all 5 screenshot slides to German and Spanish in one click with matching typography. Saved us from delaying our EU launch.",
                         beta_user: true,
@@ -561,7 +562,7 @@ export default function LandingPage() {
                         id: "user-beta-daisuke-05",
                         authorAnonymized: "Dai***** Tan*****",
                         authorRole: "SwiftUI Creator",
-                        rating: 5,
+                        rating: 5.0,
                         title: "Makes screenshots look like official Apple keynotes",
                         body: "The titanium bezels and soft shadows make raw simulator captures look incredible. Several indie devs on X asked what tool I used.",
                         beta_user: true,
@@ -570,7 +571,7 @@ export default function LandingPage() {
                         id: "user-mateo-06",
                         authorAnonymized: "Mat***** Sil*****",
                         authorRole: "Android Developer",
-                        rating: 5,
+                        rating: 4.0,
                         title: "Actually gets Google Play tablet sizes right",
                         body: "Most tools only care about iPhone. SnapFrame gave me clean, uncompressed sets for both phones and tablets without stretched borders.",
                         beta_user: false,
@@ -579,7 +580,7 @@ export default function LandingPage() {
                         id: "user-liam-07",
                         authorAnonymized: "Lia***** O'C*****",
                         authorRole: "ASO Consultant",
-                        rating: 5,
+                        rating: 5.0,
                         title: "Perfect for rapid A/B screenshot testing",
                         body: "We duplicate projects, tweak headlines or gradients, and download ready-to-upload PNGs in 30 seconds. Great utility for growth experiments.",
                         beta_user: false,
@@ -588,7 +589,7 @@ export default function LandingPage() {
                         id: "user-amira-08",
                         authorAnonymized: "Ami***** El-*****",
                         authorRole: "Product Lead",
-                        rating: 5,
+                        rating: 5.0,
                         title: "Zero learning curve, flawless submission",
                         body: "Our marketing intern created our full App Store set on her first morning. Preset store sizes ensure Connect never rejects the uploads.",
                         beta_user: false,
@@ -613,10 +614,11 @@ export default function LandingPage() {
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <div className="flex items-center gap-1 text-amber-500">
-                            {[...Array(rev.rating || 5)].map((_, i) => (
-                              <Star key={i} className="w-3.5 h-3.5 fill-amber-500" />
-                            ))}
+                          <div className="flex items-center gap-1.5 text-amber-500">
+                            <RatingStars rating={rev.rating || 5} size="w-3.5 h-3.5" />
+                            <span className="text-[11px] font-bold text-amber-500/90 ml-0.5">
+                              {Number(rev.rating || 5).toFixed(1)}
+                            </span>
                           </div>
 
                           <div className="flex items-center gap-1.5">

@@ -118,7 +118,7 @@ const jsonLd = {
       },
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue: "4.9",
+        ratingValue: "4.8",
         reviewCount: "8",
         bestRating: "5",
         worstRating: "1",
@@ -132,7 +132,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "5.0",
           },
           reviewBody: "Used to spend half my Sunday exporting 6.9\" and 6.5\" frames in Figma. With SnapFrame, I dropped my raw screenshots in and had all localized ZIP bundles ready in 5 minutes.",
         },
@@ -144,7 +144,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "4.5",
           },
           reviewBody: "My clients love split-device layouts across two slides. SnapFrame aligns the canvas offset automatically with zero clipping issues. The 3D device renders look super crisp.",
         },
@@ -156,7 +156,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "5.0",
           },
           reviewBody: "I love that you can test everything with Ctrl+V before paying anything. The organized Fastlane folder structure made our release pipeline so much easier.",
         },
@@ -168,7 +168,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "4.5",
           },
           reviewBody: "We translated all 5 screenshot slides to German and Spanish in one click with matching typography. Saved us from delaying our EU launch.",
         },
@@ -180,7 +180,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "5.0",
           },
           reviewBody: "The titanium bezels and soft shadows make raw simulator captures look incredible. Several indie devs on X asked what tool I used.",
         },
@@ -192,7 +192,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "4.0",
           },
           reviewBody: "Most tools only care about iPhone. SnapFrame gave me clean, uncompressed sets for both phones and tablets without stretched borders.",
         },
@@ -204,7 +204,7 @@ const jsonLd = {
           },
           reviewRating: {
             "@type": "Rating",
-            ratingValue: "5",
+            ratingValue: "5.0",
           },
           reviewBody: "We duplicate projects, tweak headlines or gradients, and download ready-to-upload PNGs in 30 seconds. Great utility for growth experiments.",
         },
