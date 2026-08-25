@@ -324,6 +324,22 @@ async function ensureSeedDataInFirestore(db: import("firebase-admin/firestore").
   }
 }
 
+interface ReviewsCache {
+  payload: {
+    reviews: ReviewItem[];
+    totalCount: number;
+    averageRating: number;
+  };
+  cachedAt: number;
+}
+
+let serverReviewsCache: ReviewsCache | null = null;
+const SERVER_CACHE_TTL_MS = 60 * 1000; // 60 seconds cache for public list
+
+export function invalidateReviewsCache() {
+  serverReviewsCache = null;
+}
+
 /**
  * GET /api/reviews
  * Returns all approved reviews from Firestore, with fallback to seed reviews.
@@ -359,16 +375,31 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ review: { ...data, id: userReviewDoc.id } });
     }
 
+    // Serve from server cache if warm
+    if (serverReviewsCache && Date.now() - serverReviewsCache.cachedAt < SERVER_CACHE_TTL_MS) {
+      return NextResponse.json(serverReviewsCache.payload, {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+          "X-Cache-Status": "HIT",
+        },
+      });
+    }
+
     const fallbackAverage = Number(
       (SEED_APPROVED_REVIEWS.reduce((sum, r) => sum + (r.rating || 5), 0) / SEED_APPROVED_REVIEWS.length).toFixed(1)
     );
 
     // Public list: Approved reviews
     if (!db) {
-      return NextResponse.json({
+      const fallbackPayload = {
         reviews: SEED_APPROVED_REVIEWS,
         totalCount: SEED_APPROVED_REVIEWS.length,
         averageRating: fallbackAverage,
+      };
+      return NextResponse.json(fallbackPayload, {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
       });
     }
 
@@ -383,10 +414,15 @@ export async function GET(req: NextRequest) {
       .get();
 
     if (snapshot.empty) {
-      return NextResponse.json({
+      const fallbackPayload = {
         reviews: SEED_APPROVED_REVIEWS,
         totalCount: SEED_APPROVED_REVIEWS.length,
         averageRating: fallbackAverage,
+      };
+      return NextResponse.json(fallbackPayload, {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
       });
     }
 
@@ -401,10 +437,22 @@ export async function GET(req: NextRequest) {
 
     const averageRating = Number((totalScore / reviews.length).toFixed(1));
 
-    return NextResponse.json({
+    const resultPayload = {
       reviews,
       totalCount: reviews.length,
       averageRating,
+    };
+
+    serverReviewsCache = {
+      payload: resultPayload,
+      cachedAt: Date.now(),
+    };
+
+    return NextResponse.json(resultPayload, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        "X-Cache-Status": "MISS",
+      },
     });
   } catch (error: any) {
     console.error("[Reviews API] GET error:", error?.message || error);
@@ -505,6 +553,9 @@ export async function POST(req: NextRequest) {
     };
 
     await reviewDocRef.set(reviewItem, { merge: true });
+
+    // Invalidate server cache so new approved review appears immediately
+    serverReviewsCache = null;
 
     return NextResponse.json({
       success: true,

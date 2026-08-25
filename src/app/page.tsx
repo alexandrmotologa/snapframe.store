@@ -37,32 +37,87 @@ import { BrandHeroIcon } from "@/components/ui/BrandHeroIcon";
 import { GithubIcon } from "@/components/ui/GithubIcon";
 import { RatingStars } from "@/components/ui/RatingStars";
 
+interface ReviewItem {
+  id: string;
+  authorAnonymized: string;
+  authorRole: string;
+  rating: number;
+  title: string;
+  body: string;
+  status?: "pending" | "approved" | "rejected";
+  beta_user?: boolean;
+}
+
+const REVIEWS_CLIENT_CACHE_KEY = "snapframe_reviews_cache_v1";
+
 export default function LandingPage() {
   const router = useRouter();
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const { user, setAuthModalOpen } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<ReviewItem[] | null>(null);
   const [apiAverageRating, setApiAverageRating] = useState<number | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   useEffect(() => {
+    // 1. Instant Cache Hydration (0ms Latency on Repeat Visits)
+    try {
+      const cached = localStorage.getItem(REVIEWS_CLIENT_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.reviews)) {
+          setReviews(parsed.reviews);
+          if (typeof parsed.averageRating === "number") {
+            setApiAverageRating(parsed.averageRating);
+          }
+        }
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+
+    // 2. Background Revalidation from Server / Firestore
+    let isMounted = true;
     fetch("/api/reviews")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
+        if (!isMounted) return;
         if (data?.reviews && Array.isArray(data.reviews)) {
           setReviews(data.reviews);
+          try {
+            localStorage.setItem(
+              REVIEWS_CLIENT_CACHE_KEY,
+              JSON.stringify({
+                reviews: data.reviews,
+                averageRating: data.averageRating,
+                updatedAt: Date.now(),
+              })
+            );
+          } catch {
+            // Ignore
+          }
+        } else {
+          setReviews((prev) => prev || []);
         }
         if (typeof data?.averageRating === "number") {
           setApiAverageRating(data.averageRating);
         }
       })
-      .catch((err) => console.error("Failed to load reviews:", err));
+      .catch((err) => {
+        console.error("Failed to load reviews:", err);
+        if (isMounted) {
+          setReviews((prev) => prev || []);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Filter only approved reviews for rating metrics
   const approvedReviews = useMemo(() => {
+    if (!reviews) return [];
     return reviews.filter((r) => r.status === "approved" || r.status === undefined);
   }, [reviews]);
 
@@ -75,18 +130,17 @@ export default function LandingPage() {
     if (apiAverageRating !== null) {
       return apiAverageRating.toFixed(1);
     }
-    return "4.9";
+    return null;
   }, [approvedReviews, apiAverageRating]);
 
   // Automatic gentle carousel rotation (every 4 seconds)
   useEffect(() => {
-    if (isCarouselPaused) return;
-    const totalItems = reviews.length || 8;
+    if (isCarouselPaused || approvedReviews.length === 0) return;
     const timer = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % totalItems);
+      setCarouselIndex((prev) => (prev + 1) % approvedReviews.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [isCarouselPaused, reviews.length]);
+  }, [isCarouselPaused, approvedReviews.length]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
@@ -222,7 +276,7 @@ export default function LandingPage() {
                   <span>Google Play Sizes Guide (2026)</span>
                   <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                 </Link>
-                {user ? (
+                {mounted && user ? (
                   <Link
                     href="/projects"
                     onClick={() => setMobileMenuOpen(false)}
@@ -450,7 +504,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Card 5: Store & Tablet Simulator */}
             <div className="p-6 rounded-3xl bg-card border border-border/70 dark:border-border/60 space-y-3 shadow-sm hover:shadow-md dark:shadow-xs hover:border-primary/50 dark:hover:border-primary/40 transition-all duration-300">
               <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 shadow-xs">
                 <Smartphone className="w-5 h-5" />
@@ -461,7 +514,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Card 6: 4K Export & Fastlane */}
             <div className="p-6 rounded-3xl bg-card border border-border/70 dark:border-border/60 space-y-3 shadow-sm hover:shadow-md dark:shadow-xs hover:border-primary/50 dark:hover:border-primary/40 transition-all duration-300">
               <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 shadow-xs">
                 <Zap className="w-5 h-5" />
@@ -486,7 +538,11 @@ export default function LandingPage() {
                 Built by developers, for developers
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Real feedback from {approvedReviews.length || 8} verified mobile creators who shipped App Store &amp; Google Play updates with SnapFrame.
+                {reviews === null ? (
+                  "Loading verified creator reviews from App Store & Google Play developers..."
+                ) : (
+                  `Real feedback from ${approvedReviews.length} verified mobile creators who shipped App Store & Google Play updates with SnapFrame.`
+                )}
               </p>
             </div>
 
@@ -496,7 +552,7 @@ export default function LandingPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const total = reviews.length || 8;
+                    const total = approvedReviews.length || 1;
                     setCarouselIndex((prev) => (prev - 1 + total) % total);
                   }}
                   className="w-9 h-9 rounded-xl border border-border/70 bg-card hover:bg-secondary text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
@@ -507,7 +563,7 @@ export default function LandingPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    const total = reviews.length || 8;
+                    const total = approvedReviews.length || 1;
                     setCarouselIndex((prev) => (prev + 1) % total);
                   }}
                   className="w-9 h-9 rounded-xl border border-border/70 bg-card hover:bg-secondary text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
@@ -521,7 +577,7 @@ export default function LandingPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  if (user) {
+                  if (mounted && user) {
                     router.push("/account");
                   } else {
                     setAuthModalOpen(true);
@@ -541,170 +597,120 @@ export default function LandingPage() {
             onMouseEnter={() => setIsCarouselPaused(true)}
             onMouseLeave={() => setIsCarouselPaused(false)}
           >
-            {(() => {
-              const allReviews =
-                reviews.length > 0
-                  ? reviews
-                  : [
-                      {
-                        id: "user-beta-marcus-01",
-                        authorAnonymized: "Mar***** Lin*****",
-                        authorRole: "Indie iOS Dev · 2 Apps Live",
-                        rating: 5.0,
-                        title: "Saved me hours of Figma tweaking",
-                        body: "Used to spend half my Sunday exporting 6.9\" and 6.5\" frames in Figma. With SnapFrame, I dropped my raw screenshots in and had all localized ZIP bundles ready in 5 minutes.",
-                        beta_user: true,
-                      },
-                      {
-                        id: "user-beta-sarah-02",
-                        authorAnonymized: "Sar***** Kim*****",
-                        authorRole: "Freelance UI Designer",
-                        rating: 4.5,
-                        title: "The panoramic continuous frames are brilliant",
-                        body: "My clients love split-device layouts across two slides. SnapFrame aligns the canvas offset automatically with zero clipping issues. The 3D device renders look super crisp.",
-                        beta_user: true,
-                      },
-                      {
-                        id: "user-beta-alex-03",
-                        authorAnonymized: "Ale***** Rod*****",
-                        authorRole: "Flutter Developer @ IndieSquad",
-                        rating: 5.0,
-                        title: "No paywall to preview & Fastlane export is great",
-                        body: "I love that you can test everything with Ctrl+V before paying anything. The organized Fastlane folder structure made our release pipeline so much easier.",
-                        beta_user: true,
-                      },
-                      {
-                        id: "user-beta-elena-04",
-                        authorAnonymized: "Ele***** Van*****",
-                        authorRole: "Solo SaaS Founder",
-                        rating: 4.5,
-                        title: "Localized our App Store listing in seconds",
-                        body: "We translated all 5 screenshot slides to German and Spanish in one click with matching typography. Saved us from delaying our EU launch.",
-                        beta_user: true,
-                      },
-                      {
-                        id: "user-beta-daisuke-05",
-                        authorAnonymized: "Dai***** Tan*****",
-                        authorRole: "SwiftUI Creator",
-                        rating: 5.0,
-                        title: "Makes screenshots look like official Apple keynotes",
-                        body: "The titanium bezels and soft shadows make raw simulator captures look incredible. Several indie devs on X asked what tool I used.",
-                        beta_user: true,
-                      },
-                      {
-                        id: "user-mateo-06",
-                        authorAnonymized: "Mat***** Sil*****",
-                        authorRole: "Android Developer",
-                        rating: 4.0,
-                        title: "Actually gets Google Play tablet sizes right",
-                        body: "Most tools only care about iPhone. SnapFrame gave me clean, uncompressed sets for both phones and tablets without stretched borders.",
-                        beta_user: false,
-                      },
-                      {
-                        id: "user-liam-07",
-                        authorAnonymized: "Lia***** O'C*****",
-                        authorRole: "ASO Consultant",
-                        rating: 5.0,
-                        title: "Perfect for rapid A/B screenshot testing",
-                        body: "We duplicate projects, tweak headlines or gradients, and download ready-to-upload PNGs in 30 seconds. Great utility for growth experiments.",
-                        beta_user: false,
-                      },
-                      {
-                        id: "user-amira-08",
-                        authorAnonymized: "Ami***** El-*****",
-                        authorRole: "Product Lead",
-                        rating: 5.0,
-                        title: "Zero learning curve, flawless submission",
-                        body: "Our marketing intern created our full App Store set on her first morning. Preset store sizes ensure Connect never rejects the uploads.",
-                        beta_user: false,
-                      },
-                    ];
+            {reviews === null ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="p-6 rounded-3xl bg-card border border-border/50 space-y-4 animate-pulse h-64 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="w-24 h-4 bg-muted/60 rounded-md" />
+                        <div className="w-16 h-4 bg-muted/60 rounded-full" />
+                      </div>
+                      <div className="w-3/4 h-4 bg-muted/60 rounded-md mt-2" />
+                      <div className="w-full h-12 bg-muted/40 rounded-md" />
+                    </div>
+                    <div className="pt-3 border-t border-border/40 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-muted/60" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="w-20 h-3 bg-muted/60 rounded-md" />
+                        <div className="w-28 h-2.5 bg-muted/40 rounded-md" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : approvedReviews.length > 0 ? (
+              <>
+                {(() => {
+                  const visibleItems = [0, 1, 2].map(
+                    (offset) => approvedReviews[(carouselIndex + offset) % approvedReviews.length]
+                  );
 
-              // Pick 3 sliding window items based on carouselIndex
-              const visibleItems = [0, 1, 2].map(
-                (offset) => allReviews[(carouselIndex + offset) % allReviews.length]
-              );
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {visibleItems.map((rev, idx) => (
+                        <motion.div
+                          key={`${rev.id}-${carouselIndex}-${idx}`}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.45, ease: "easeOut" }}
+                          className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-sm hover:shadow-md flex flex-col justify-between hover:border-border transition-all relative overflow-hidden group"
+                        >
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <div className="flex items-center gap-1.5 text-amber-500">
+                                <RatingStars rating={rev.rating || 5} size="w-3.5 h-3.5" />
+                                <span className="text-[11px] font-bold text-amber-500/90 ml-0.5">
+                                  {Number(rev.rating || 5).toFixed(1)}
+                                </span>
+                              </div>
 
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {visibleItems.map((rev, idx) => (
-                    <motion.div
-                      key={`${rev.id}-${carouselIndex}-${idx}`}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.45, ease: "easeOut" }}
-                      className="p-6 rounded-3xl bg-card border border-border/70 space-y-4 shadow-sm hover:shadow-md flex flex-col justify-between hover:border-border transition-all relative overflow-hidden group"
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <div className="flex items-center gap-1.5 text-amber-500">
-                            <RatingStars rating={rev.rating || 5} size="w-3.5 h-3.5" />
-                            <span className="text-[11px] font-bold text-amber-500/90 ml-0.5">
-                              {Number(rev.rating || 5).toFixed(1)}
-                            </span>
+                              <div className="flex items-center gap-1.5">
+                                {rev.beta_user && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-2xs">
+                                    <Rocket className="w-2.5 h-2.5 text-amber-500" />
+                                    <span>Beta Tester</span>
+                                  </span>
+                                )}
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                  <CheckCircle2 className="w-2.5 h-2.5" />
+                                  <span>Verified</span>
+                                </span>
+                              </div>
+                            </div>
+
+                            {rev.title ? (
+                              <h4 className="text-xs font-bold text-foreground">
+                                &ldquo;{rev.title}&rdquo;
+                              </h4>
+                            ) : null}
+
+                            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic line-clamp-4">
+                              &ldquo;{rev.body}&rdquo;
+                            </p>
                           </div>
 
-                          <div className="flex items-center gap-1.5">
-                            {rev.beta_user && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-2xs">
-                                <Rocket className="w-2.5 h-2.5 text-amber-500" />
-                                <span>Beta Tester</span>
-                              </span>
-                            )}
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              <CheckCircle2 className="w-2.5 h-2.5" />
-                              <span>Verified</span>
-                            </span>
+                          <div className="pt-3 border-t border-border/40 flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary/30 to-indigo-500/20 text-primary font-bold text-xs flex items-center justify-center shrink-0 border border-primary/20">
+                              {rev.authorAnonymized ? rev.authorAnonymized.slice(0, 2).toUpperCase() : "CR"}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-foreground truncate font-mono">
+                                {rev.authorAnonymized || "Verified User"}
+                              </h4>
+                              <p className="text-[11px] text-muted-foreground truncate">
+                                {rev.authorRole || "App Creator"}
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  );
+                })()}
 
-                        {rev.title ? (
-                          <h4 className="text-xs font-bold text-foreground">
-                            &ldquo;{rev.title}&rdquo;
-                          </h4>
-                        ) : null}
-
-                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic line-clamp-4">
-                          &ldquo;{rev.body}&rdquo;
-                        </p>
-                      </div>
-
-                      <div className="pt-3 border-t border-border/40 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary/30 to-indigo-500/20 text-primary font-bold text-xs flex items-center justify-center shrink-0 border border-primary/20">
-                          {rev.authorAnonymized ? rev.authorAnonymized.slice(0, 2).toUpperCase() : "CR"}
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-foreground truncate font-mono">
-                            {rev.authorAnonymized || "Verified User"}
-                          </h4>
-                          <p className="text-[11px] text-muted-foreground truncate">
-                            {rev.authorRole || "App Creator"}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
+                {/* Pagination Dots */}
+                <div className="flex items-center justify-center gap-1.5 pt-4">
+                  {approvedReviews.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      type="button"
+                      onClick={() => setCarouselIndex(dotIdx)}
+                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                        carouselIndex === dotIdx
+                          ? "w-6 bg-primary"
+                          : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                      }`}
+                      aria-label={`Jump to review ${dotIdx + 1}`}
+                    />
                   ))}
                 </div>
-              );
-            })()}
-
-            {/* Pagination Dots */}
-            <div className="flex items-center justify-center gap-1.5 pt-4">
-              {[0, 1, 2, 3, 4, 5, 6, 7].map((dotIdx) => (
-                <button
-                  key={dotIdx}
-                  type="button"
-                  onClick={() => setCarouselIndex(dotIdx)}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    carouselIndex === dotIdx
-                      ? "w-6 bg-primary"
-                      : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
-                  }`}
-                  aria-label={`Jump to review ${dotIdx + 1}`}
-                />
-              ))}
-            </div>
+              </>
+            ) : null}
           </div>
         </section>
 
@@ -721,11 +727,11 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Button
                 size="lg"
-                onClick={() => (user ? router.push("/projects") : setAuthModalOpen(true))}
+                onClick={() => (mounted && user ? router.push("/projects") : setAuthModalOpen(true))}
                 className="gap-2 px-8 py-6 rounded-2xl text-base font-semibold shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
-                <span>{user ? "Go to Dashboard" : "Start Creating Free"}</span>
+                <span>{mounted && user ? "Go to Dashboard" : "Start Creating Free"}</span>
               </Button>
               <Link
                 href="/pricing"
