@@ -26,7 +26,12 @@ export function useScreenDragDrop({
 }: UseScreenDragDropProps) {
   const { setActiveLayer, toggleSelectLayer, clearSelection, updateLayer } = useEditorStore();
 
-  const [snapGuides, setSnapGuides] = useState<{ x?: boolean; y?: boolean } | null>(null);
+  const [snapGuides, setSnapGuides] = useState<{
+    x?: number;
+    y?: number;
+    isScreenCenterX?: boolean;
+    isScreenCenterY?: boolean;
+  } | null>(null);
 
   const dragRef = useRef<{
     layerId: string;
@@ -126,30 +131,116 @@ export function useScreenDragDrop({
     let targetY = dragRef.current.origY + (y - dragRef.current.startY);
 
     const layer = screen.layers.find((l) => l.id === dragRef.current?.layerId);
-    let snappedX = false;
-    let snappedY = false;
+    let guideXPercent: number | undefined = undefined;
+    let guideYPercent: number | undefined = undefined;
+    let isScreenCenterX = false;
+    let isScreenCenterY = false;
 
     if (layer) {
-      const layerCenterX = targetX + layer.width / 2;
-      const screenCenterX = screen.width / 2;
-      const SNAP_THRESHOLD = 30;
+      const SNAP_THRESHOLD = Math.max(16, Math.min(36, Math.round(screen.width * 0.018)));
+      const siblings = screen.layers.filter((l) => l.id !== layer.id);
 
-      if (Math.abs(layerCenterX - screenCenterX) < SNAP_THRESHOLD) {
-        const snapDiff = Math.round(screenCenterX - layer.width / 2) - targetX;
-        targetX += snapDiff;
-        snappedX = true;
+      // ── X-AXIS SNAPPING ──
+      const xCandidates: Array<{ diff: number; guideX: number; isCenter?: boolean }> = [];
+
+      // 1. Screen center
+      const screenCenterX = screen.width / 2;
+      const layerCenterX = targetX + layer.width / 2;
+      xCandidates.push({
+        diff: screenCenterX - layerCenterX,
+        guideX: screenCenterX,
+        isCenter: true,
+      });
+
+      // 2. Safe margins (6% from edges)
+      const leftMargin = Math.round(screen.width * 0.06);
+      const rightMargin = Math.round(screen.width * 0.94);
+      xCandidates.push({ diff: leftMargin - targetX, guideX: leftMargin });
+      xCandidates.push({ diff: rightMargin - (targetX + layer.width), guideX: rightMargin });
+
+      // 3. Sibling layers (left, center, right)
+      siblings.forEach((sib) => {
+        const sibCenterX = sib.x + sib.width / 2;
+        // Center alignment
+        xCandidates.push({ diff: sibCenterX - layerCenterX, guideX: sibCenterX });
+        // Left alignment
+        xCandidates.push({ diff: sib.x - targetX, guideX: sib.x });
+        // Right alignment
+        xCandidates.push({ diff: sib.x + sib.width - (targetX + layer.width), guideX: sib.x + sib.width });
+      });
+
+      // Find closest X snap
+      let bestXSnap: { diff: number; guideX: number; isCenter?: boolean } | null = null;
+      for (const cand of xCandidates) {
+        if (Math.abs(cand.diff) <= SNAP_THRESHOLD) {
+          if (!bestXSnap || Math.abs(cand.diff) < Math.abs(bestXSnap.diff)) {
+            bestXSnap = cand;
+          }
+        }
       }
 
-      const layerCenterY = targetY + layer.height / 2;
+      if (bestXSnap) {
+        targetX += bestXSnap.diff;
+        guideXPercent = (bestXSnap.guideX / screen.width) * 100;
+        isScreenCenterX = Boolean(bestXSnap.isCenter);
+      }
+
+      // ── Y-AXIS SNAPPING ──
+      const yCandidates: Array<{ diff: number; guideY: number; isCenter?: boolean }> = [];
+
+      // 1. Screen center
       const screenCenterY = screen.height / 2;
-      if (Math.abs(layerCenterY - screenCenterY) < SNAP_THRESHOLD) {
-        const snapDiff = Math.round(screenCenterY - layer.height / 2) - targetY;
-        targetY += snapDiff;
-        snappedY = true;
+      const layerCenterY = targetY + layer.height / 2;
+      yCandidates.push({
+        diff: screenCenterY - layerCenterY,
+        guideY: screenCenterY,
+        isCenter: true,
+      });
+
+      // 2. Safe margins (6% from edges)
+      const topMargin = Math.round(screen.height * 0.06);
+      const bottomMargin = Math.round(screen.height * 0.94);
+      yCandidates.push({ diff: topMargin - targetY, guideY: topMargin });
+      yCandidates.push({ diff: bottomMargin - (targetY + layer.height), guideY: bottomMargin });
+
+      // 3. Sibling layers (top, center, bottom)
+      siblings.forEach((sib) => {
+        const sibCenterY = sib.y + sib.height / 2;
+        // Center alignment
+        yCandidates.push({ diff: sibCenterY - layerCenterY, guideY: sibCenterY });
+        // Top alignment
+        yCandidates.push({ diff: sib.y - targetY, guideY: sib.y });
+        // Bottom alignment
+        yCandidates.push({ diff: sib.y + sib.height - (targetY + layer.height), guideY: sib.y + sib.height });
+      });
+
+      // Find closest Y snap
+      let bestYSnap: { diff: number; guideY: number; isCenter?: boolean } | null = null;
+      for (const cand of yCandidates) {
+        if (Math.abs(cand.diff) <= SNAP_THRESHOLD) {
+          if (!bestYSnap || Math.abs(cand.diff) < Math.abs(bestYSnap.diff)) {
+            bestYSnap = cand;
+          }
+        }
+      }
+
+      if (bestYSnap) {
+        targetY += bestYSnap.diff;
+        guideYPercent = (bestYSnap.guideY / screen.height) * 100;
+        isScreenCenterY = Boolean(bestYSnap.isCenter);
       }
     }
 
-    setSnapGuides({ x: snappedX, y: snappedY });
+    setSnapGuides(
+      guideXPercent !== undefined || guideYPercent !== undefined
+        ? {
+            x: guideXPercent,
+            y: guideYPercent,
+            isScreenCenterX,
+            isScreenCenterY,
+          }
+        : null
+    );
 
     const finalDeltaX = targetX - dragRef.current.origX;
     const finalDeltaY = targetY - dragRef.current.origY;

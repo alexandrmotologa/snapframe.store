@@ -8,7 +8,8 @@ import { ALL_DEVICES, isTabletDevice, IOS_DEVICES, ANDROID_DEVICES } from "@/lib
 import { AppleStoreIcon, GooglePlayIcon } from "@/components/icons/StoreIcons";
 import {
   CheckCircle2, AlertTriangle, XCircle, ShieldCheck,
-  Smartphone, Tablet, Info, ChevronDown, ChevronUp, Eye, Trash2, Plus, Sparkles, Lock, Unlock, Maximize2, Ratio, Sliders
+  Smartphone, Tablet, Info, ChevronDown, ChevronUp, Eye, Trash2, Plus, Sparkles, Lock, Unlock, Maximize2, Ratio, Sliders,
+  Split, Share2
 } from "lucide-react";
 import { Screen, ScreenshotLayer, ImageLayer, ScreenSet } from "@/lib/types";
 import {
@@ -78,6 +79,8 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
     setCustomScreenDimensions,
     setMockupScale,
     generateDualThemeSet,
+    generateABVariantSet,
+    addCustomPresetSet,
   } = useEditorStore();
 
   const { user, isPro, setAuthModalOpen, setUpgradeModalOpen } = useAuthStore();
@@ -931,6 +934,105 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                             <span>{(ss.name || "").toLowerCase().includes("dark") ? "☀️ Create Light Set" : "🌙 Create Dark Set"}</span>
                           </button>
                         </div>
+
+                        {/* A/B Testing Variant Generator */}
+                        <div className="pt-2 border-t border-border/40 flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                              <Split className="w-3 h-3 text-indigo-400" />
+                              <span>A/B Testing Variant</span>
+                            </span>
+                            <p className="text-[9.5px] text-muted-foreground truncate">
+                              Auto-clone with high-conversion visual variation
+                            </p>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[11px] font-semibold border border-indigo-500/30 hover:border-indigo-500/50 flex items-center gap-1 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0">
+                              {!isPro && (
+                                <span className="text-[9px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                              )}
+                              <span>⚡ A/B Variant</span>
+                              <ChevronDown className="w-3 h-3 ml-0.5 opacity-70" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 p-1 bg-card/95 backdrop-blur-xl border border-border/80 shadow-2xl rounded-xl">
+                              <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
+                                Choose A/B Strategy
+                              </DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  if (!isPro) {
+                                    toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                                    setUpgradeModalOpen(true);
+                                    return;
+                                  }
+                                  generateABVariantSet(ss.id, "high-contrast-dark");
+                                  toast.success("✨ Generated High-Contrast Dark A/B Variant set!");
+                                }}
+                                className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+                              >
+                                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <span>🌙 High-Contrast Dark</span>
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">Deep obsidian background & glowing text</span>
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  if (!isPro) {
+                                    toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                                    setUpgradeModalOpen(true);
+                                    return;
+                                  }
+                                  generateABVariantSet(ss.id, "minimalist-clean");
+                                  toast.success("✨ Generated Minimalist Clean A/B Variant set!");
+                                }}
+                                className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+                              >
+                                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <span>☀️ Minimalist Clean Studio</span>
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">Crisp neutral light background with stark typography</span>
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  if (!isPro) {
+                                    toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                                    setUpgradeModalOpen(true);
+                                    return;
+                                  }
+                                  generateABVariantSet(ss.id, "vibrant-glow");
+                                  toast.success("✨ Generated Vibrant Glow A/B Variant set!");
+                                }}
+                                className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+                              >
+                                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <span>🎨 Vibrant Gradient Glow</span>
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">Eye-catching multi-tone saturated gradient</span>
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  if (!isPro) {
+                                    toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                                    setUpgradeModalOpen(true);
+                                    return;
+                                  }
+                                  generateABVariantSet(ss.id, "bold-conversion");
+                                  toast.success("✨ Generated Bold Conversion A/B Variant set!");
+                                }}
+                                className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+                              >
+                                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <span>🔥 Bold Conversion Focus</span>
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">Maximum contrast with highlighted callouts</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
 
                       {/* Bottom Collapse Trigger */}
@@ -1068,6 +1170,60 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
                   <Plus className="w-3 h-3" />
                 </div>
               </button>
+            </div>
+          </div>
+
+          {/* ── SOCIAL MEDIA & LAUNCH PRESETS ── */}
+          <div className="space-y-2.5 pt-3 border-t border-border/50">
+            <div className="flex items-center justify-between px-0.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Share2 className="w-3.5 h-3.5 text-primary" />
+                <span>Social &amp; Launch Presets</span>
+              </span>
+              <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                PRO SUITE
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2">
+              {CANVAS_PRESETS.filter((p) => p.category === "marketing" || p.category === "social").map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => {
+                    if (!isPro) {
+                      toast.info("Social Media & Product Hunt presets are a SnapFrame Pro feature.");
+                      setUpgradeModalOpen(true);
+                      return;
+                    }
+                    addCustomPresetSet({
+                      name: preset.label,
+                      width: preset.width,
+                      height: preset.height,
+                      description: preset.desc,
+                    });
+                    toast.success(`✨ Added ${preset.label} (${preset.width} × ${preset.height}) set with proportional scaling!`);
+                  }}
+                  className="flex items-center justify-between p-2.5 rounded-xl border border-border/60 bg-secondary/30 hover:bg-secondary/70 hover:border-primary/40 transition-all cursor-pointer group text-left shadow-xs"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                        {preset.label}
+                      </p>
+                      {!isPro && (
+                        <span className="text-[8.5px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground font-mono truncate">
+                      {preset.desc}
+                    </p>
+                  </div>
+                  <div className="w-5 h-5 rounded-md bg-secondary/80 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all shrink-0 ml-1.5">
+                    <Plus className="w-3 h-3" />
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>

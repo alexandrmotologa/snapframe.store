@@ -2359,11 +2359,27 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
           />
 
         {/* Magnetic Smart Snapping Guide Lines */}
-        {snapGuides?.x && (
-          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1.5px] bg-pink-500 shadow-md shadow-pink-500/50 z-20 pointer-events-none" />
+        {snapGuides?.x !== undefined && (
+          <div
+            className={cn(
+              "absolute top-0 bottom-0 w-[1.5px] z-30 pointer-events-none transition-opacity",
+              snapGuides.isScreenCenterX
+                ? "bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"
+                : "bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"
+            )}
+            style={{ left: `${snapGuides.x}%` }}
+          />
         )}
-        {snapGuides?.y && (
-          <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1.5px] bg-pink-500 shadow-md shadow-pink-500/50 z-20 pointer-events-none" />
+        {snapGuides?.y !== undefined && (
+          <div
+            className={cn(
+              "absolute left-0 right-0 h-[1.5px] z-30 pointer-events-none transition-opacity",
+              snapGuides.isScreenCenterY
+                ? "bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"
+                : "bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"
+            )}
+            style={{ top: `${snapGuides.y}%` }}
+          />
         )}
 
         {/* Resize handles overlay — shown when layer is selected */}

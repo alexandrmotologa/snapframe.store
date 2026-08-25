@@ -663,6 +663,130 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
     });
   },
 
+  generateABVariantSet: (sourceSetId, strategy) => {
+    get().recordHistory(true);
+    set((state) => {
+      const sourceSet = state.screenSets.find((ss) => ss.id === sourceSetId);
+      if (!sourceSet) return state;
+
+      const newSetId = nanoid();
+      const clone = typeof structuredClone === "function"
+        ? structuredClone
+        : (obj: any) => JSON.parse(JSON.stringify(obj));
+
+      const strategyLabels: Record<string, string> = {
+        "high-contrast-dark": "A/B: High-Contrast Dark",
+        "minimalist-clean": "A/B: Minimalist Clean",
+        "vibrant-glow": "A/B: Vibrant Glow",
+        "bold-conversion": "A/B: Bold Conversion",
+      };
+
+      const label = strategyLabels[strategy] || "A/B Variant";
+      const baseName = (sourceSet.name || "Set").replace(/\s*\(A\/B:[^)]+\)/gi, "").trim();
+      const newSetName = `${baseName} (${label})`;
+
+      const newScreens = clone(sourceSet.screens).map((scr: Screen) => {
+        const newScreenId = nanoid();
+
+        let newBg: import("@/lib/types").Background = scr.background;
+        if (strategy === "high-contrast-dark") {
+          newBg = {
+            type: "gradient",
+            gradient: {
+              direction: "to-b",
+              stops: [
+                { color: "#0B0F19", position: 0 },
+                { color: "#020617", position: 100 },
+              ],
+            },
+          };
+        } else if (strategy === "minimalist-clean") {
+          newBg = {
+            type: "gradient",
+            gradient: {
+              direction: "to-b",
+              stops: [
+                { color: "#FFFFFF", position: 0 },
+                { color: "#F1F5F9", position: 100 },
+              ],
+            },
+          };
+        } else if (strategy === "vibrant-glow") {
+          newBg = {
+            type: "gradient",
+            gradient: {
+              direction: "to-br",
+              stops: [
+                { color: "#4F46E5", position: 0 },
+                { color: "#EC4899", position: 100 },
+              ],
+            },
+          };
+        } else if (strategy === "bold-conversion") {
+          newBg = {
+            type: "gradient",
+            gradient: {
+              direction: "to-b",
+              stops: [
+                { color: "#1E1B4B", position: 0 },
+                { color: "#312E81", position: 100 },
+              ],
+            },
+          };
+        }
+
+        const newLayers = scr.layers.map((l: Layer) => {
+          const newLayerId = nanoid();
+          if (l.type === "text") {
+            const tl = l as import("@/lib/types").TextLayer;
+            let newColor = tl.color;
+            if (strategy === "high-contrast-dark" || strategy === "vibrant-glow") {
+              newColor = "#FFFFFF";
+            } else if (strategy === "minimalist-clean") {
+              newColor = "#0F172A";
+            } else if (strategy === "bold-conversion") {
+              newColor = "#FFFFFF";
+            }
+
+            return {
+              ...tl,
+              id: newLayerId,
+              color: newColor,
+            };
+          }
+          return {
+            ...l,
+            id: newLayerId,
+          };
+        });
+
+        return {
+          ...scr,
+          id: newScreenId,
+          background: newBg,
+          layers: newLayers,
+        };
+      });
+
+      const newScreenSet: ScreenSet = {
+        ...clone(sourceSet),
+        id: newSetId,
+        name: newSetName,
+        screens: newScreens,
+        mockup: {
+          ...sourceSet.mockup,
+          color: strategy === "minimalist-clean" ? "silver" : "black",
+        },
+      };
+
+      return {
+        screenSets: [...state.screenSets, newScreenSet],
+        activeSetId: newSetId,
+        activeScreenId: newScreens[0]?.id ?? null,
+      };
+    });
+  },
+
   updateLayerLocalization: (setId, screenId, layerId, langCode, content) => {
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
@@ -1198,6 +1322,65 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       activeScreenId: newSet.screens[0]?.id ?? null,
     }));
 
+    get().recordHistory();
+  },
+
+  addCustomPresetSet: (preset) => {
+    get().recordHistory(true);
+    const newId = nanoid();
+    const sourceSet = get().screenSets.find((s) => s.id === get().activeSetId) || get().screenSets[0];
+    const newW = preset.width;
+    const newH = preset.height;
+    const oldW = sourceSet?.preset.width || 1290;
+    const oldH = sourceSet?.preset.height || 2796;
+
+    const newScreens: Screen[] = (sourceSet ? sourceSet.screens : []).map((screen, idx) => ({
+      ...screen,
+      id: nanoid(),
+      name: `${preset.name} - Screen ${idx + 1}`,
+      width: newW,
+      height: newH,
+      layers: scaleLayersForDimensions(screen.layers, oldW, oldH, newW, newH, true),
+    }));
+
+    const newSet: ScreenSet = {
+      id: newId,
+      name: preset.name,
+      store: "ios",
+      deviceId: sourceSet?.deviceId || "iphone-17-pro-max",
+      preset: {
+        name: preset.name,
+        width: newW,
+        height: newH,
+        store: "ios",
+        description: preset.description || `${newW} × ${newH}`,
+      },
+      mockup: {
+        device: sourceSet?.deviceId || "iphone-17-pro-max",
+        color: sourceSet?.mockup?.color || "black",
+        showFrame: sourceSet?.mockup?.showFrame ?? true,
+        showReflection: sourceSet?.mockup?.showReflection ?? false,
+        showShadow: sourceSet?.mockup?.showShadow ?? false,
+        frameType: sourceSet?.mockup?.frameType ?? "3d",
+      },
+      screens: newScreens.length > 0 ? newScreens : [
+        {
+          id: nanoid(),
+          name: "Screen 1",
+          width: newW,
+          height: newH,
+          caption: "",
+          background: { type: "gradient", gradient: { direction: "to-br", stops: [{ color: "#6366f1", position: 0 }, { color: "#8b5cf6", position: 100 }] } },
+          layers: [],
+        },
+      ],
+    };
+
+    set((state) => ({
+      screenSets: [...state.screenSets, newSet],
+      activeSetId: newId,
+      activeScreenId: newSet.screens[0]?.id ?? null,
+    }));
     get().recordHistory();
   },
 

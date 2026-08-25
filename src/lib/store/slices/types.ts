@@ -99,6 +99,11 @@ export interface ContentSlice {
 
   addScreenSet: (store: "ios" | "android") => void;
   addTabletSet: (store?: "ios" | "android") => void;
+  addCustomPresetSet: (preset: { name: string; width: number; height: number; description?: string }) => void;
+  generateABVariantSet: (
+    sourceSetId: string,
+    strategy: "high-contrast-dark" | "minimalist-clean" | "vibrant-glow" | "bold-conversion"
+  ) => void;
   removeScreenSet: (setId: string) => void;
   updateScreenSet: (setId: string, updates: Partial<ScreenSet>) => void;
 }

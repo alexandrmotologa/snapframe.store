@@ -2,7 +2,7 @@
 
 import { useState, memo } from "react";
 import {
-  Plus, ChevronDown, Smartphone, EyeOff, Eye, CopyCheck,
+  Plus, ChevronDown, Smartphone, EyeOff, Eye, CopyCheck, Split,
 } from "lucide-react";
 import { useEditorStore } from "@/lib/store/editorStore";
 import { toast } from "@/lib/store/toastStore";
@@ -68,7 +68,7 @@ export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging =
   const {
     activeSetId, setActiveSet, setActiveScreen, addScreen, zoom,
     updateDevice, updateMockup, screenSets,
-    updateScreen,
+    updateScreen, generateABVariantSet,
   } = useEditorStore();
 
   const { isPro, setUpgradeModalOpen } = useAuthStore();
@@ -451,6 +451,98 @@ export const ScreenSetRow = memo(function ScreenSetRow({ screenSet, isDragging =
             <Switch checked={isShowingScreenshots} onCheckedChange={toggleScreenshots} />
           </label>
         </div>
+
+        {/* ── A/B Testing Variant Generator Button ── */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 hover:border-indigo-500/50 transition-all ml-1 cursor-pointer shadow-xs active:scale-95 shrink-0"
+            title="Generate high-converting A/B Testing variant set"
+          >
+            <Split className="w-3.5 h-3.5 shrink-0" />
+            <span>⚡ A/B Variant</span>
+            {!isPro && (
+              <span className="text-[8.5px] px-1 py-0.2 rounded font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">PRO</span>
+            )}
+            <ChevronDown className="w-3 h-3 opacity-70" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-60 p-1 bg-card/95 backdrop-blur-xl border border-border/80 shadow-2xl rounded-xl z-50">
+            <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
+              Choose A/B Testing Strategy
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                if (!isPro) {
+                  toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                  setUpgradeModalOpen(true);
+                  return;
+                }
+                generateABVariantSet(screenSet.id, "high-contrast-dark");
+                toast.success("✨ Generated High-Contrast Dark A/B Variant set!");
+              }}
+              className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+            >
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                <span>🌙 High-Contrast Dark</span>
+              </span>
+              <span className="text-[10px] text-muted-foreground">Deep obsidian background & glowing text</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                if (!isPro) {
+                  toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                  setUpgradeModalOpen(true);
+                  return;
+                }
+                generateABVariantSet(screenSet.id, "minimalist-clean");
+                toast.success("✨ Generated Minimalist Clean A/B Variant set!");
+              }}
+              className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+            >
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                <span>☀️ Minimalist Clean Studio</span>
+              </span>
+              <span className="text-[10px] text-muted-foreground">Crisp neutral light background with stark typography</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                if (!isPro) {
+                  toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                  setUpgradeModalOpen(true);
+                  return;
+                }
+                generateABVariantSet(screenSet.id, "vibrant-glow");
+                toast.success("✨ Generated Vibrant Glow A/B Variant set!");
+              }}
+              className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+            >
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                <span>🎨 Vibrant Gradient Glow</span>
+              </span>
+              <span className="text-[10px] text-muted-foreground">Eye-catching multi-tone saturated gradient</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                if (!isPro) {
+                  toast.info("A/B Testing Variant Generator is a SnapFrame Pro feature.");
+                  setUpgradeModalOpen(true);
+                  return;
+                }
+                generateABVariantSet(screenSet.id, "bold-conversion");
+                toast.success("✨ Generated Bold Conversion A/B Variant set!");
+              }}
+              className="text-xs cursor-pointer flex flex-col items-start gap-0.5 py-1.5 px-2 rounded-lg"
+            >
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                <span>🔥 Bold Conversion Focus</span>
+              </span>
+              <span className="text-[10px] text-muted-foreground">Maximum contrast with highlighted callouts</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Sync to all sets */}
         {screenSets.length > 1 && (

@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Paintbrush } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ColorInput } from "@/components/ui/color-input";
+import { EyeDropperButton } from "@/components/ui/EyeDropperButton";
 
 interface Props {
   currentBackground: Background;
@@ -63,20 +64,26 @@ export function AdvancedBackgroundPicker({ currentBackground, onSelect }: Props)
             </div>
             <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between">
               <span className="text-xs text-muted-foreground font-medium">Custom Color</span>
-              <div 
-                className={cn(
-                  "relative w-10 h-8 rounded-md border shadow-sm overflow-hidden flex-shrink-0 transition-transform hover:scale-105",
-                  currentBackground.type === "solid" && currentBackground.color && !PRESET_MINIMAL.includes(currentBackground.color) ? "ring-2 ring-primary ring-offset-1" : "border-border/50"
-                )}
-                style={{ backgroundColor: currentBackground.type === "solid" ? currentBackground.color : "#ffffff" }}
-                title="Pick a custom color"
-              >
-                <ColorInput
-                  value={currentBackground.type === "solid" ? currentBackground.color : "#ffffff"}
-                  onColorChange={(color) => onSelect({ type: "solid", color })}
-                  onColorCommit={(color) => onSelect({ type: "solid", color })}
-                  className="absolute inset-0 w-[200%] h-[200%] -translate-x-1/4 -translate-y-1/4 cursor-pointer opacity-0"
+              <div className="flex items-center gap-1.5">
+                <EyeDropperButton
+                  onPickColor={(color) => onSelect({ type: "solid", color })}
+                  className="h-8 w-8 rounded-md border border-border/60 bg-secondary/40"
                 />
+                <div 
+                  className={cn(
+                    "relative w-10 h-8 rounded-md border shadow-sm overflow-hidden flex-shrink-0 transition-transform hover:scale-105",
+                    currentBackground.type === "solid" && currentBackground.color && !PRESET_MINIMAL.includes(currentBackground.color) ? "ring-2 ring-primary ring-offset-1" : "border-border/50"
+                  )}
+                  style={{ backgroundColor: currentBackground.type === "solid" ? currentBackground.color : "#ffffff" }}
+                  title="Pick a custom color"
+                >
+                  <ColorInput
+                    value={currentBackground.type === "solid" ? currentBackground.color : "#ffffff"}
+                    onColorChange={(color) => onSelect({ type: "solid", color })}
+                    onColorCommit={(color) => onSelect({ type: "solid", color })}
+                    className="absolute inset-0 w-[200%] h-[200%] -translate-x-1/4 -translate-y-1/4 cursor-pointer opacity-0"
+                  />
+                </div>
               </div>
             </div>
           </TabsContent>

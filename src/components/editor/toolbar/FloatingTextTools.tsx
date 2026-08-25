@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { ColorInput } from "@/components/ui/color-input";
+import { EyeDropperButton } from "@/components/ui/EyeDropperButton";
 import { cn, loadGoogleFont } from "@/lib/utils";
 import {
   FONT_FAMILIES,
@@ -154,29 +155,39 @@ export function FloatingTextTools({ tl, update }: FloatingTextToolsProps) {
       </Popover>
 
       {/* Color swatch */}
-      <Tooltip>
-        <TooltipTrigger
-          className="h-7 w-7 rounded hover:bg-secondary flex items-center justify-center transition-colors cursor-pointer"
-          style={{ color: tl.color }}
-        >
-          <label className="w-5 h-5 rounded cursor-pointer ring-1 ring-black/20 dark:ring-white/20 overflow-hidden shrink-0 block">
-            <ColorInput
-              value={tl.color.startsWith("rgba") ? "#ffffff" : tl.color}
-              onColorChange={(color) => update({ color })}
-              className="opacity-0 w-0 h-0"
-            />
-            <div
-              className="w-full h-full"
-              style={{
-                background: tl.gradientColor
-                  ? `linear-gradient(to right, ${tl.gradientColor[0]}, ${tl.gradientColor[1]})`
-                  : tl.color,
-              }}
-            />
-          </label>
-        </TooltipTrigger>
-        <TooltipContent>Text color</TooltipContent>
-      </Tooltip>
+      <div className="flex items-center gap-0.5 shrink-0">
+        <Tooltip>
+          <TooltipTrigger
+            className="h-7 w-7 rounded hover:bg-secondary flex items-center justify-center transition-colors cursor-pointer"
+            style={{ color: tl.color }}
+          >
+            <label className="w-5 h-5 rounded cursor-pointer ring-1 ring-black/20 dark:ring-white/20 overflow-hidden shrink-0 block">
+              <ColorInput
+                value={tl.color.startsWith("rgba") ? "#ffffff" : tl.color}
+                onColorChange={(color) => update({ color })}
+                className="opacity-0 w-0 h-0"
+              />
+              <div
+                className="w-full h-full"
+                style={{
+                  background: tl.gradientColor
+                    ? `linear-gradient(to right, ${tl.gradientColor[0]}, ${tl.gradientColor[1]})`
+                    : tl.color,
+                }}
+              />
+            </label>
+          </TooltipTrigger>
+          <TooltipContent>Text color</TooltipContent>
+        </Tooltip>
+        <EyeDropperButton
+          onPickColor={(color) => {
+            update({ color });
+            useEditorStore.getState().recordHistory();
+          }}
+          title="Pick text color from screen"
+          size="icon-xs"
+        />
+      </div>
 
       {/* Gradient text toggle */}
       <button

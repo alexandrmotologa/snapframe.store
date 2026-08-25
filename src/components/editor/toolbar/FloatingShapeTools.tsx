@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ColorInput } from "@/components/ui/color-input";
+import { EyeDropperButton } from "@/components/ui/EyeDropperButton";
 import { ToolbarNumInput as NumInput } from "./ToolbarPrimitives";
 
 export interface FloatingShapeToolsProps {
@@ -33,19 +34,26 @@ export function FloatingShapeTools({ sh, update }: FloatingShapeToolsProps) {
   return (
     <>
       {/* Shape Fill Color */}
-      <Tooltip>
-        <TooltipTrigger className="h-7 w-7 rounded hover:bg-secondary flex items-center justify-center transition-colors cursor-pointer">
-          <label className="w-6 h-6 rounded-lg cursor-pointer ring-1 ring-border overflow-hidden shrink-0 block">
-            <ColorInput
-              value={sh.fill}
-              onColorChange={(color) => update({ fill: color })}
-              className="opacity-0 w-0 h-0"
-            />
-            <div className="w-full h-full" style={{ background: sh.fill }} />
-          </label>
-        </TooltipTrigger>
-        <TooltipContent>Fill color</TooltipContent>
-      </Tooltip>
+      <div className="flex items-center gap-0.5 shrink-0">
+        <Tooltip>
+          <TooltipTrigger className="h-7 w-7 rounded hover:bg-secondary flex items-center justify-center transition-colors cursor-pointer">
+            <label className="w-6 h-6 rounded-lg cursor-pointer ring-1 ring-border overflow-hidden shrink-0 block">
+              <ColorInput
+                value={sh.fill}
+                onColorChange={(color) => update({ fill: color })}
+                className="opacity-0 w-0 h-0"
+              />
+              <div className="w-full h-full" style={{ background: sh.fill }} />
+            </label>
+          </TooltipTrigger>
+          <TooltipContent>Fill color</TooltipContent>
+        </Tooltip>
+        <EyeDropperButton
+          onPickColor={(color) => update({ fill: color })}
+          title="Pick shape fill color from screen"
+          size="icon-xs"
+        />
+      </div>
 
       {/* Shape Outline (Stroke) */}
       <Tooltip>
