@@ -1001,7 +1001,7 @@ export default function AccountPage() {
                 </div>
               ) : billingData?.creditLogs && billingData.creditLogs.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                  <table className="w-full min-w-[500px] text-left text-xs">
                     <thead className="bg-secondary/40 border-b border-border/40 text-muted-foreground font-semibold uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="px-5 py-3">Date &amp; Time</th>

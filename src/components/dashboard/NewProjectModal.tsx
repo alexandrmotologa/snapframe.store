@@ -274,11 +274,11 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
       <DialogContent showCloseButton={false} className="max-w-5xl h-[88vh] flex flex-col p-0 gap-0 overflow-hidden bg-background/95 backdrop-blur-xl">
 
         {/* Header */}
-        <DialogHeader className="px-7 py-4 border-b border-border/50 shrink-0 flex-col gap-3">
+        <DialogHeader className="p-4 sm:px-7 sm:py-4 border-b border-border/50 shrink-0 flex-col gap-3">
           <div className="flex items-start justify-between">
             <div>
-              <DialogTitle className="text-2xl font-bold">Select a Theme</DialogTitle>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <DialogTitle className="text-xl sm:text-2xl font-bold">Select a Theme</DialogTitle>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                 Choose a pre-designed theme for your screenshots
               </p>
             </div>
@@ -290,7 +290,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
           {/* Search, Filter & Sort Controls Row */}
           <div className="flex items-center gap-3 flex-wrap justify-between pt-1">
             {/* Search Input */}
-            <div className="relative flex-1 min-w-[220px] max-w-md">
+            <div className="relative flex-1 min-w-[200px] max-w-md">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={searchQuery}
@@ -318,42 +318,16 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                 </span>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (sortBy === "popularity" || sortBy === "popularity-desc") {
-                      setSortBy("popularity-asc");
-                    } else {
-                      setSortBy("popularity-desc");
-                    }
-                  }}
+                  onClick={() => setSortBy("popularity")}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer select-none",
+                    "px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer select-none",
                     sortBy === "popularity" || sortBy === "popularity-desc" || sortBy === "popularity-asc"
                       ? "bg-background text-foreground shadow-xs ring-1 ring-border/50 font-semibold"
                       : "text-muted-foreground hover:text-foreground"
                   )}
-                  title={sortBy === "popularity-asc" ? "Least Popular first (click for Most Popular)" : "Most Popular first (click for Least Popular)"}
+                  title="Most popular first"
                 >
-                  <Flame className="w-3 h-3 text-amber-500" />
-                  Popularity {sortBy === "popularity-asc" ? "↑" : "↓"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (sortBy === "name-asc") {
-                      setSortBy("name-desc");
-                    } else {
-                      setSortBy("name-asc");
-                    }
-                  }}
-                  className={cn(
-                    "px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer select-none",
-                    sortBy === "name-asc" || sortBy === "name-desc"
-                      ? "bg-background text-foreground shadow-xs ring-1 ring-border/50 font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                  title={sortBy === "name-desc" ? "Z to A (click for A to Z)" : "A to Z (click for Z to A)"}
-                >
-                  Name {sortBy === "name-desc" ? "Z–A ↑" : "A–Z ↓"}
+                  Popular
                 </button>
                 <button
                   type="button"
@@ -402,7 +376,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
 
         {/* Body (Scrollable List) */}
         <ScrollArea className="flex-1 min-h-0 bg-secondary/20">
-          <div className="p-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="p-4 sm:p-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
             
             {themes.map((tpl) => {
               const isSelected = selectedTemplate === tpl.id;
@@ -410,93 +384,82 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
               const isProTpl = isProTemplate(tpl);
 
               return (
-                <div 
-                  key={tpl.id} 
+                <div
+                  key={tpl.id}
+                  onClick={() => setSelectedTemplate(tpl.id)}
                   className={cn(
-                    "relative flex flex-col items-center gap-4 p-6 rounded-[2rem] transition-all cursor-pointer group",
-                    isSelected 
-                      ? "bg-primary/5 shadow-2xl shadow-primary/10 ring-2 ring-primary scale-[1.01]" 
-                      : "bg-background shadow-md hover:shadow-xl hover:-translate-y-1 hover:ring-2 hover:ring-primary/30 border border-border/50"
+                    "group relative flex flex-col items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer bg-card shadow-xs hover:shadow-md hover:border-primary/50 text-left",
+                    isSelected
+                      ? "border-primary ring-2 ring-primary/20 shadow-md shadow-primary/10"
+                      : "border-border/60 hover:bg-accent/5"
                   )}
-                  onClick={() => {
-                    if (isProTpl && !isPro) {
-                      onClose();
-                      if (isGuest) {
-                        setAuthModalOpen(true);
-                        toast.info("Pro Suite Templates require SnapFrame Pro. Sign in with Google or GitHub to upgrade.");
-                      } else {
-                        setUpgradeModalOpen(true);
-                        toast.info("Pro Suite Templates require SnapFrame Pro. Upgrade to unlock luxury presets.");
-                      }
-                      return;
-                    }
-                    setSelectedTemplate(tpl.id);
-                  }}
                 >
-                  {/* Pro Industry or Popular Badge */}
-                  {isProTpl ? (
-                    <div className="absolute top-4 left-4 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 border border-amber-300/40 shadow-sm">
-                      {!isPro ? (
-                        <>
-                          <Lock className="w-3 h-3 text-zinc-950 stroke-[3]" />
-                          <span>PRO SUITE</span>
-                        </>
-                      ) : (
-                        <>
-                          <Crown className="w-3 h-3 text-zinc-950 fill-zinc-950" />
-                          <span>PRO SUITE</span>
-                        </>
-                      )}
-                    </div>
-                  ) : isPopular ? (
-                    <div className="absolute top-4 left-4 z-10 flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-xs">
-                      <Flame className="w-3 h-3 fill-amber-500 text-amber-500" />
-                      POPULAR
-                    </div>
-                  ) : null}
+                  {/* Top Badges Row */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+                    {/* Pro Badge */}
+                    {isProTpl ? (
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold flex items-center gap-1 shadow-2xs">
+                        <Crown className="w-2.5 h-2.5" />
+                        <span>PRO</span>
+                      </span>
+                    ) : isPopular ? (
+                      <span className="px-2 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold flex items-center gap-1 shadow-2xs">
+                        <Flame className="w-2.5 h-2.5 text-rose-500" />
+                        <span>POPULAR</span>
+                      </span>
+                    ) : (
+                      <span />
+                    )}
 
-                  {/* Selection indicator */}
-                  <div className={cn(
-                    "absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10",
-                    isSelected ? "border-primary bg-primary" : "border-muted-foreground/30 group-hover:border-primary/50 bg-background/50 backdrop-blur"
-                  )}>
-                    {isSelected ? (
-                      <Check className="w-3.5 h-3.5 text-primary-foreground" />
-                    ) : isProTpl && !isPro ? (
-                      <Lock className="w-3 h-3 text-muted-foreground" />
-                    ) : null}
+                    {/* Checkbox indicator */}
+                    <div className={cn(
+                      "w-5 h-5 rounded-full border flex items-center justify-center transition-colors shrink-0",
+                      isSelected
+                        ? "bg-primary border-primary"
+                        : "border-border/80 bg-background/80 group-hover:border-primary/50"
+                    )}>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+                    </div>
                   </div>
 
-                  {/* Single Screen Preview */}
-                  <div 
-                    className="w-[160px] shrink-0 rounded-[1.5rem] overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow mt-2 ring-1 ring-border/50"
-                    style={{ aspectRatio: "3/4" }}
-                  >
+                  {/* Visual Preview SVG */}
+                  <div className="w-full h-36 rounded-xl overflow-hidden bg-background/50 border border-border/40 p-2 flex items-center justify-center mb-3 mt-4 group-hover:scale-[1.02] transition-transform">
                     <LayoutPreview template={tpl} />
                   </div>
 
-                  {/* Text details */}
-                  <div className="text-center mt-1 w-full px-2">
-                    <h3 className="text-lg font-bold text-foreground">{tpl.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{tpl.description}</p>
+                  {/* Meta */}
+                  <div className="w-full space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <h3 className="text-sm font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                        {tpl.name}
+                      </h3>
+                      <span className="text-[10px] capitalize font-medium text-muted-foreground px-1.5 py-0.5 rounded-md bg-secondary/80 shrink-0">
+                        {tpl.category ?? "General"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                      {tpl.description}
+                    </p>
                   </div>
                 </div>
               );
             })}
 
-            {/* Custom/Blank Project at the bottom */}
-            <div 
-              className={cn(
-                "relative flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] transition-all cursor-pointer group h-full min-h-[300px]",
-                selectedTemplate === "blank"
-                  ? "bg-primary/5 shadow-2xl shadow-primary/10 ring-2 ring-primary" 
-                  : "bg-secondary/20 shadow-md border-2 border-dashed border-border hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 hover:bg-secondary/40"
-              )}
+            {/* Custom / Blank Canvas Option */}
+            <div
               onClick={() => setSelectedTemplate("blank")}
+              className={cn(
+                "group relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed transition-all cursor-pointer bg-card/50 hover:bg-card shadow-xs hover:shadow-md text-left min-h-[220px]",
+                selectedTemplate === "blank"
+                  ? "border-primary ring-2 ring-primary/20 shadow-md shadow-primary/10"
+                  : "border-border/70 hover:border-primary/50"
+              )}
             >
               <div className={cn(
-                "absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10",
-                selectedTemplate === "blank" ? "border-primary bg-primary" : "border-muted-foreground/30 group-hover:border-primary/50"
+                "absolute top-3 right-3 w-5 h-5 rounded-full border flex items-center justify-center transition-colors",
+                selectedTemplate === "blank"
+                  ? "bg-primary border-primary"
+                  : "border-border/80 bg-background/80 group-hover:border-primary/50"
               )}>
                 {selectedTemplate === "blank" && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
               </div>
@@ -515,9 +478,9 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
         </ScrollArea>
 
         {/* Footer */}
-        <div className="px-7 py-4 border-t border-border/50 shrink-0 bg-card flex items-end justify-between">
-          <div className="flex items-end gap-4 flex-1">
-            <div className="flex flex-col gap-1 w-full max-w-sm">
+        <div className="p-4 sm:px-7 sm:py-4 border-t border-border/50 shrink-0 bg-card flex flex-col md:flex-row items-stretch md:items-end justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4 flex-1">
+            <div className="flex flex-col gap-1 w-full sm:max-w-sm">
               <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Project Name</label>
               <Input
                 value={projectName}
@@ -528,7 +491,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
               />
             </div>
             
-            <div className="w-px h-10 bg-border/50 mx-2" />
+            <div className="hidden sm:block w-px h-10 bg-border/50 mx-1" />
             
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Platforms</label>
@@ -536,14 +499,14 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                 <Button
                   variant={platforms.ios ? "default" : "outline"}
                   onClick={() => setPlatforms(prev => ({ ...prev, ios: !prev.ios }))}
-                  className="h-10 px-4 font-medium"
+                  className="flex-1 sm:flex-initial h-10 px-4 font-medium cursor-pointer"
                 >
                   iOS
                 </Button>
                 <Button
                   variant={platforms.android ? "default" : "outline"}
                   onClick={() => setPlatforms(prev => ({ ...prev, android: !prev.android }))}
-                  className="h-10 px-4 font-medium"
+                  className="flex-1 sm:flex-initial h-10 px-4 font-medium cursor-pointer"
                 >
                   Android
                 </Button>
@@ -551,11 +514,11 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
             </div>
           </div>
           
-          <div className="flex items-end gap-3 h-10">
+          <div className="flex items-center justify-end gap-2.5 sm:gap-3 pt-1 md:pt-0">
             <Button
               variant="outline"
               onClick={onClose}
-              className="h-10 px-6 font-medium"
+              className="flex-1 sm:flex-initial h-10 px-4 sm:px-6 font-medium cursor-pointer"
             >
               Cancel
             </Button>
@@ -565,10 +528,10 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                   onClose();
                   setAuthModalOpen(true);
                 }}
-                className="h-10 px-6 font-semibold gap-2 bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20 cursor-pointer"
+                className="flex-1 sm:flex-initial h-10 px-4 sm:px-6 font-semibold gap-2 bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20 cursor-pointer"
               >
                 <Lock className="w-4 h-4" />
-                Sign In Free (1/1 Max)
+                <span>Sign In Free (1/1 Max)</span>
               </Button>
             ) : hasReachedFreeLimit ? (
               <Button
@@ -576,16 +539,16 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                   onClose();
                   setUpgradeModalOpen(true);
                 }}
-                className="h-10 px-6 font-semibold gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 cursor-pointer"
+                className="flex-1 sm:flex-initial h-10 px-4 sm:px-6 font-semibold gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
-                Upgrade to Pro (3/3 Limit)
+                <span>Upgrade to Pro (3/3 Limit)</span>
               </Button>
             ) : (
               <Button
                 onClick={handleCreate}
                 disabled={!projectName.trim() || !selectedTemplate || (!platforms.ios && !platforms.android) || creating}
-                className="h-10 px-8 font-semibold gap-2 shadow-lg shadow-primary/20"
+                className="flex-1 sm:flex-initial h-10 px-6 sm:px-8 font-semibold gap-2 shadow-lg shadow-primary/20 cursor-pointer"
               >
                 {creating ? (
                   <span className="flex items-center gap-2">
@@ -594,7 +557,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                   </span>
                 ) : (
                   <>
-                    Select a Theme
+                    <span>Select a Theme</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

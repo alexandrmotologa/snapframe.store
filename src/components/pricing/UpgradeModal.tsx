@@ -124,7 +124,7 @@ export function UpgradeModal() {
 
   return (
     <Dialog open={isUpgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden bg-background/95 backdrop-blur-xl border border-border/80 shadow-2xl rounded-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 bg-background/95 backdrop-blur-xl border border-border/80 shadow-2xl rounded-2xl">
         <DialogTitle className="sr-only">Upgrade to SnapFrame Pro</DialogTitle>
         <DialogDescription className="sr-only">Choose between monthly and annual plans for unlimited AI, 4K exports, and video studio.</DialogDescription>
 

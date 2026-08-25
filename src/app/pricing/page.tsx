@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
   X,
@@ -21,6 +22,8 @@ import {
   CheckCircle2,
   TrendingUp,
   LayoutGrid,
+  Menu,
+  Plus,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -77,6 +80,7 @@ export default function PricingPage() {
 
   // 1080p vs 4K Quality Preview Tab
   const [previewQuality, setPreviewQuality] = useState<"1080p" | "4k">("4k");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isGuest = Boolean(!user || user.isAnonymous);
 
@@ -185,12 +189,12 @@ export default function PricingPage() {
 
       {/* Header */}
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group cursor-pointer">
             <SnapFrameLogo size={32} withText textClassName="text-lg" />
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/templates"
               className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
@@ -203,16 +207,80 @@ export default function PricingPage() {
               className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Back to Projects
+              <span>Projects</span>
             </Link>
             <ThemeToggle />
             <UserMenu />
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="sm:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Sheet */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="sm:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl px-6 py-4 space-y-3 overflow-hidden shadow-2xl"
+            >
+              <div className="flex flex-col space-y-2 text-sm font-medium">
+                <Link
+                  href="/templates"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LayoutGrid className="w-4 h-4 text-primary" />
+                    <span>55+ Screenshot Templates</span>
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  href="/projects"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <ArrowLeft className="w-4 h-4 text-primary" />
+                    <span>Go to My Projects</span>
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  href="/app-store-screenshot-sizes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span>iOS App Store Sizes (2026)</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  href="/google-play-screenshot-sizes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span>Google Play Sizes (2026)</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12 sm:py-16 space-y-16">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-16 space-y-12 sm:space-y-16">
         {/* Hero Section */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider shadow-xs">
@@ -440,8 +508,8 @@ export default function PricingPage() {
           </div>
 
           <div className="rounded-3xl border border-border/80 bg-card/60 backdrop-blur-sm overflow-hidden shadow-lg">
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left border-collapse">
+            <div className="overflow-x-auto -mx-1 sm:mx-0">
+              <table className="w-full min-w-[540px] text-xs text-left border-collapse">
                 <thead>
                   <tr className="border-b border-border/60 bg-secondary/40">
                     <th className="py-4 px-6 font-bold text-foreground w-1/2">Features &amp; Limits</th>

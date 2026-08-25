@@ -963,8 +963,8 @@ export default function ProjectsPage() {
               {/* Action Controls (Sort, View Mode, New Project) */}
               <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap justify-between sm:justify-end w-full sm:w-auto">
                 {/* Bidirectional Sort Toggle Group */}
-                <div className="flex items-center gap-1 bg-secondary/50 p-1 rounded-xl border border-border/40 text-xs">
-                  <span className="text-[11px] font-medium text-muted-foreground px-2 hidden sm:flex items-center gap-1">
+                <div className="flex items-center gap-1 bg-secondary/50 p-1 rounded-xl border border-border/40 text-xs overflow-x-auto max-w-full">
+                  <span className="text-[11px] font-medium text-muted-foreground px-2 hidden sm:flex items-center gap-1 shrink-0">
                     <ArrowUpDown className="w-3 h-3" /> Sort:
                   </span>
 

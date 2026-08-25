@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Sparkles,
@@ -15,6 +15,9 @@ import {
   Flame,
   CheckCircle2,
   SlidersHorizontal,
+  Menu,
+  X,
+  Plus,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -99,6 +102,7 @@ export function TemplatesClient() {
   const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     getAllTemplates().then((all) => {
@@ -145,9 +149,9 @@ export function TemplatesClient() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "App Store & Google Play Screenshot Templates",
+    name: "55+ App Store & Google Play Screenshot Templates | SnapFrame",
     description:
-      "Curated library of 50+ screenshot design templates for iOS App Store and Google Play listing optimization.",
+      "Curated library of 55+ screenshot design templates for iOS App Store and Google Play listing optimization.",
     url: "https://snapframe.store/templates",
     mainEntity: {
       "@type": "ItemList",
@@ -169,7 +173,7 @@ export function TemplatesClient() {
 
       {/* Header */}
       <header className="border-b border-border/50 bg-card/70 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 cursor-pointer group">
             <SnapFrameLogo size={32} withText textClassName="text-lg" />
           </Link>
@@ -203,10 +207,10 @@ export function TemplatesClient() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <Button
               size="sm"
-              className="rounded-xl text-xs gap-1.5 font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
+              className="hidden sm:inline-flex rounded-xl text-xs gap-1.5 font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => {
                 const project = createProject(null, "New App Presentation");
                 router.push(`/editor/${project.id}`);
@@ -217,12 +221,91 @@ export function TemplatesClient() {
             </Button>
             <ThemeToggle />
             <UserMenu />
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Sheet */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl px-6 py-4 space-y-3 overflow-hidden shadow-2xl"
+            >
+              <div className="flex flex-col space-y-2 text-sm font-medium">
+                <Link
+                  href="/templates"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-primary/10 text-primary font-bold transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <LayoutGrid className="w-4 h-4" />
+                    <span>55+ Screenshot Templates</span>
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/pricing"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-amber-500" />
+                    <span>Pro Pricing ($5.75/mo)</span>
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  href="/app-store-screenshot-sizes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span>iOS App Store Sizes Guide (2026)</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  href="/google-play-screenshot-sizes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary transition-colors"
+                >
+                  <span>Google Play Sizes Guide (2026)</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    const project = createProject(null, "New App Presentation");
+                    router.push(`/editor/${project.id}`);
+                  }}
+                  className="w-full text-left flex items-center justify-between p-2.5 rounded-xl bg-primary text-primary-foreground font-bold transition-all"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Launch Studio Editor</span>
+                  </span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-12 w-full space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-8 sm:space-y-10">
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold shadow-2xs">
             <Flame className="w-3.5 h-3.5 text-amber-500" />

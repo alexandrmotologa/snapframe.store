@@ -172,7 +172,7 @@ export default function AppStoreScreenshotSizesPage() {
       />
       {/* ── Top Header ── */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
               <SnapFrameLogo size={28} />
@@ -261,7 +261,7 @@ export default function AppStoreScreenshotSizesPage() {
         </div>
 
         <div className="overflow-x-auto rounded-3xl border border-border/80 bg-card/60 backdrop-blur-md shadow-xl">
-          <table className="w-full text-left text-xs sm:text-sm border-collapse">
+          <table className="w-full min-w-[620px] text-left text-xs sm:text-sm border-collapse">
             <thead>
               <tr className="border-b border-border/60 bg-secondary/40 text-muted-foreground">
                 <th className="p-4 font-semibold">Display Size & Target</th>
