@@ -174,37 +174,39 @@ export function TemplatesClient() {
       {/* Header */}
       <header className="border-b border-border/50 bg-card/70 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer group">
-            <SnapFrameLogo size={32} withText textClassName="text-lg" />
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2 cursor-pointer group shrink-0">
+              <SnapFrameLogo size={32} withText textClassName="text-lg" />
+            </Link>
 
-          <div className="hidden md:flex items-center gap-2">
-            <Link
-              href="/templates"
-              className="text-xs font-semibold text-primary px-3 py-1.5 rounded-lg bg-primary/10 flex items-center gap-1.5"
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Templates</span>
-            </Link>
-            <Link
-              href="/pricing"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
-            >
-              <Crown className="w-3.5 h-3.5 text-amber-400" />
-              <span>Pricing</span>
-            </Link>
-            <Link
-              href="/app-store-screenshot-sizes"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
-            >
-              <span>iOS Specs</span>
-            </Link>
-            <Link
-              href="/google-play-screenshot-sizes"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
-            >
-              <span>Play Store Specs</span>
-            </Link>
+            <nav className="hidden md:flex items-center gap-1.5">
+              <Link
+                href="/templates"
+                className="text-xs font-semibold text-primary px-3 py-1.5 rounded-lg bg-primary/10 flex items-center gap-1.5"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>Templates</span>
+              </Link>
+              <Link
+                href="/pricing"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
+              >
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span>Pricing</span>
+              </Link>
+              <Link
+                href="/app-store-screenshot-sizes"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
+              >
+                <span>iOS Specs</span>
+              </Link>
+              <Link
+                href="/google-play-screenshot-sizes"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
+              >
+                <span>Play Store Specs</span>
+              </Link>
+            </nav>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-2.5">
@@ -222,11 +224,11 @@ export function TemplatesClient() {
             <ThemeToggle />
             <UserMenu />
 
-            {/* Mobile Menu Toggle Button */}
+            {/* Mobile / Tablet Menu Toggle Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+              className="min-[1100px]:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
               aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >
@@ -235,14 +237,14 @@ export function TemplatesClient() {
           </div>
         </div>
 
-        {/* Mobile Dropdown Sheet */}
+        {/* Mobile / Tablet Dropdown Sheet */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl px-6 py-4 space-y-3 overflow-hidden shadow-2xl"
+              className="min-[1100px]:hidden border-t border-border/50 bg-card/95 backdrop-blur-xl px-6 py-4 space-y-3 overflow-hidden shadow-2xl"
             >
               <div className="flex flex-col space-y-2 text-sm font-medium">
                 <Link
