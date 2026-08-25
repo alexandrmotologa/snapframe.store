@@ -129,7 +129,7 @@ export function UpgradeModal() {
         <DialogDescription className="sr-only">Choose between monthly and annual plans for unlimited AI, 4K exports, and video studio.</DialogDescription>
 
         {/* Top Header Banner */}
-        <div className="relative p-6 sm:p-8 bg-gradient-to-br from-indigo-950/60 via-purple-950/40 to-background border-b border-border/60">
+        <div className="relative p-6 sm:p-8 pr-14 sm:pr-16 bg-gradient-to-br from-indigo-950/60 via-purple-950/40 to-background border-b border-border/60">
           <div className="flex items-center justify-between">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold uppercase tracking-wider shadow-sm">
               <Crown className="w-3.5 h-3.5" />

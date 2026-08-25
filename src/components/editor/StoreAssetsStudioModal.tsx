@@ -256,7 +256,7 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="max-w-6xl w-full h-[90vh] p-0 flex flex-col bg-card/95 backdrop-blur-2xl border border-border/80 shadow-2xl rounded-3xl overflow-hidden">
         {/* Header with Navigation Tabs */}
-        <DialogHeader className="p-4 sm:p-6 pb-4 border-b border-border/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
+        <DialogHeader className="p-4 sm:p-6 pr-14 sm:pr-16 pb-4 border-b border-border/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-purple-500/25">
               <Sparkles className="w-5 h-5" />

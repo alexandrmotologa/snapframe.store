@@ -145,8 +145,8 @@ export function QuickTipsModal({ open, onClose }: QuickTipsModalProps) {
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-xl p-0 overflow-hidden bg-card/95 backdrop-blur-2xl border border-border/80 shadow-2xl rounded-3xl">
         {/* ── Top Header with Step Badge ── */}
-        <div className="p-6 pb-4 border-b border-border/50 bg-secondary/30">
-          <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="p-6 pr-14 pb-4 border-b border-border/50 bg-secondary/30">
+          <div className="flex items-center gap-2.5 mb-2">
             <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5 rounded-full border border-border/60 bg-background/80">
               {step.badge}
             </Badge>
