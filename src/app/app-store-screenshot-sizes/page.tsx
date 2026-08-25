@@ -26,7 +26,7 @@ const IOS_SIZES = [
     aspectRatio: "19.5:9 (~9:19.5)",
     devices: "iPhone 16 Pro Max",
     status: "Latest 2025/2026 Spec",
-    badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
   },
   {
     category: "6.7\" Display (iPhone 15 Pro Max / 16 Plus)",
@@ -35,7 +35,7 @@ const IOS_SIZES = [
     aspectRatio: "19.5:9",
     devices: "iPhone 16 Plus, 15 Pro Max, 15 Plus, 14 Pro Max",
     status: "Primary Required",
-    badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
   },
   {
     category: "6.5\" Display (iPhone 11 Pro Max / XS Max)",
@@ -44,7 +44,7 @@ const IOS_SIZES = [
     aspectRatio: "19.5:9",
     devices: "iPhone 11 Pro Max, iPhone XS Max, iPhone XR (828 × 1792)",
     status: "Standard Spec",
-    badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    badgeColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
   },
   {
     category: "5.5\" Display (iPhone 8 Plus / SE legacy)",
@@ -53,7 +53,7 @@ const IOS_SIZES = [
     aspectRatio: "16:9",
     devices: "iPhone 8 Plus, 7 Plus, 6s Plus",
     status: "Legacy Option",
-    badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    badgeColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
   },
   {
     category: "13\" Display (iPad Pro M4 / iPad Pro 12.9\")",
@@ -62,7 +62,7 @@ const IOS_SIZES = [
     aspectRatio: "4:3 (3:4)",
     devices: "iPad Pro 13\" (M4), iPad Pro 12.9\" (1st–6th gen: 2048 × 2732)",
     status: "iPad Primary Required",
-    badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
   },
   {
     category: "11\" Display (iPad Pro 11\" / iPad Air)",
@@ -71,7 +71,7 @@ const IOS_SIZES = [
     aspectRatio: "1.43:1",
     devices: "iPad Pro 11\" (1st–4th gen, M4), iPad Air 11\" (M2)",
     status: "iPad Standard",
-    badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    badgeColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
   },
 ];
 

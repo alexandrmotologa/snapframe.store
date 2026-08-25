@@ -74,7 +74,7 @@ export function Footer() {
                 <li>
                   <Link href="/templates" className="hover:text-foreground transition-colors font-medium text-foreground flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
-                    <span>50+ Screenshot Templates</span>
+                    <span>55+ Screenshot Templates</span>
                   </Link>
                 </li>
                 <li>
