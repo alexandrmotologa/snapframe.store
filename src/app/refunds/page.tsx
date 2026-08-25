@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Refund Policy | SnapFrame",
   description:
     "Learn about SnapFrame's 14-day money-back guarantee, cancellation policy, and how to request a refund through Paddle.",
+  alternates: {
+    canonical: "https://snapframe.store/refunds",
+  },
 };
 
 export default function RefundPolicyPage() {

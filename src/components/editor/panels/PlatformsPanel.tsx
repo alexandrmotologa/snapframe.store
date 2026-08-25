@@ -147,7 +147,7 @@ export const PlatformsPanel = memo(function PlatformsPanel() {
         resLabel = is69 ? '6.9" Display (1320 × 2868)' : is67 ? '6.7" Display (1290 × 2796)' : `${w} × ${h} px`;
       }
     } else {
-      const minSideValid = Math.min(w, h) >= 1080 || Math.max(w, h) >= 1080;
+      const minSideValid = Math.min(w, h) >= 720 && Math.max(w, h) >= 1080;
       const ratio = h / w;
       resValid = minSideValid && (isTablet ? ratio >= 1.35 && ratio <= 1.85 : ratio >= 1.5 && ratio <= 2.3);
       resLabel = isTablet ? `${w} × ${h} px (Tablet 16:10 / 4:3)` : `${w} × ${h} px (9:16 Standard)`;

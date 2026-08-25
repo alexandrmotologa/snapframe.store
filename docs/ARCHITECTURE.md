@@ -196,7 +196,16 @@ When users add an **iPad Pro (2048 × 2732 px)** or **Android Tablet (1600 × 25
 ### 6.9 Synchronous History Snapshots & Fail-Safe Storage Sandboxing
 - **Synchronous Pre-Mutation Snapshotting:** Structural editor actions (`addScreen`, `deleteScreen`, `reorderScreens`, `addScreenSet`, `removeScreenSet`, `applyTemplate`) invoke `recordHistory(true)` immediately *prior* to state mutations. This guarantees the pre-action baseline is saved to the history stack so `undo()` (`Ctrl+Z`) restores the exact pre-mutation state deterministically.
 - **Continuous Debounced History:** Live value sliders, color pickers, and transform drags batch history states with a 300ms debounce timer to prevent history array explosion.
-- **Fail-Safe Browser Storage:** All client-side persistence invocations (`localStorage`) operate within structured `try/catch` sandboxes, ensuring zero unhandled exceptions when users operate in restricted incognito windows or private browsing containers.
+### 6.10 Resilient Auth, Safe AI Credit Consumption & Search Enhancements
+- **Resilient Server Token Fallback (`serverAuth.ts`):** Validates Firebase ID tokens with RS256 algorithm enforcement, expiration check, and clock-skew tolerance. Emits structured warnings and maintains non-blocking operation for local/preview environments.
+- **Safe Pre-Flight AI Credit Consumption:** Components verify credit availability via `checkAiCreditAvailable()` prior to API dispatch and execute `consumeAiCredit()` strictly upon 200 OK server response and payload validation.
+- **Keyword-Mapped Sticker Search (`StickersPanel.tsx`):** Built-in bidirectional emoji dictionary mapping common terms (`heart`, `fire`, `star`, `rocket`, `smile`, etc.) to emoji elements for instant search discovery.
+- **Google Rich Results Schema.org JSON-LD:** Structured `FAQPage` and `BreadcrumbList` schemas on guide routes (`/app-store-screenshot-sizes` and `/google-play-screenshot-sizes`) for optimal Google SERP click-through rates.
+
+### 6.11 Productivity Power-Ups & Brand Management Suite
+- **📝 Batch Captions Editor (`BatchCaptionsWidget`):** Tabular multi-screen text editing mode allowing creators to review and edit primary headlines and subtitles across all screens simultaneously with instant canvas synchronization.
+- **🎨 Project Brand Kit (`BrandKitPalette.tsx`):** Project-scoped brand color palette supporting 1-click application across backgrounds, text layers, and shapes, with tiered capacity limits (3 colors for Free, 12 colors for Pro).
+- **🪄 Quick AI Text Actions:** 1-click optimization chips in `AICopywriterWidget` (`✂️ Shorten (<30c)`, `🔥 Add Emojis`, `🎯 Benefit-Driven`, `🚀 High Energy`, `✨ Rewrite Tone`, `💡 5 Alternatives`) powered by contextual AI copywriter prompts.
 
 ---
 
@@ -208,7 +217,8 @@ SnapFrame enforces a conversion-optimized 3-tier architecture:
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **👤 Guest** | 1 Active Session Project | 1-Click Clipboard Copy only (ZIP prompts free sign-in) | Standard Store Sizes only | Active Screen only | 🔒 Locked (Prompts sign-in) | 🔒 Locked (Prompts sign-in) | ❌ Local memory | $0 (No sign-in) |
 | **🟢 Free Registered** | Up to 3 Local Projects | Up to 3 screens per set (1 device platform, 1 language) | Standard Store Sizes only | Screens 1 to 3 | Phone Simulator (iPhone & Android) | 3 Complimentary Credits | ❌ LocalStorage | $0 (Google / GitHub) |
-| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless, Dual Theme | Freeform W × H, Product Hunt, Twitter, IG, Web Hero & Mockup Scale (50%–150%) | All 10 screens lossless | Phone & Tablet Simulator (iPad Pro 13" & Tabs) | 500 Credits / Month | ✅ Google Firestore | $9/mo or $69/yr |
+| **⭐ SnapFrame Pro** | Unlimited Projects | Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android + Tablet), 40+ languages, Fastlane suite, 4K lossless, Dual Theme | Freeform W × H, Product Hunt, Twitter, IG, Web Hero & Mockup Scale (50%–150%) | All 10 screens lossless | Phone & Tablet Simulator (iPad Pro 13" & Tabs) | 1,500 Credits / Month | ✅ Google Firestore | $9/mo or $69/yr ($5.75/mo billed annually) |
+
 
 
 

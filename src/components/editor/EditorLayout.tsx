@@ -129,6 +129,7 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
       if (renameTimerRef.current) clearTimeout(renameTimerRef.current);
       renameTimerRef.current = setTimeout(() => {
         useProjectStore.getState().updateProject(project.id, { name: val });
+        setSaveStatus("saved");
       }, 500);
     }
   };
@@ -138,7 +139,16 @@ export function EditorLayout({ projectId }: EditorLayoutProps) {
     if (project && localName !== project.name) {
       useProjectStore.getState().updateProject(project.id, { name: localName });
     }
+    setSaveStatus("saved");
   };
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (renameTimerRef.current) clearTimeout(renameTimerRef.current);
+      if (thumbTimerRef.current) clearTimeout(thumbTimerRef.current);
+    };
+  }, []);
 
   // ── Dynamic save status listener (1s debounce) ───────────────────────────
   useEffect(() => {

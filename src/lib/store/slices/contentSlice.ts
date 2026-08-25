@@ -1405,7 +1405,7 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
     get().recordHistory(true);
     set((state) => ({
       screenSets: state.screenSets.map((ss) =>
-        ss.id !== setId ? { ...ss, ...updates } : ss
+        ss.id === setId ? { ...ss, ...updates } : ss
       ),
     }));
   },

@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "Terms of Service | SnapFrame",
   description:
     "Read the Terms of Service governing your use of SnapFrame, including commercial licensing, intellectual property rights, and user account policies.",
+  alternates: {
+    canonical: "https://snapframe.store/terms",
+  },
 };
 
 export default function TermsOfServicePage() {

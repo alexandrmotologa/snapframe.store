@@ -100,10 +100,76 @@ const ANDROID_SIZES = [
 ];
 
 export default function AppStoreScreenshotSizesPage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Can I upload 6.7\" screenshots for 6.9\" iPhone 16 Pro Max displays?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes! App Store Connect allows you to provide 6.7\" screenshots (1290 × 2796) and Apple will automatically scale them for 6.9\" displays. However, to achieve maximum visual clarity and pixel sharpness, SnapFrame allows you to export true 1320 × 2868 lossless 6.9\" assets.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Why does App Store Connect reject PNG screenshots with transparency?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Apple requires all screenshot submissions to have a solid background without alpha channels (transparency). SnapFrame guarantees that all exported PNG, WebP, and JPEG files are flattened with 0% alpha channel to eliminate App Store upload rejection errors.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How many screenshots should I include for optimal conversion rates?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Top grossing apps upload between 5 to 7 screenshots per localization. The first 3 screenshots represent over 80% of all user impressions in App Store search results, so make sure your first 3 screens convey your primary value proposition with bold, legible headlines.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Does SnapFrame generate localized screenshots for international App Stores?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes! With SnapFrame Pro, you can design your master set once and automatically duplicate and translate headlines across 40+ languages (German, French, Japanese, Spanish, Romanian, Chinese, and more) with 1-click Fastlane ZIP exports.",
+        },
+      },
+    ],
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://snapframe.store",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "App Store Screenshot Sizes Guide",
+        item: "https://snapframe.store/app-store-screenshot-sizes",
+      },
+    ],
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {/* ── Top Header ── */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -330,6 +396,7 @@ export default function AppStoreScreenshotSizesPage() {
             >
               <button
                 type="button"
+                aria-expanded={openFaq === idx}
                 onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                 className="w-full p-4 sm:p-5 flex items-center justify-between text-left font-semibold text-sm text-foreground hover:bg-secondary/40 transition-colors cursor-pointer"
               >

@@ -511,6 +511,7 @@ export async function renderScreenToCanvas(
         else ctx.rect(x, y, w, h);
         ctx.fillStyle = "rgba(99,102,241,0.08)";
         ctx.fill();
+        ctx.restore();
         continue;
       }
 

@@ -46,6 +46,7 @@ interface AuthState {
   linkWithGithub: () => Promise<User | null>;
   signOutUser: () => Promise<void>;
   consumeAiCredit: (feature?: string) => Promise<{ allowed: boolean; remaining: number; isPro: boolean }>;
+  checkAiCreditAvailable: () => boolean;
   setProStatus: (isPro: boolean, plan?: string) => void;
 }
 
@@ -348,8 +349,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
               }
 
               const currentState = get();
-              const hasActiveLocalPro = Boolean(currentState.isPro && currentState.user?.uid === currentUser.uid);
-              const isProVal = Boolean(verification.isPro || hasActiveLocalPro);
+              const isProVal = typeof verification.isPro === "boolean"
+                ? verification.isPro
+                : Boolean(currentState.isPro && currentState.user?.uid === currentUser.uid);
               const planVal = verification.plan || (isProVal ? (currentState.plan || "pro-monthly") : null);
               const subStatusVal = verification.subscriptionStatus || (isProVal ? "active" : null);
               const creditsVal = isProVal
@@ -433,6 +435,25 @@ export const useAuthStore = create<AuthState>((set, get) => {
       const nextPlan = plan || (isPro ? "pro-monthly" : null);
       set({ isPro, plan: nextPlan });
       persistAuthSession({ ...get(), isPro, plan: nextPlan });
+    },
+
+    checkAiCreditAvailable: () => {
+      const state = get();
+      const currentUser = state.user;
+      if (!currentUser || currentUser.isAnonymous) {
+        set({ isAuthModalOpen: true });
+        toast.info("AI features require a free account. Sign in with Google or GitHub to get 3 free AI credits!");
+        return false;
+      }
+      if (state.isPro) {
+        return true;
+      }
+      if (state.aiCredits <= 0) {
+        set({ isUpgradeModalOpen: true });
+        toast.info("You've used all 3 free AI credits. Upgrade to SnapFrame Pro for unlimited AI!");
+        return false;
+      }
+      return true;
     },
 
     consumeAiCredit: async (feature = "general") => {

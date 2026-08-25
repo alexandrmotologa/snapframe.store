@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "Privacy Policy | SnapFrame",
   description:
     "Learn how SnapFrame collects, protects, and handles your data in full compliance with the European General Data Protection Regulation (GDPR) and CCPA.",
+  alternates: {
+    canonical: "https://snapframe.store/privacy",
+  },
 };
 
 export default function PrivacyPolicyPage() {

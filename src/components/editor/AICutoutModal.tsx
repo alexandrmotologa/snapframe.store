@@ -39,7 +39,7 @@ function AICutoutModalContent({
   initialImageSrc?: string;
 }) {
   const { getActiveSet, getActiveScreen, addLayer, getActiveLayer } = useEditorStore();
-  const { user, consumeAiCredit, setAuthModalOpen } = useAuthStore();
+  const { user, consumeAiCredit, checkAiCreditAvailable, setAuthModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const [imageSrc, setImageSrc] = useState<string>(() => {
@@ -175,8 +175,7 @@ function AICutoutModalContent({
       return;
     }
 
-    const creditRes = await consumeAiCredit("ai-cutout");
-    if (!creditRes.allowed) return;
+    if (!checkAiCreditAvailable()) return;
 
     const set = getActiveSet();
     const screen = getActiveScreen();
@@ -205,6 +204,7 @@ function AICutoutModalContent({
     };
 
     addLayer(set.id, screen.id, popoutLayer);
+    await consumeAiCredit("ai-cutout");
     toast.success("✨ Added 3D Pop-Out floating layer to canvas!");
     onClose();
   };

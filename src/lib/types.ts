@@ -455,6 +455,8 @@ export interface Project {
   activeLanguage?: string;
   /** Global theme for colors */
   themeId?: ThemeId;
+  /** Custom saved brand colors palette for this project (HEX codes) */
+  brandColors?: string[];
   /** Store listing text metadata mapped by langCode (e.g. 'en', 'fr') */
   storeListing?: Record<string, {
     ios?: { name: string; subtitle: string; description: string; promotionalText: string; whatsNew: string };

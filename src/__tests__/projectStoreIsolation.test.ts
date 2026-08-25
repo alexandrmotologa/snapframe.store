@@ -141,4 +141,37 @@ describe("Project Store Multi-Tenant Isolation & Storage", () => {
     expect(userProjects).toHaveLength(1);
     expect(userProjects[0].name).toBe("My First Draft Screenshot");
   });
+
+  it("should add, cap, and remove brand colors on project", () => {
+    const testProject: Project = {
+      id: "brand-proj",
+      name: "Brand App",
+      templateId: null,
+      screenSets: [],
+      createdAt: 1000,
+      updatedAt: 1000,
+    };
+
+    useProjectStore.setState({ projects: [testProject] });
+
+    // Add colors
+    const res1 = useProjectStore.getState().addBrandColor("brand-proj", "#6366F1");
+    const res2 = useProjectStore.getState().addBrandColor("brand-proj", "#10B981");
+    const res3 = useProjectStore.getState().addBrandColor("brand-proj", "#F59E0B");
+    expect(res1).toBe(true);
+    expect(res2).toBe(true);
+    expect(res3).toBe(true);
+
+    const updated = useProjectStore.getState().projects[0];
+    expect(updated.brandColors).toEqual(["#6366F1", "#10B981", "#F59E0B"]);
+
+    // Free limit is 3 colors, 4th addition should fail for free users
+    const res4 = useProjectStore.getState().addBrandColor("brand-proj", "#EC4899");
+    expect(res4).toBe(false);
+
+    // Remove color
+    useProjectStore.getState().removeBrandColor("brand-proj", "#10B981");
+    const afterRemove = useProjectStore.getState().projects[0];
+    expect(afterRemove.brandColors).toEqual(["#6366F1", "#F59E0B"]);
+  });
 });

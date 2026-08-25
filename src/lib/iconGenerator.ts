@@ -15,6 +15,11 @@ export function downloadBlob(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+export function sanitizeAppName(name: string): string {
+  const clean = (name || "App").trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+  return clean || "app";
+}
+
 export interface IconStyleConfig {
   type: "glyph" | "emoji" | "image" | "text";
   symbolName: string; // e.g. "Sparkles", "Camera", "Flame", etc.
@@ -395,7 +400,8 @@ export async function exportXcodeAppIconSet(config: IconStyleConfig, appName: st
   }
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
-  downloadBlob(zipBlob, `${appName.toLowerCase().replace(/\s+/g, "-")}-AppIcon.appiconset.zip`);
+  const safeName = sanitizeAppName(appName);
+  downloadBlob(zipBlob, `${safeName}-AppIcon.appiconset.zip`);
 }
 
 /**
@@ -438,7 +444,8 @@ export async function exportAndroidIconBundle(config: IconStyleConfig, appName: 
   }
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
-  downloadBlob(zipBlob, `${appName.toLowerCase().replace(/\s+/g, "-")}-android-icons.zip`);
+  const safeName = sanitizeAppName(appName);
+  downloadBlob(zipBlob, `${safeName}-android-icons.zip`);
 }
 
 /**
@@ -463,5 +470,6 @@ export async function exportWebFaviconPack(config: IconStyleConfig, appName: str
   }
 
   const zipBlob = await zip.generateAsync({ type: "blob" });
-  downloadBlob(zipBlob, `${appName.toLowerCase().replace(/\s+/g, "-")}-favicon-pack.zip`);
+  const safeName = sanitizeAppName(appName);
+  downloadBlob(zipBlob, `${safeName}-favicon-pack.zip`);
 }

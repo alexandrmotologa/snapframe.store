@@ -12,12 +12,20 @@ function decodeAndValidateJwt(token: string): { uid: string; email?: string } | 
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
+
+    // Validate header format
+    const header = JSON.parse(Buffer.from(parts[0], "base64url").toString("utf8"));
+    if (!header || typeof header !== "object") return null;
+
     const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
     const uid = payload.user_id || payload.sub || payload.uid;
-    if (!uid) return null;
+    if (!uid || typeof uid !== "string") return null;
 
     const nowSec = Math.floor(Date.now() / 1000);
     if (typeof payload.exp === "number" && payload.exp < nowSec) {
+      return null;
+    }
+    if (typeof payload.iat === "number" && payload.iat > nowSec + 300) {
       return null;
     }
 
@@ -101,6 +109,7 @@ export async function verifyAuth(
   }
 
   // Resilient token validation fallback when Admin SDK service credentials are not configured
+  console.warn("[ServerAuth] Notice: Firebase Admin credentials not loaded. Using fallback JWT structure validator.");
   const validated = decodeAndValidateJwt(idToken);
   if (!validated) {
     return {

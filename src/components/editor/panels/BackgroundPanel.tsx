@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { GradientDirection } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ColorInput } from "@/components/ui/color-input";
+import { BrandKitPalette } from "@/components/editor/BrandKitPalette";
 import { Upload, Sparkles, Paintbrush, Blend, Grid3X3, Link2 } from "lucide-react";
 
 type Tab = "color" | "gradient" | "mesh" | "panoramic" | "ai_magic";
@@ -343,6 +344,15 @@ export const BackgroundPanel = memo(function BackgroundPanel() {
                 </span>
               </div>
             </div>
+
+            {/* Brand Kit Saved Palette */}
+            <BrandKitPalette
+              activeColor={bg?.type === "solid" ? bg.color : undefined}
+              onSelectColor={(color) => {
+                applyBg({ type: "solid", color });
+                useEditorStore.getState().recordHistory();
+              }}
+            />
 
             {/* Preset palettes */}
             <div>

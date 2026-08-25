@@ -193,6 +193,8 @@ interface ProjectStore {
   duplicateProject: (id: string) => Project;
   getProject: (id: string) => Project | undefined;
   saveProjectThumbnail: (id: string, dataUrl: string) => void;
+  addBrandColor: (projectId: string, color: string) => boolean;
+  removeBrandColor: (projectId: string, color: string) => void;
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
@@ -408,5 +410,43 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     if (modifiedProject) {
       syncProjectIfPro(modifiedProject, false);
     }
+  },
+
+  addBrandColor: (projectId, color) => {
+    const hex = color.trim().toUpperCase();
+    if (!hex.startsWith("#") || hex.length < 4) return false;
+    const project = get().projects.find((p) => p.id === projectId);
+    if (!project) return false;
+
+    const { isPro, setUpgradeModalOpen } = useAuthStore.getState();
+    const currentColors = project.brandColors || [];
+    const maxColors = isPro ? 12 : 3;
+
+    if (currentColors.some((c) => c.toUpperCase() === hex)) return true;
+
+    if (currentColors.length >= maxColors) {
+      if (!isPro) {
+        setUpgradeModalOpen(true);
+        toast.info("Free plan includes up to 3 saved brand colors. Upgrade to Pro for up to 12 colors!");
+      } else {
+        toast.info("Maximum 12 brand colors reached.");
+      }
+      return false;
+    }
+
+    const updatedColors = [...currentColors, hex];
+    get().updateProject(projectId, { brandColors: updatedColors });
+    toast.success(`Saved brand color ${hex}!`);
+    return true;
+  },
+
+  removeBrandColor: (projectId, color) => {
+    const hex = color.trim().toUpperCase();
+    const project = get().projects.find((p) => p.id === projectId);
+    if (!project || !project.brandColors) return;
+
+    const updatedColors = project.brandColors.filter((c) => c.toUpperCase() !== hex);
+    get().updateProject(projectId, { brandColors: updatedColors });
+    toast.info(`Removed ${hex} from brand palette`);
   },
 }));

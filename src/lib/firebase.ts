@@ -102,6 +102,9 @@ export async function getFirebaseAuth(): Promise<{
   })();
 
   await initPromise;
+  if (!auth) {
+    initPromise = null;
+  }
   return { auth, googleProvider, githubProvider };
 }
 

@@ -148,7 +148,7 @@ function StoreListingContent({
   const updateProject = useProjectStore((s) => s.updateProject);
   const getProject = useProjectStore((s) => s.getProject);
   const screenSets = useEditorStore((s) => s.screenSets);
-  const { user, consumeAiCredit } = useAuthStore();
+  const { user, consumeAiCredit, checkAiCreditAvailable } = useAuthStore();
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [appStoreData, setAppStoreData] = useState<AppStoreListingData>(initialAppStore);
@@ -179,8 +179,7 @@ function StoreListingContent({
       return;
     }
 
-    const creditRes = await consumeAiCredit("ai-store-listing");
-    if (!creditRes.allowed) return;
+    if (!checkAiCreditAvailable()) return;
 
     try {
       setIsGenerating(true);
@@ -213,6 +212,8 @@ function StoreListingContent({
       if (!res.ok || data.error) {
         throw new Error(data.error || "Failed to generate listing");
       }
+
+      await consumeAiCredit("ai-store-listing");
 
       if (data.listing?.ios) {
         setAppStoreData((prev) => ({

@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/account/", "/editor/"],
+        disallow: ["/api/", "/account/", "/editor/", "/projects", "/projects/"],
       },
     ],
     sitemap: "https://snapframe.store/sitemap.xml",

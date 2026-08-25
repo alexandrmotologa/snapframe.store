@@ -46,11 +46,23 @@ Return JSON:
   ]
 }`;
     } else {
+      let actionDirective = `Rewrite the text to be engaging in tone: ${tone}.`;
+      if (action === "shorten") {
+        actionDirective = "Shorten the text to be ultra-concise, punchy, and strictly under 28 characters.";
+      } else if (action === "emojis") {
+        actionDirective = "Add 1 or 2 relevant, high-converting emojis to the headline to increase App Store click-through rate.";
+      } else if (action === "benefit") {
+        actionDirective = "Transform this feature description into a customer-centric benefit proposition (what the user gains/achieves).";
+      } else if (action === "punchy") {
+        actionDirective = "Rewrite with strong action power verbs to maximize conversion and engagement.";
+      }
+
       prompt = `You are an expert App Store marketing copywriter.
-Task: ${action} the following text: "${text}".
+Task: ${actionDirective}
+Original Text: "${text}".
 Tone: ${tone}.
 Target Language: ${language}.
-CRITICAL CONSTRAINT: The output MUST be strictly under ${maxLength} characters in length (no exceptions!).
+CRITICAL CONSTRAINT: The output "result" and each of the "variations" MUST be strictly under ${maxLength} characters in total length (including spaces and emojis, no exceptions!).
 
 Return JSON:
 {

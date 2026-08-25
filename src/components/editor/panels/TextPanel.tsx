@@ -7,8 +7,9 @@ import { toast } from "@/lib/store/toastStore";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Lock, Sparkles, Link2, Palette, Check, RefreshCw } from "lucide-react";
+import { Lock, Sparkles, Link2, Palette, Check, RefreshCw, Type, ListOrdered, Crown, Plus, Wand2 } from "lucide-react";
 import { TEXT_GRADIENT_PRESETS, TextGradientPreset } from "@/lib/textPresets";
+import { BrandKitPalette } from "@/components/editor/BrandKitPalette";
 
 // ── Google Fonts loader ────────────────────────────────────────────────────────
 const GOOGLE_FONTS = [
@@ -487,7 +488,7 @@ function FontRow() {
 // ── AI Copywriter & Tone Assistant ──────────────────────────────────────────
 function AICopywriterWidget() {
   const { getActiveSet, getActiveScreen, getActiveLayer, updateLayer } = useEditorStore();
-  const { user, consumeAiCredit, setAuthModalOpen } = useAuthStore();
+  const { user, consumeAiCredit, checkAiCreditAvailable, setAuthModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const layer = getActiveLayer();
@@ -531,9 +532,8 @@ function AICopywriterWidget() {
     );
   }
 
-  const handleRunAI = async (action: "rewrite" | "shorten" | "punchy" | "emojis" | "ideas") => {
-    const creditRes = await consumeAiCredit("ai-copywriter");
-    if (!creditRes.allowed) return;
+  const handleRunAI = async (action: "rewrite" | "shorten" | "punchy" | "emojis" | "benefit" | "ideas") => {
+    if (!checkAiCreditAvailable()) return;
 
     try {
       setIsGenerating(true);
@@ -552,6 +552,8 @@ function AICopywriterWidget() {
 
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "Generation failed");
+
+      await consumeAiCredit("ai-copywriter");
 
       if (data.result) {
         updateLayer(set.id, screen.id, layer.id, { content: data.result } as Partial<import("@/lib/types").Layer>);
@@ -577,7 +579,7 @@ function AICopywriterWidget() {
       {/* Title & Live Character Meter */}
       <div className="flex items-center justify-between text-xs">
         <span className="font-bold flex items-center gap-1 text-foreground">
-          <span className="text-indigo-400">✨</span> AI Copywriter &amp; Tone
+          <span className="text-indigo-400">✨</span> AI Copywriter &amp; Quick Actions
         </span>
         <span
           className={cn(
@@ -618,23 +620,13 @@ function AICopywriterWidget() {
         ))}
       </div>
 
-      {/* Quick Action Buttons */}
+      {/* Quick AI Action Buttons */}
       <div className="grid grid-cols-2 gap-1.5">
-        <button
-          type="button"
-          onClick={() => handleRunAI("rewrite")}
-          disabled={isGenerating || !currentText}
-          className="h-7 px-2 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-        >
-          {isGenerating ? <span className="animate-spin text-xs">⏳</span> : <span>✨</span>}
-          <span>Rewrite Tone</span>
-        </button>
-
         <button
           type="button"
           onClick={() => handleRunAI("shorten")}
           disabled={isGenerating || !currentText}
-          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
         >
           <span>✂️</span>
           <span>Shorten (&lt;30c)</span>
@@ -642,19 +634,49 @@ function AICopywriterWidget() {
 
         <button
           type="button"
+          onClick={() => handleRunAI("emojis")}
+          disabled={isGenerating || !currentText}
+          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
+        >
+          <span>🔥</span>
+          <span>Add Emojis</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleRunAI("benefit")}
+          disabled={isGenerating || !currentText}
+          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
+        >
+          <span>🎯</span>
+          <span>Benefit-Driven</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => handleRunAI("punchy")}
           disabled={isGenerating || !currentText}
-          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
         >
-          <span>💥</span>
-          <span>Make Punchier</span>
+          <span>🚀</span>
+          <span>High Energy</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleRunAI("rewrite")}
+          disabled={isGenerating || !currentText}
+          className="h-7 px-2 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
+        >
+          {isGenerating ? <span className="animate-spin text-xs">⏳</span> : <span>✨</span>}
+          <span>Rewrite Tone</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleRunAI("ideas")}
           disabled={isGenerating}
-          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+          className="h-7 px-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
         >
           <span>💡</span>
           <span>5 Alternatives</span>
@@ -690,9 +712,231 @@ function AICopywriterWidget() {
   );
 }
 
+// ── Batch Captions Editor Widget (Edit All Headlines) ──────────────────────────
+function BatchCaptionsWidget() {
+  const { getActiveSet, updateLayer, addLayer, setActiveScreen, activeScreenId } = useEditorStore();
+  const { isPro, setUpgradeModalOpen, checkAiCreditAvailable, consumeAiCredit } = useAuthStore();
+  const [isRewritingAll, setIsRewritingAll] = useState(false);
+  const activeSet = getActiveSet();
+
+  if (!activeSet) return null;
+
+  const screens = activeSet.screens;
+
+  const handleUpdateText = (screenId: string, layerId: string, content: string) => {
+    updateLayer(activeSet.id, screenId, layerId, { content } as Partial<import("@/lib/types").Layer>);
+  };
+
+  const handleCommit = () => {
+    useEditorStore.getState().recordHistory();
+  };
+
+  const handleAddDefaultHeadline = (screenId: string) => {
+    const targetScreen = screens.find((s) => s.id === screenId);
+    if (!targetScreen) return;
+    addLayer(activeSet.id, screenId, {
+      type: "text",
+      content: "Catchy App Feature",
+      fontSize: 120,
+      fontWeight: 800,
+      fontFamily: "Inter",
+      color: "#ffffff",
+      align: "center",
+      lineHeight: 1.1,
+      letterSpacing: -1,
+      width: 1100,
+      height: 250,
+      x: Math.round((targetScreen.width - 1100) / 2),
+      y: Math.round(targetScreen.height * 0.2),
+      rotation: 0,
+      opacity: 1,
+    } as Parameters<typeof addLayer>[2]);
+    toast.success("Added headline layer!");
+  };
+
+  const handleAiBatchRewrite = async () => {
+    if (!isPro) {
+      setUpgradeModalOpen(true);
+      toast.info("AI Batch Headline Generation across all screens is a Pro feature!");
+      return;
+    }
+    if (!checkAiCreditAvailable()) return;
+
+    try {
+      setIsRewritingAll(true);
+      const currentCaptions = screens.map((s, idx) => {
+        const textLayers = (s.layers.filter((l) => l.type === "text") as import("@/lib/types").TextLayer[])
+          .sort((a, b) => (b.fontSize || 0) - (a.fontSize || 0));
+        return {
+          screenIndex: idx + 1,
+          screenId: s.id,
+          headlineLayerId: textLayers[0]?.id,
+          currentText: textLayers[0]?.content || `Screen ${idx + 1} Feature`,
+        };
+      });
+
+      const res = await fetch("/api/ai/copywriter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "ideas",
+          niche: "mobile application high-converting narrative",
+          maxLength: 30,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Batch generation failed");
+
+      await consumeAiCredit("ai-batch-captions");
+
+      const ideas = data.options || data.variations || [];
+      if (ideas.length > 0) {
+        currentCaptions.forEach((item, idx) => {
+          const newText = ideas[idx % ideas.length];
+          if (item.headlineLayerId && newText) {
+            updateLayer(activeSet.id, item.screenId, item.headlineLayerId, {
+              content: newText,
+            } as Partial<import("@/lib/types").Layer>);
+          }
+        });
+        useEditorStore.getState().recordHistory();
+        toast.success(`Rewrote headlines across ${screens.length} screens!`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to batch rewrite headlines");
+    } finally {
+      setIsRewritingAll(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full space-y-3 p-3 min-h-0 overflow-hidden">
+      {/* Top Banner & Quick Actions */}
+      <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-secondary/60 border border-border/60 shrink-0">
+        <div>
+          <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+            <span>📝 Batch Headlines Editor</span>
+          </h4>
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Edit text across all {screens.length} screens simultaneously
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleAiBatchRewrite}
+          disabled={isRewritingAll}
+          className="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-[10.5px] font-bold flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95 disabled:opacity-50 shrink-0"
+        >
+          {isRewritingAll ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+          <span>{isPro ? "AI Rewrite All" : "AI Rewrite (Pro)"}</span>
+        </button>
+      </div>
+
+      {/* Screen Cards List */}
+      <ScrollArea className="flex-1 min-h-0 pr-1">
+        <div className="space-y-3 pb-16">
+          {screens.map((screen, idx) => {
+            const isLocked = !isPro && idx >= 3;
+            const isSelected = activeScreenId === screen.id;
+            const textLayers = (screen.layers.filter((l) => l.type === "text") as import("@/lib/types").TextLayer[])
+              .sort((a, b) => (b.fontSize || 0) - (a.fontSize || 0));
+
+            return (
+              <div
+                key={screen.id}
+                onClick={() => setActiveScreen(screen.id)}
+                className={cn(
+                  "p-3 rounded-2xl border transition-all relative overflow-hidden",
+                  isSelected
+                    ? "bg-card border-primary ring-1 ring-primary/40 shadow-xs"
+                    : "bg-card/70 border-border/70 hover:border-border"
+                )}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10.5px] font-mono font-bold flex items-center justify-center border border-primary/20">
+                      {idx + 1}
+                    </span>
+                    <span className="text-xs font-bold text-foreground">Screen {idx + 1}</span>
+                  </div>
+                  {isLocked && (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[9.5px] font-bold flex items-center gap-1">
+                      <Lock className="w-2.5 h-2.5" /> Pro (4–10)
+                    </span>
+                  )}
+                </div>
+
+                {/* Text Layer Inputs */}
+                {textLayers.length > 0 ? (
+                  <div className="space-y-2">
+                    {textLayers.map((tl, lIdx) => {
+                      const isHeadline = lIdx === 0;
+                      return (
+                        <div key={tl.id} className="space-y-1">
+                          <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
+                            <span>{isHeadline ? "Primary Headline" : `Subtitle / Layer ${lIdx + 1}`}</span>
+                            <span className="font-mono text-[9px]">{tl.content?.length || 0}c</span>
+                          </div>
+                          <textarea
+                            disabled={isLocked}
+                            value={tl.content || ""}
+                            onChange={(e) => handleUpdateText(screen.id, tl.id, e.target.value)}
+                            onBlur={handleCommit}
+                            rows={isHeadline ? 2 : 1}
+                            placeholder={isHeadline ? "Enter headline..." : "Enter subtitle..."}
+                            className={cn(
+                              "w-full px-2.5 py-1.5 text-xs rounded-xl bg-secondary/70 border border-border/60 text-foreground outline-none resize-none focus:ring-1 focus:ring-primary/40 font-medium leading-snug",
+                              isLocked && "opacity-50 cursor-not-allowed"
+                            )}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-3 border border-dashed border-border/70 rounded-xl bg-secondary/20">
+                    <p className="text-[11px] text-muted-foreground mb-2">No text layers on this screen</p>
+                    <button
+                      type="button"
+                      disabled={isLocked}
+                      onClick={() => handleAddDefaultHeadline(screen.id)}
+                      className="px-3 py-1 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Add Headline</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Pro Lock Overlay for screens 4+ on Free tier */}
+                {isLocked && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUpgradeModalOpen(true);
+                    }}
+                    className="absolute inset-0 bg-background/70 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-3 text-center cursor-pointer group z-10"
+                  >
+                    <Crown className="w-5 h-5 text-amber-500 fill-amber-500 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold text-foreground">Unlock Screen {idx + 1} with Pro</span>
+                    <span className="text-[10px] text-muted-foreground mt-0.5">Free plan supports batch editing screens 1–3</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
 // ── Main TextPanel ─────────────────────────────────────────────────────────────
 export const TextPanel = memo(function TextPanel() {
-  const { getActiveSet, getActiveScreen, addLayer, getActiveLayer } = useEditorStore();
+  const { getActiveSet, getActiveScreen, addLayer, getActiveLayer, updateLayer } = useEditorStore();
+  const [panelMode, setPanelMode] = useState<"presets" | "batch">("presets");
   const [activeCategory, setActiveCategory] = useState("Niche Copy (AI)");
   const activeLayer = getActiveLayer();
   const hasTextLayer = activeLayer?.type === "text";
@@ -726,84 +970,140 @@ export const TextPanel = memo(function TextPanel() {
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
-      {/* Smart Typography Sync (Text Link) — shown when text layer is active */}
-      {hasTextLayer && <SmartSyncWidget />}
-
-      {/* Metallic & Glow Text Gradients Picker — shown when text layer is active */}
-      {hasTextLayer && <TextGradientsWidget />}
-
-      {/* AI Copywriter Widget — shown when text layer is active */}
-      {hasTextLayer && <AICopywriterWidget />}
-
-      {/* Font selector — shown when text layer is active */}
-      {hasTextLayer && <FontRow />}
-
-      {/* Category tabs */}
-      <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0 overflow-x-auto">
-        {PRESET_CATEGORIES.map((cat) => (
+      {/* Top Mode Segmented Switcher */}
+      <div className="p-2 border-b border-border/40 bg-card/60 shrink-0">
+        <div className="grid grid-cols-2 gap-1 p-1 bg-secondary/80 rounded-xl border border-border/40">
           <button
-            key={cat.name}
             type="button"
-            onClick={() => setActiveCategory(cat.name)}
+            onClick={() => setPanelMode("presets")}
             className={cn(
-              "shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all",
-              activeCategory === cat.name
-                ? "bg-primary text-primary-foreground font-semibold"
-                : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
+              "py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none",
+              panelMode === "presets"
+                ? "bg-background text-foreground shadow-xs ring-1 ring-border/50"
+                : "text-muted-foreground hover:text-foreground active:scale-95"
             )}
           >
-            {cat.name}
+            <Type className="w-3.5 h-3.5" />
+            <span>Layer &amp; Styles</span>
           </button>
-        ))}
+          <button
+            type="button"
+            onClick={() => setPanelMode("batch")}
+            className={cn(
+              "py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer select-none",
+              panelMode === "batch"
+                ? "bg-background text-foreground shadow-xs ring-1 ring-border/50"
+                : "text-muted-foreground hover:text-foreground active:scale-95"
+            )}
+          >
+            <ListOrdered className="w-3.5 h-3.5 text-primary" />
+            <span>All Headlines</span>
+          </button>
+        </div>
       </div>
 
-      <p className="px-4 text-[10px] text-muted-foreground mb-1">Click to add to active screen</p>
+      {panelMode === "batch" ? (
+        <BatchCaptionsWidget />
+      ) : (
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Smart Typography Sync (Text Link) — shown when text layer is active */}
+          {hasTextLayer && <SmartSyncWidget />}
 
-      <ScrollArea className="flex-1 min-h-0 overflow-hidden">
-        <div className="px-3 pb-16 space-y-2">
-          {category.presets.map((preset) => (
-            <button
-              key={preset.label}
-              type="button"
-              onClick={() => handleAdd(preset)}
-              className="w-full text-left px-4 py-3.5 rounded-xl bg-secondary/50 hover:bg-secondary/90 border border-border/50 hover:border-primary/40 hover:ring-1 hover:ring-primary/30 transition-all group relative overflow-hidden cursor-pointer"
-            >
-              {/* Custom Preview or theme-adaptive text preview */}
-              {preset.customPreview ? (
-                <div className="w-full flex items-center justify-start py-0.5">
-                  {preset.customPreview}
-                </div>
-              ) : preset.preview ? (
-                <div
-                  className={cn(
-                    "leading-tight truncate transition-colors",
-                    preset.preview.isMuted
-                      ? "text-muted-foreground group-hover:text-foreground"
-                      : "text-foreground group-hover:text-primary"
-                  )}
-                  style={{
-                    fontSize: preset.preview.fontSize,
-                    fontWeight: preset.preview.fontWeight,
-                    letterSpacing: preset.preview.letterSpacing ?? 0,
-                    lineHeight: preset.preview.lineHeight ?? 1.2,
-                    textTransform: preset.preview.uppercase ? "uppercase" : "none",
-                    whiteSpace: "pre",
-                  }}
+          {/* Brand Kit Saved Palette for Text Color — shown when text layer is active */}
+          {hasTextLayer && (
+            <div className="px-3.5 py-2.5 border-b border-border/40 bg-card/30">
+              <BrandKitPalette
+                activeColor={(activeLayer as import("@/lib/types").TextLayer).color}
+                onSelectColor={(color) => {
+                  const set = getActiveSet();
+                  const screen = getActiveScreen();
+                  if (set && screen && activeLayer) {
+                    updateLayer(set.id, screen.id, activeLayer.id, { color } as Partial<import("@/lib/types").Layer>);
+                    useEditorStore.getState().recordHistory();
+                    toast.success(`Applied brand color ${color} to text!`);
+                  }
+                }}
+              />
+            </div>
+          )}
+
+          {/* Metallic & Glow Text Gradients Picker — shown when text layer is active */}
+          {hasTextLayer && <TextGradientsWidget />}
+
+          {/* AI Copywriter Widget — shown when text layer is active */}
+          {hasTextLayer && <AICopywriterWidget />}
+
+          {/* Font selector — shown when text layer is active */}
+          {hasTextLayer && <FontRow />}
+
+          {/* Category tabs */}
+          <div className="flex gap-1 px-3 pt-3 pb-2 shrink-0 overflow-x-auto">
+            {PRESET_CATEGORIES.map((cat) => (
+              <button
+                key={cat.name}
+                type="button"
+                onClick={() => setActiveCategory(cat.name)}
+                className={cn(
+                  "shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all",
+                  activeCategory === cat.name
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
+                )}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+
+          <p className="px-4 text-[10px] text-muted-foreground mb-1">Click to add to active screen</p>
+
+          <ScrollArea className="flex-1 min-h-0 overflow-hidden">
+            <div className="px-3 pb-16 space-y-2">
+              {category.presets.map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => handleAdd(preset)}
+                  className="w-full text-left px-4 py-3.5 rounded-xl bg-secondary/50 hover:bg-secondary/90 border border-border/50 hover:border-primary/40 hover:ring-1 hover:ring-primary/30 transition-all group relative overflow-hidden cursor-pointer"
                 >
-                  {preset.preview.text}
-                </div>
-              ) : null}
+                  {/* Custom Preview or theme-adaptive text preview */}
+                  {preset.customPreview ? (
+                    <div className="w-full flex items-center justify-start py-0.5">
+                      {preset.customPreview}
+                    </div>
+                  ) : preset.preview ? (
+                    <div
+                      className={cn(
+                        "leading-tight truncate transition-colors",
+                        preset.preview.isMuted
+                          ? "text-muted-foreground group-hover:text-foreground"
+                          : "text-foreground group-hover:text-primary"
+                      )}
+                      style={{
+                        fontSize: preset.preview.fontSize,
+                        fontWeight: preset.preview.fontWeight,
+                        letterSpacing: preset.preview.letterSpacing ?? 0,
+                        lineHeight: preset.preview.lineHeight ?? 1.2,
+                        textTransform: preset.preview.uppercase ? "uppercase" : "none",
+                        whiteSpace: "pre",
+                      }}
+                    >
+                      {preset.preview.text}
+                    </div>
+                  ) : null}
 
-              {/* Label */}
-              <p className="text-[10px] font-medium text-muted-foreground mt-1.5 group-hover:text-primary transition-colors">
-                {preset.label}
-              </p>
-              {/* Hover gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-xl" />
-            </button>
-          ))}
+                  {/* Label */}
+                  <p className="text-[10px] font-medium text-muted-foreground mt-1.5 group-hover:text-primary transition-colors">
+                    {preset.label}
+                  </p>
+                  {/* Hover gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-xl" />
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
         </div>
-      </ScrollArea>
+      )}
     </div>
   );
 });

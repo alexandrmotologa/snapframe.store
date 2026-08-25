@@ -48,7 +48,7 @@ interface AICaptionsModalProps {
 export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
   const { getActiveSet, getActiveScreen, updateLayerLocalization } = useEditorStore();
   const { projectLanguages } = useLanguageStore();
-  const { user, consumeAiCredit, setAuthModalOpen } = useAuthStore();
+  const { user, consumeAiCredit, checkAiCreditAvailable, setAuthModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
 
 
@@ -83,8 +83,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
     }
     if (!set || !screen || textLayers.length === 0) return;
 
-    const creditRes = await consumeAiCredit("ai-translate");
-    if (!creditRes.allowed) return;
+    if (!checkAiCreditAvailable()) return;
 
     setStatus("loading");
     setErrorMsg("");
@@ -108,6 +107,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
           }
         });
       }
+      await consumeAiCredit("ai-translate");
       setStatus("done");
     } catch (e) {
       console.error(e);
@@ -125,8 +125,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
     }
     if (!appUrl.startsWith("http")) return;
 
-    const creditRes = await consumeAiCredit("ai-scrape-captions");
-    if (!creditRes.allowed) return;
+    if (!checkAiCreditAvailable()) return;
 
     setScrapeStatus("loading");
     setScrapedData(null);
@@ -138,6 +137,7 @@ export function AICaptionsModal({ onClose }: AICaptionsModalProps) {
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error ?? "Scrape failed");
+      await consumeAiCredit("ai-scrape-captions");
       setScrapedData(data);
       setScrapeStatus("done");
     } catch (e) {

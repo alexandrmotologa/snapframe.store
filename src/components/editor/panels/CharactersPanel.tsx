@@ -175,8 +175,12 @@ export function CharactersPanel() {
                     loading="lazy"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                     onError={(e) => {
-                      if (directUrl) {
-                        (e.target as HTMLImageElement).src = directUrl;
+                      const target = e.target as HTMLImageElement;
+                      if (directUrl && target.src !== directUrl) {
+                        target.src = directUrl;
+                      } else {
+                        target.onerror = null;
+                        target.style.display = "none";
                       }
                     }}
                   />

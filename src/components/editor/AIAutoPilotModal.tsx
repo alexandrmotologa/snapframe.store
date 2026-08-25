@@ -19,7 +19,7 @@ interface AIAutoPilotModalProps {
 export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) {
   const { screenSets, activeSetId, updateScreenBackground, addLayer, updateLayer } = useEditorStore();
   const { activeLang } = useLanguageStore();
-  const { user, isPro, aiCredits, consumeAiCredit, setAuthModalOpen } = useAuthStore();
+  const { user, isPro, aiCredits, consumeAiCredit, checkAiCreditAvailable, setAuthModalOpen } = useAuthStore();
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const activeSet = screenSets.find((s) => s.id === activeSetId) || screenSets[0];
@@ -49,8 +49,7 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
       return;
     }
 
-    const creditRes = await consumeAiCredit("vision-autopilot");
-    if (!creditRes.allowed) {
+    if (!checkAiCreditAvailable()) {
       return;
     }
 
@@ -90,6 +89,7 @@ export function AIAutoPilotModal({ open, onOpenChange }: AIAutoPilotModalProps) 
       }
 
       const generatedStories = data.screens || [];
+      await consumeAiCredit("vision-autopilot");
       setProgressStep("Applying high-conversion typography & color palettes...");
 
       // Apply results to active set screens

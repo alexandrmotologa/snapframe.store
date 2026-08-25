@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Check,
@@ -64,6 +65,7 @@ const PRICING_FAQS = [
 ];
 
 export default function PricingPage() {
+  const router = useRouter();
   const { user, isPro, setAuthModalOpen, setProStatus } = useAuthStore();
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -79,10 +81,10 @@ export default function PricingPage() {
 
   // Calculated ROI Metrics
   const totalScreenshots = calcApps * calcLanguages * 10;
-  const hoursInFigma = Math.max(1, Math.round((totalScreenshots * 3.5) / 60));
-  const estimatedDesignCost = totalScreenshots * 4; // $4 per screen design/localization in market
+  const hoursInFigma = Math.max(2, Math.round((totalScreenshots * 3.5) / 60));
+  const estimatedDesignCost = Math.max(150, totalScreenshots * 12);
   const proAnnualCost = 69;
-  const netSavings = Math.max(0, estimatedDesignCost - proAnnualCost);
+  const netSavings = Math.max(81, estimatedDesignCost - proAnnualCost);
 
   // Schema.org FAQPage structured data for Google SERP rich snippets
   const faqSchema = {
@@ -99,6 +101,11 @@ export default function PricingPage() {
   };
 
   const handleCheckout = async (plan: "annual" | "monthly") => {
+    if (isPro) {
+      router.push("/account");
+      return;
+    }
+
     if (isGuest) {
       setAuthModalOpen(true);
       toast.info("Please create a free account with Google or GitHub first to link your Pro subscription.");
@@ -339,13 +346,21 @@ export default function PricingPage() {
               <p className="text-xs text-muted-foreground leading-relaxed">
                 For ambitious developers, agencies, and studios who want maximum downloads and conversions.
               </p>
-              <div className="flex items-baseline gap-1 pt-2">
-                <span className="text-4xl font-black text-foreground">
-                  {billingCycle === "annual" ? "$5.75" : "$9"}
-                </span>
-                <span className="text-xs text-muted-foreground font-semibold">
-                  / month {billingCycle === "annual" && <span className="text-primary font-bold">(billed annually at $69/year)</span>}
-                </span>
+              <div className="flex items-baseline gap-2 pt-2">
+                {billingCycle === "annual" ? (
+                  <>
+                    <span className="text-4xl font-black text-foreground">$5.75</span>
+                    <span className="text-lg font-bold text-muted-foreground line-through decoration-rose-500/70">$9</span>
+                    <span className="text-xs text-muted-foreground font-semibold">
+                      / month <span className="text-emerald-600 dark:text-emerald-400 font-bold">(billed $69/yr · Save 36%)</span>
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-4xl font-black text-foreground">$9</span>
+                    <span className="text-xs text-muted-foreground font-semibold">/ month</span>
+                  </>
+                )}
               </div>
 
               <div className="pt-4 border-t border-border/50 space-y-3 text-xs">
@@ -408,6 +423,85 @@ export default function PricingPage() {
             </button>
           </div>
         </div>
+
+        {/* ── FEATURE COMPARISON MATRIX ── */}
+        <section className="max-w-4xl mx-auto space-y-6 pt-6">
+          <div className="text-center space-y-1.5">
+            <h2 className="text-2xl sm:text-3xl font-black text-foreground">Compare Plans &amp; Capabilities</h2>
+            <p className="text-xs text-muted-foreground">Detailed breakdown of everything included in Free vs. Pro.</p>
+          </div>
+
+          <div className="rounded-3xl border border-border/80 bg-card/60 backdrop-blur-sm overflow-hidden shadow-lg">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-border/60 bg-secondary/40">
+                    <th className="py-4 px-6 font-bold text-foreground w-1/2">Features &amp; Limits</th>
+                    <th className="py-4 px-4 font-bold text-center text-muted-foreground w-1/4">Free Starter</th>
+                    <th className="py-4 px-4 font-bold text-center text-primary w-1/4 bg-primary/5">
+                      <span className="flex items-center justify-center gap-1">
+                        <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                        SnapFrame Pro
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Screens per Project</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">Up to 3 screens</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">Full 10 screens</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Export Quality &amp; Resolution</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">Standard 1080p</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">4K Ultra-HD Lossless</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Platform Formats (iPhone, iPad, Android, Tablet)</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">1 Device set</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">All Stores &amp; Formats</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">40+ Language Localizations Batch Export</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">1 Language</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">Unlimited (Fastlane ZIP)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Multi-Device Cloud Sync (Firestore)</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">Local Browser only</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">Realtime Cloud Sync</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">AI Auto-Pilot &amp; Copywriter</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground">3 Free Generations</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">1,500 Generations / mo</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">ASO A/B Testing Variant Generator</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground"><X className="w-4 h-4 mx-auto opacity-40 text-muted-foreground" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">4 Strategy Presets</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Dual Theme Generator (Light &amp; Dark)</td>
+                    <td className="py-3.5 px-4 text-center text-muted-foreground"><X className="w-4 h-4 mx-auto opacity-40 text-muted-foreground" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5"><Check className="w-4 h-4 mx-auto text-emerald-500" /></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Watermark / Branding</td>
+                    <td className="py-3.5 px-4 text-center text-emerald-600 dark:text-emerald-400 font-semibold">100% Clean (No Watermark)</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">100% Clean</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-6 text-foreground font-medium">Commercial Usage Rights</td>
+                    <td className="py-3.5 px-4 text-center text-emerald-600 dark:text-emerald-400 font-semibold">Full Commercial</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 bg-primary/5">Full Commercial</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
         {/* ── INTERACTIVE ROI & TIME SAVINGS CALCULATOR ── */}
         <section className="p-8 sm:p-10 rounded-3xl bg-card border border-border/80 shadow-lg max-w-4xl mx-auto space-y-8">
