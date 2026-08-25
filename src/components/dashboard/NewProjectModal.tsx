@@ -148,8 +148,9 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
   const [creating, setCreating] = useState(false);
   const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
 
-  // Search and sort state
+  // Search, category and sort state
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<TemplateSortOption>("popularity");
   const [globalCounts, setGlobalCounts] = useState<Record<string, number>>({});
 
@@ -159,6 +160,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
     setPlatforms({ ios: true, android: true });
     setCreating(false);
     setSearchQuery("");
+    setSelectedCategory("all");
     onClose();
   };
 
@@ -181,9 +183,43 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
 
   // Filtered & Sorted Themes
   const themes = useMemo(() => {
-    const base = templates.filter((t) => t.id !== "blank");
+    let base = templates.filter((t) => t.id !== "blank");
+    if (selectedCategory !== "all") {
+      base = base.filter((t) => {
+        if (selectedCategory === "pro") return isProTemplate(t);
+        if (selectedCategory === "dark") {
+          return (t.tags || []).some(tag => ["dark", "obsidian", "night", "cyber", "black"].includes(tag.toLowerCase())) ||
+                 (t.name || "").toLowerCase().includes("dark") ||
+                 (t.name || "").toLowerCase().includes("obsidian") ||
+                 (t.name || "").toLowerCase().includes("cyber");
+        }
+        if (selectedCategory === "minimal") {
+          return (t.tags || []).some(tag => ["minimal", "clean", "light", "white", "simple"].includes(tag.toLowerCase())) ||
+                 (t.name || "").toLowerCase().includes("minimal") ||
+                 (t.name || "").toLowerCase().includes("clean");
+        }
+        if (selectedCategory === "gradient") {
+          return (t.tags || []).some(tag => ["gradient", "vibrant", "glow", "neon", "sunset", "mesh"].includes(tag.toLowerCase())) ||
+                 (t.previewGradient && t.previewGradient.length > 1);
+        }
+        if (selectedCategory === "finance") {
+          return (t.tags || []).some(tag => ["crypto", "finance", "fintech", "analytics", "banking", "saas", "dashboard", "business"].includes(tag.toLowerCase())) ||
+                 (t.name || "").toLowerCase().includes("crypto") ||
+                 (t.name || "").toLowerCase().includes("finance") ||
+                 (t.name || "").toLowerCase().includes("analytics") ||
+                 (t.name || "").toLowerCase().includes("saas");
+        }
+        if (selectedCategory === "fitness") {
+          return (t.tags || []).some(tag => ["fitness", "health", "workout", "lifestyle", "habit", "sport", "meditation"].includes(tag.toLowerCase())) ||
+                 (t.name || "").toLowerCase().includes("fitness") ||
+                 (t.name || "").toLowerCase().includes("health") ||
+                 (t.name || "").toLowerCase().includes("workout");
+        }
+        return true;
+      });
+    }
     return sortAndFilterTemplates(base, searchQuery, sortBy, globalCounts);
-  }, [templates, searchQuery, sortBy, globalCounts]);
+  }, [templates, selectedCategory, searchQuery, sortBy, globalCounts]);
 
 
   // Identify top 3 popular templates for 🔥 Popular badge
@@ -334,6 +370,33 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Category Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs pt-1">
+            {[
+              { id: "all", label: "All Themes" },
+              { id: "pro", label: "👑 Pro Suites" },
+              { id: "dark", label: "🌙 Dark & Cyber" },
+              { id: "minimal", label: "☀️ Clean Minimal" },
+              { id: "gradient", label: "🎨 Vibrant Glow" },
+              { id: "finance", label: "📈 Finance & SaaS" },
+              { id: "fitness", label: "⚡ Health & Fitness" },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategory(cat.id)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border",
+                  selectedCategory === cat.id
+                    ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                    : "bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground border-border/50"
+                )}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
         </DialogHeader>
 

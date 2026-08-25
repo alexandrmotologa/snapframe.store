@@ -12,6 +12,13 @@ import {
   ArrowRight,
   HelpCircle,
   CreditCard,
+  Clock,
+  Zap,
+  Lock,
+  Eye,
+  Sliders,
+  CheckCircle2,
+  TrendingUp,
 } from "lucide-react";
 import { SnapFrameLogo } from "@/components/ui/SnapFrameLogo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -24,8 +31,6 @@ import { openPaddleCheckout } from "@/lib/paddle";
 import { getIdTokenSafe, getFirebaseDb } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "@/lib/store/toastStore";
-
-
 
 const PRICING_FAQS = [
   {
@@ -61,10 +66,37 @@ const PRICING_FAQS = [
 export default function PricingPage() {
   const { user, isPro, setAuthModalOpen, setProStatus } = useAuthStore();
   const [billingCycle, setBillingCycle] = useState<"annual" | "monthly">("annual");
-
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Interactive ROI Calculator State
+  const [calcApps, setCalcApps] = useState<number>(2);
+  const [calcLanguages, setCalcLanguages] = useState<number>(5);
+
+  // 1080p vs 4K Quality Preview Tab
+  const [previewQuality, setPreviewQuality] = useState<"1080p" | "4k">("4k");
+
   const isGuest = Boolean(!user || user.isAnonymous);
+
+  // Calculated ROI Metrics
+  const totalScreenshots = calcApps * calcLanguages * 10;
+  const hoursInFigma = Math.max(1, Math.round((totalScreenshots * 3.5) / 60));
+  const estimatedDesignCost = totalScreenshots * 4; // $4 per screen design/localization in market
+  const proAnnualCost = 69;
+  const netSavings = Math.max(0, estimatedDesignCost - proAnnualCost);
+
+  // Schema.org FAQPage structured data for Google SERP rich snippets
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: PRICING_FAQS.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
 
   const handleCheckout = async (plan: "annual" | "monthly") => {
     if (isGuest) {
@@ -137,6 +169,12 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+      {/* FAQPage Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       {/* Header */}
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -175,7 +213,7 @@ export default function PricingPage() {
           </h1>
 
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Start for free with 3 AI credits or upgrade to SnapFrame Pro for unlimited AI Auto-Pilot, 4K lossless exports, and video preview creation.
+            Start for free with 3 AI credits or upgrade to SnapFrame Pro for unlimited AI Auto-Pilot, 4K lossless exports, and Fastlane store automation.
           </p>
 
           {/* Billing Cycle Switcher */}
@@ -248,55 +286,54 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
-                  <span>Phone Live Store Simulator &amp; App Icon Studio</span>
+                  <span>Freeform Shapes, Text Styling &amp; Custom Shadows</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
-                  <span>Standard 1x &amp; 2x PNG / JPEG Exports</span>
+                  <span>Unlimited 60fps MP4/GIF &amp; 1024px App Icon Exports</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
+                <div className="flex items-center gap-2.5 text-muted-foreground line-through opacity-60">
                   <X className="w-4 h-4 shrink-0" />
-                  <span>Multi-Device Real-Time Cloud Sync</span>
+                  <span>10-Screen Multi-Platform ZIP (iOS + Android + Tablet)</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
+                <div className="flex items-center gap-2.5 text-muted-foreground line-through opacity-60">
                   <X className="w-4 h-4 shrink-0" />
-                  <span>Full 10-Screen Multi-Platform ZIP (iOS + iPad + Android)</span>
+                  <span>Batch 40+ Language Localization Export</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
+                <div className="flex items-center gap-2.5 text-muted-foreground line-through opacity-60">
                   <X className="w-4 h-4 shrink-0" />
-                  <span>Dual Theme Generator (Light &amp; Dark matching sets)</span>
+                  <span>Fastlane &amp; Store Listing Metadata Automation</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground/70 dark:text-muted-foreground/40">
+                <div className="flex items-center gap-2.5 text-muted-foreground line-through opacity-60">
                   <X className="w-4 h-4 shrink-0" />
-                  <span>Batch 40+ Language Export &amp; Fastlane Suite</span>
+                  <span>4K Lossless Ultra-HD Master Exports</span>
                 </div>
               </div>
             </div>
 
             <Link
               href="/projects"
-              className="w-full py-3 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground text-xs font-bold flex items-center justify-center gap-2 border border-border/60 transition-all cursor-pointer shadow-xs active:scale-95"
+              className="w-full py-3.5 rounded-xl bg-secondary hover:bg-secondary/80 text-foreground text-xs font-bold text-center border border-border/80 transition-colors"
             >
-              <span>Get Started Free</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              Start Free (No Card Required)
             </Link>
           </div>
 
           {/* PRO TIER CARD */}
-          <div className="relative p-8 rounded-3xl bg-gradient-to-b from-indigo-500/[0.08] via-purple-500/[0.04] to-card dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-card border-2 border-indigo-500/30 dark:border-indigo-500/50 shadow-xl shadow-indigo-500/10 dark:shadow-2xl flex flex-col justify-between space-y-6">
-            {/* Popular Badge */}
-            <div className="absolute -top-3.5 right-8 px-3.5 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-pink-500 text-white text-[11px] font-bold shadow-md uppercase tracking-wider">
-              Most Popular
+          <div className="p-8 rounded-3xl bg-gradient-to-b from-card via-card to-primary/5 border-2 border-primary shadow-xl shadow-primary/10 flex flex-col justify-between space-y-6 relative hover:shadow-2xl hover:shadow-primary/15 transition-all">
+            <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-[10.5px] font-black tracking-wide uppercase shadow-md flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Most Popular</span>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                   <h3 className="text-xl font-bold text-foreground">SnapFrame Pro</h3>
+                  <Crown className="w-5 h-5 text-amber-500 fill-amber-500" />
                 </div>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/25">
-                  Full Access
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  Pro Suite
                 </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -318,11 +355,11 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span><strong>Custom Canvas Dimensions &amp; Freeform W × H</strong></span>
+                  <span><strong>Social Media Presets</strong> (Product Hunt, Twitter, Instagram, Web Hero)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span><strong>Social Media Presets</strong> (Product Hunt, Twitter, Instagram 1:1, Web Hero)</span>
+                  <span><strong>ASO A/B Testing Variant Generator</strong> (4 High-Converting Strategies)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -343,10 +380,6 @@ export default function PricingPage() {
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span><strong>Dual Theme Generator</strong> (1-Click Light &amp; Dark matching sets)</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-foreground font-medium">
-                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span><strong>iPad Pro &amp; Tablet Store Simulator</strong></span>
                 </div>
                 <div className="flex items-center gap-2.5 text-foreground font-medium">
                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -376,6 +409,181 @@ export default function PricingPage() {
           </div>
         </div>
 
+        {/* ── INTERACTIVE ROI & TIME SAVINGS CALCULATOR ── */}
+        <section className="p-8 sm:p-10 rounded-3xl bg-card border border-border/80 shadow-lg max-w-4xl mx-auto space-y-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center border border-indigo-500/20">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-foreground">Interactive ROI &amp; Time Savings Calculator</h2>
+              <p className="text-xs text-muted-foreground">See how much time and freelance designer costs SnapFrame Pro eliminates for your app.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            {/* Sliders */}
+            <div className="space-y-6 bg-secondary/30 p-6 rounded-2xl border border-border/60">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-foreground">Active Mobile Apps:</span>
+                  <span className="font-mono font-black text-primary px-2.5 py-0.5 rounded-lg bg-primary/10 border border-primary/20">
+                    {calcApps} {calcApps === 1 ? "App" : "Apps"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={calcApps}
+                  onChange={(e) => setCalcApps(Number(e.target.value))}
+                  className="w-full accent-primary h-2 bg-secondary rounded-lg cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-muted-foreground">
+                  <span>1 app</span>
+                  <span>5 apps</span>
+                  <span>10 apps</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-foreground">Target Localization Languages:</span>
+                  <span className="font-mono font-black text-primary px-2.5 py-0.5 rounded-lg bg-primary/10 border border-primary/20">
+                    {calcLanguages} {calcLanguages === 1 ? "Language" : "Languages"}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="40"
+                  value={calcLanguages}
+                  onChange={(e) => setCalcLanguages(Number(e.target.value))}
+                  className="w-full accent-primary h-2 bg-secondary rounded-lg cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-muted-foreground">
+                  <span>1 lang (EN)</span>
+                  <span>10 langs</span>
+                  <span>40+ Global</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Calculations Breakdown */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl bg-secondary/50 border border-border/60 text-center">
+                  <span className="text-[11px] font-semibold text-muted-foreground block">Total Screenshots</span>
+                  <strong className="text-2xl font-black text-foreground font-mono">{totalScreenshots}</strong>
+                  <span className="text-[10px] text-muted-foreground block">screens required</span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center">
+                  <span className="text-[11px] font-semibold text-rose-500 block">Manual Figma Time</span>
+                  <strong className="text-2xl font-black text-rose-500 font-mono">~{hoursInFigma} hrs</strong>
+                  <span className="text-[10px] text-muted-foreground block">wasted in design tools</span>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-transparent border border-emerald-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                    <Zap className="w-4 h-4" />
+                    <span>With SnapFrame Pro:</span>
+                  </span>
+                  <span className="text-xs font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded">
+                    45 SECONDS
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between pt-1 border-t border-emerald-500/20">
+                  <span className="text-xs text-muted-foreground">Estimated Freelancer Savings:</span>
+                  <strong className="text-xl font-black text-foreground font-mono">
+                    Save ${netSavings.toLocaleString()} / yr
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 1080P VS 4K ULTRA-HD QUALITY COMPARISON ── */}
+        <section className="p-8 sm:p-10 rounded-3xl bg-secondary/20 border border-border/70 max-w-4xl mx-auto space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase tracking-wide">
+                  Visual Fidelity
+                </span>
+                <h3 className="text-xl font-black text-foreground">Standard 1080p vs. 4K Ultra-HD Lossless</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                App Store guidelines penalize blurry, compressed graphics. Compare our zero-compression 4K master output.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1 bg-card p-1 rounded-xl border border-border/80 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setPreviewQuality("1080p")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  previewQuality === "1080p"
+                    ? "bg-secondary text-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Standard (1080p)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewQuality("4k")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  previewQuality === "4k"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>4K Pro Master</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-card border border-border/80 relative overflow-hidden shadow-inner">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+              <div className="space-y-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block font-mono">
+                  {previewQuality === "4k" ? "✨ 4K Pro Vector Rendering (Lossless 3840×2160)" : "⚠️ Standard 1080p Raster Output"}
+                </span>
+                <h4 className="text-lg font-bold text-foreground">
+                  {previewQuality === "4k" ? "Crisp Typographic Precision & Chamfered Hardware" : "Compressed Pixels & Blurry Fine Text"}
+                </h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {previewQuality === "4k"
+                    ? "Every font glyph, sub-pixel shadow, and titanium device bezel is rendered natively at up to 4K resolution using SVG bezier curves and 32-bit color depth."
+                    : "Standard exports can suffer from downscaled blurriness, blurry captions on retina displays, and compression artifacts in App Store search results."}
+                </p>
+                <div className="pt-2 flex items-center gap-2 text-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span className="font-semibold text-foreground">
+                    {previewQuality === "4k" ? "100% Passed Apple & Google Store Quality Review" : "Standard Resolution"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative h-44 rounded-xl overflow-hidden border border-border/70 flex items-center justify-center bg-gradient-to-br from-indigo-950/40 via-purple-950/20 to-background">
+                <div className={`text-center space-y-2 transition-all duration-300 ${previewQuality === "1080p" ? "blur-[1.2px] opacity-80" : "scale-105"}`}>
+                  <span className="text-3xl font-black bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent block">
+                    {previewQuality === "4k" ? "ULTRA HD · 4K" : "1080p STANDARD"}
+                  </span>
+                  <span className="text-[11px] font-mono text-muted-foreground block">
+                    {previewQuality === "4k" ? "Pixel-Perfect Bezels & Zero Noise" : "Downscaled Compression"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Merchant of Record & Guarantee Banner */}
         <div className="p-6 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 max-w-4xl mx-auto">
           <div className="flex items-center gap-4">
@@ -383,9 +591,9 @@ export default function PricingPage() {
               <Shield className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-foreground">14-Day Money-Back Guarantee (Fair Policy)</h4>
+              <h4 className="text-sm font-bold text-foreground">14-Day Money-Back Guarantee &amp; 1-Click Cancel</h4>
               <p className="text-xs text-muted-foreground mt-0.5 max-w-xl">
-                Try SnapFrame Pro with confidence. 100% full refund within 14 days for unutilized accounts. Once AI generations or Pro exports are consumed, cancel anytime in 1-click with zero lock-in.
+                Try SnapFrame Pro with zero risk. 100% full refund within 14 days for unutilized accounts. Cancel anytime in 1-click directly from your account page.
               </p>
             </div>
           </div>
