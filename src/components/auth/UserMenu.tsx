@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/authStore";
-import { LogOut, User as UserIcon, Sparkles, ChevronDown, ShieldAlert, Crown, CreditCard } from "lucide-react";
+import { LogOut, User as UserIcon, Sparkles, ChevronDown, ShieldAlert, ShieldCheck, Crown, CreditCard } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { isUserAdmin } from "@/lib/adminAuth";
 
 interface UserMenuProps {
   className?: string;
@@ -174,6 +175,21 @@ export function UserMenu({ className }: UserMenuProps) {
           <Sparkles className="w-3.5 h-3.5 text-primary" />
           <span>My Projects</span>
         </DropdownMenuItem>
+
+        {isUserAdmin(user.email) && (
+          <DropdownMenuItem
+            onClick={() => router.push("/admin")}
+            className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl cursor-pointer p-2 flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />
+              <span>Admin Console</span>
+            </div>
+            <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-rose-500/15 text-rose-500 border border-rose-500/30">
+              ADMIN
+            </span>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem
           onClick={async () => {

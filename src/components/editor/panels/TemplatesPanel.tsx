@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Search, Check, Layers, LayoutTemplate, Lock, Crown } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { Search, Check, Layers, LayoutTemplate, Lock, Crown, Plus, Sparkles, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 import { useEditorStore } from "@/lib/store/editorStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { BASE_TEMPLATES, getAllTemplates, isProTemplate } from "@/lib/templates";
 import { recordTemplateSelection } from "@/lib/templatePopularity";
+import { getLocalCustomTemplates, customTemplateToTemplate, CustomTemplate, deleteCustomTemplate } from "@/lib/customTemplates";
+import { SaveTemplateModal } from "@/components/editor/SaveTemplateModal";
 import { cn } from "@/lib/utils";
 import type { Template } from "@/lib/types";
 import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
@@ -16,6 +19,7 @@ import { HorizontalScrollRail } from "@/components/ui/horizontal-scroll-rail";
 // ── Category definitions ────────────────────────────────────────────────────
 const CATEGORIES = [
   "All",
+  "My Presets",
   "Pro Niches",
   "10 Screens",
   "8 Screens",
@@ -154,18 +158,46 @@ export function TemplatesPanel() {
   const isGuest = Boolean(!user || user.isAnonymous);
 
   const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
+  const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [isSaveModalOpen, setSaveModalOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("All");
   const [applyScope, setApplyScope] = useState<"all" | "active">("all");
   const [appliedId, setAppliedId] = useState<string | null>(null);
 
+  // Load custom templates from storage
+  const loadCustomTemplates = useCallback(() => {
+    const local = getLocalCustomTemplates();
+    setCustomTemplates(local);
+  }, []);
+
   useEffect(() => {
     getAllTemplates().then(setTemplates).catch(() => {});
-  }, []);
+    loadCustomTemplates();
+
+    const handleCustomUpdated = () => {
+      loadCustomTemplates();
+    };
+    window.addEventListener("snapframe_custom_templates_updated", handleCustomUpdated);
+    return () => {
+      window.removeEventListener("snapframe_custom_templates_updated", handleCustomUpdated);
+    };
+  }, [loadCustomTemplates]);
 
   const activeSet = getActiveSet();
 
   const filtered = useMemo(() => {
+    if (category === "My Presets") {
+      const converted = customTemplates.map(customTemplateToTemplate);
+      if (!query.trim()) return converted;
+      const q = query.toLowerCase();
+      return converted.filter((t) =>
+        t.name.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.tags.some((tag) => tag.includes(q))
+      );
+    }
+
     return templates.filter((t) => {
       const count = t.screens?.length || 1;
       let matchCat = false;
@@ -184,7 +216,7 @@ export function TemplatesPanel() {
         t.tags.some((tag) => tag.includes(q));
       return matchCat && matchQ;
     });
-  }, [templates, query, category]);
+  }, [templates, customTemplates, query, category]);
 
   const handleApply = (template: Template) => {
     // Check Pro Gating
@@ -211,14 +243,54 @@ export function TemplatesPanel() {
     setTimeout(() => setAppliedId(null), 2000);
   };
 
+  const handleDeleteCustom = async (e: React.MouseEvent, templateId: string) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this custom preset?")) {
+      await deleteCustomTemplate(templateId);
+      loadCustomTemplates();
+      toast.success("Custom preset deleted.");
+    }
+  };
+
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
-      {/* Search Header */}
+      {/* Save Template Modal */}
+      <SaveTemplateModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
+        screens={activeSet?.screens || []}
+      />
+
+      {/* Search & Action Header */}
       <div className="p-3 border-b border-border/40 shrink-0 space-y-2">
-        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
-          <LayoutTemplate className="w-3.5 h-3.5 text-primary" />
-          <span>Pre-made Templates</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
+            <LayoutTemplate className="w-3.5 h-3.5 text-primary" />
+            <span>Templates &amp; Presets</span>
+          </div>
+
+          <Button
+            size="sm"
+            onClick={() => {
+              if (!isPro) {
+                if (isGuest) {
+                  setAuthModalOpen(true);
+                  toast.info("Custom Template Presets require SnapFrame Pro. Sign in to upgrade.");
+                } else {
+                  setUpgradeModalOpen(true);
+                  toast.info("Custom Template Presets require SnapFrame Pro. Upgrade to create presets.");
+                }
+                return;
+              }
+              setSaveModalOpen(true);
+            }}
+            className="h-7 px-2.5 rounded-lg text-[11px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground gap-1 cursor-pointer shadow-xs active:scale-95"
+          >
+            <Plus className="w-3 h-3" />
+            <span>Save Preset</span>
+          </Button>
         </div>
+
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary/70 border border-border/40">
           <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
           <input
@@ -243,13 +315,20 @@ export function TemplatesPanel() {
                 e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
               }}
               className={cn(
-                "shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] font-medium transition-all cursor-pointer whitespace-nowrap",
+                "shrink-0 px-2.5 py-1 rounded-lg text-[10.5px] font-medium transition-all cursor-pointer whitespace-nowrap flex items-center gap-1",
                 category === cat
                   ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95"
+                  : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-95",
+                cat === "My Presets" && "font-bold text-indigo-400 dark:text-indigo-300"
               )}
             >
-              {cat}
+              {cat === "My Presets" && <Sparkles className="w-3 h-3 text-indigo-400" />}
+              <span>{cat}</span>
+              {cat === "My Presets" && customTemplates.length > 0 && (
+                <span className="px-1 py-0.2 rounded-full bg-indigo-500/20 text-indigo-400 text-[9px] font-bold">
+                  {customTemplates.length}
+                </span>
+              )}
             </button>
           ))}
         </HorizontalScrollRail>
@@ -295,23 +374,59 @@ export function TemplatesPanel() {
         </div>
       )}
 
-      {/* Template grid - Always rendered */}
+      {/* Template grid */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-3 grid grid-cols-2 gap-2.5">
           {filtered.length === 0 && (
-            <div className="col-span-2 text-center py-8 text-xs text-muted-foreground">
-              No templates found matching &ldquo;{query}&rdquo;
+            <div className="col-span-2 text-center py-8 px-4 text-xs text-muted-foreground space-y-2">
+              {category === "My Presets" ? (
+                <>
+                  <Sparkles className="w-8 h-8 text-indigo-400/50 mx-auto" />
+                  <p className="font-bold text-foreground">No custom presets saved yet</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Customize your canvas with your favorite frames &amp; gradients, then click &ldquo;Save Preset&rdquo; above.
+                  </p>
+                </>
+              ) : (
+                <p>No templates found matching &ldquo;{query}&rdquo;</p>
+              )}
             </div>
           )}
-          {filtered.map((template) => (
-            <TemplateCard
-              key={template.id}
-              template={template}
-              isApplied={appliedId === template.id}
-              isProUser={isPro}
-              onApply={() => handleApply(template)}
-            />
-          ))}
+
+          {filtered.map((template) => {
+            const isCustom = template.tags?.includes("custom");
+            const customData = isCustom ? customTemplates.find((c) => c.id === template.id) : null;
+
+            return (
+              <div key={template.id} className="relative group/custom">
+                <TemplateCard
+                  template={template}
+                  isApplied={appliedId === template.id}
+                  isProUser={isPro}
+                  onApply={() => handleApply(template)}
+                />
+
+                {isCustom && customData && (
+                  <div className="absolute top-2 left-2 z-10 pointer-events-none">
+                    <span className="px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm border border-white/20 text-white text-[9px] font-bold">
+                      {customData.status === "approved" ? "✅ Public" : customData.status === "pending_review" ? "⏳ In Review" : "🔒 Private"}
+                    </span>
+                  </div>
+                )}
+
+                {isCustom && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteCustom(e, template.id)}
+                    className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-black/70 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover/custom:opacity-100 transition-opacity cursor-pointer shadow-sm"
+                    title="Delete preset"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       </ScrollArea>
     </div>

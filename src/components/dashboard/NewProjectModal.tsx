@@ -18,6 +18,7 @@ import {
 } from "@/lib/templatePopularity";
 import { cn } from "@/lib/utils";
 import { Template } from "@/lib/types";
+import { getLocalCustomTemplates, customTemplateToTemplate } from "@/lib/customTemplates";
 
 
 interface NewProjectModalProps {
@@ -167,8 +168,13 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
   useEffect(() => {
     if (!open) return;
 
-    // Load full template catalog dynamically
-    getAllTemplates().then(setTemplates).catch(() => {});
+    // Load full template catalog dynamically + local custom presets
+    getAllTemplates()
+      .then((all) => {
+        const custom = getLocalCustomTemplates().map(customTemplateToTemplate);
+        setTemplates([...custom, ...all]);
+      })
+      .catch(() => {});
 
     // Fetch global popularity counts from API
     fetch("/api/templates/popularity")
@@ -186,6 +192,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
     let base = templates.filter((t) => t.id !== "blank");
     if (selectedCategory !== "all") {
       base = base.filter((t) => {
+        if (selectedCategory === "my-presets") return (t.tags || []).includes("custom");
         if (selectedCategory === "pro") return isProTemplate(t);
         if (selectedCategory === "dark") {
           return (t.tags || []).some(tag => ["dark", "obsidian", "night", "cyber", "black"].includes(tag.toLowerCase())) ||
@@ -350,6 +357,7 @@ export function NewProjectModal({ open, onClose, onCreated }: NewProjectModalPro
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs pt-1">
             {[
               { id: "all", label: "All Themes" },
+              { id: "my-presets", label: "✨ My Presets" },
               { id: "pro", label: "👑 Pro Suites" },
               { id: "dark", label: "🌙 Dark & Cyber" },
               { id: "minimal", label: "☀️ Clean Minimal" },

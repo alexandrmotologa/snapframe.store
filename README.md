@@ -85,8 +85,20 @@
 | **Store App Icon & Dev Packs** | 🔒 Sign in required | **100% Free & Unlimited** (Xcode & Android zips) | **100% Free & Unlimited** |
 | **4K Lossless Master Exports** | ❌ Standard 1x/2x | Standard 1x/2x | **✅ 4K Ultra-HD Lossless Exports (@3x)** |
 | **Templates** | Standard templates | Standard templates | **All 12+ Pro Niche Showcases + 55+ Curated Kits** |
+| **Pro Custom Presets** | ❌ Not included | ❌ Not included | **✅ Save Custom Presets + Submit to Community Gallery** |
 | **Templates SEO Gallery** | ✅ Included (`/templates`) | ✅ Included (`/templates`) | **✅ 1-Click Launch from `/templates`** |
 | **Commercial License** | ✅ Included | ✅ Included | ✅ Included |
+
+---
+
+### 🛡️ Pro Custom Presets & Master Moderation Console (`/admin`)
+- **Pro Custom Templates:** SnapFrame Pro users can save any active canvas layout, device angles, color palettes, and typography as a **Custom Template Preset** for instant reuse across future app projects.
+- **Community Gallery Submission:** Pro creators can optionally submit their presets to the public `/templates` gallery with a dedicated *„By @creator”* attribution badge.
+- **Strictly Protected `/admin` Moderation Console:**
+  - Non-indexed route (`noindex, nofollow, nocache`, excluded from `robots.txt` and `sitemap.xml`).
+  - Strict 403 isolation: Only authorized administrator accounts can access the panel or invoke moderation APIs.
+  - **Reviews Moderation:** 1-click approval of user reviews (syncs instantly to homepage carousel and Google SEO schema), featured badge toggle, and beta tester verification.
+  - **Templates Moderation:** Live visual review of user-submitted presets with 1-click approval to public gallery, Pro Suite tagging, and feedback notes.
 
 ---
 
