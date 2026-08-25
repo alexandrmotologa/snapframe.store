@@ -408,7 +408,21 @@ export default function LandingPage() {
               <span className="text-xs text-muted-foreground font-medium">Languages Localized</span>
             </div>
             <div className="p-4 rounded-2xl bg-card border border-border/60 text-center space-y-1">
-              <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-500 to-emerald-500 bg-clip-text text-transparent block">{displayRating} / 5</span>
+              {displayRating ? (
+                <motion.span
+                  key={displayRating}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.25 }}
+                  className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-500 to-emerald-500 bg-clip-text text-transparent block"
+                >
+                  {displayRating} / 5
+                </motion.span>
+              ) : (
+                <div className="h-8 sm:h-9 flex items-center justify-center">
+                  <div className="w-16 h-7 bg-muted/60 dark:bg-muted/40 rounded-lg animate-pulse" />
+                </div>
+              )}
               <span className="text-xs text-muted-foreground font-medium flex items-center justify-center gap-1">
                 <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 inline" />
                 <span>Developer Rating</span>
