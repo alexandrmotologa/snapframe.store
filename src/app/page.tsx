@@ -90,20 +90,20 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/pricing"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary flex items-center gap-1.5"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
             >
               <Crown className="w-3.5 h-3.5 text-amber-400" />
               <span>Pricing</span>
             </Link>
             <Link
               href="/app-store-screenshot-sizes"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1000px]:flex items-center gap-1.5"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
             >
               <span>iOS Specs</span>
             </Link>
             <Link
               href="/google-play-screenshot-sizes"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1000px]:flex items-center gap-1.5"
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-secondary hidden min-[1100px]:flex items-center gap-1.5"
             >
               <span>Play Store Specs</span>
             </Link>
