@@ -39,9 +39,9 @@ export function UserMenu({ className }: UserMenuProps) {
       <button
         type="button"
         onClick={() => setAuthModalOpen(true)}
-        className="h-8 px-3 rounded-xl bg-secondary/80 hover:bg-secondary border border-border/60 text-xs font-semibold text-foreground flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+        className="h-8 px-2.5 min-[500px]:px-3 rounded-xl bg-secondary/80 hover:bg-secondary border border-border/60 text-xs font-semibold text-foreground flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
       >
-        <UserIcon className="w-3.5 h-3.5 text-indigo-400" />
+        <UserIcon className="w-3.5 h-3.5 text-indigo-400 hidden min-[500px]:inline shrink-0" />
         <span>Sign In</span>
       </button>
     );

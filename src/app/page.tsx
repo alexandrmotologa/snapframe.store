@@ -70,7 +70,7 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
       {/* ── Header ── */}
       <header className="border-b border-border/50 bg-card/70 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 cursor-pointer group"
@@ -108,7 +108,7 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {mounted && user && (
               <Button
                 variant="outline"
@@ -127,11 +127,12 @@ export default function LandingPage() {
               className={buttonVariants({
                 variant: "ghost",
                 size: "sm",
-                className: "text-muted-foreground hidden sm:inline-flex items-center gap-1.5",
+                className: "text-muted-foreground inline-flex items-center gap-1.5 px-2 min-[500px]:px-3 py-1.5",
               })}
+              title="GitHub Repository"
             >
-              <GithubIcon className="w-3.5 h-3.5 text-muted-foreground/80" />
-              <span>GitHub</span>
+              <GithubIcon className="w-3.5 h-3.5 text-muted-foreground/80 shrink-0" />
+              <span className="hidden min-[500px]:inline text-xs font-semibold">GitHub</span>
             </a>
             <ThemeToggle />
             <UserMenu />
