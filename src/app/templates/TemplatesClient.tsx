@@ -26,6 +26,8 @@ import { BASE_TEMPLATES, getAllTemplates, isProTemplate } from "@/lib/templates"
 import { useProjectStore } from "@/lib/store/projectStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { UpgradeModal } from "@/components/pricing/UpgradeModal";
+import { toast } from "@/lib/store/toastStore";
 import { Template } from "@/lib/types";
 
 const CATEGORIES = [
@@ -91,7 +93,7 @@ function TemplateCardPreview({ template }: { template: Template }) {
 
 export function TemplatesClient() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isPro, setUpgradeModalOpen, setAuthModalOpen } = useAuthStore();
   const { createProject } = useProjectStore();
 
   const [templates, setTemplates] = useState<Template[]>(BASE_TEMPLATES);
@@ -123,7 +125,19 @@ export function TemplatesClient() {
   }, [templates, searchQuery, selectedCategory]);
 
   const handleUseTemplate = (template: Template) => {
-    const project = createProject(template.id, template.name, { ios: true, android: true });
+    const isProTpl = isProTemplate(template);
+    if (isProTpl && !isPro) {
+      if (!user || user.isAnonymous) {
+        toast.info("Pro Suite Templates require SnapFrame Pro. Sign in with Google or GitHub to upgrade.");
+        setAuthModalOpen(true);
+      } else {
+        toast.info("Pro Suite Templates require SnapFrame Pro. Upgrade to unlock luxury industry presets.");
+        setUpgradeModalOpen(true);
+      }
+      return;
+    }
+
+    const project = createProject(template.id, template.name, { ios: true, android: true }, template);
     router.push(`/editor/${project.id}`);
   };
 
@@ -261,7 +275,7 @@ export function TemplatesClient() {
         {/* Templates Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredTemplates.map((template) => {
-            const isPro = isProTemplate(template);
+            const isProTpl = isProTemplate(template);
             const screenCount = template.screens?.length ?? 5;
 
             return (
@@ -281,7 +295,7 @@ export function TemplatesClient() {
                       <h2 className="text-sm font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                         {template.name}
                       </h2>
-                      {isPro && (
+                      {isProTpl && (
                         <span className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold shrink-0 flex items-center gap-1">
                           <Crown className="w-2.5 h-2.5" />
                           <span>PRO</span>
@@ -307,10 +321,23 @@ export function TemplatesClient() {
 
                   <Button
                     onClick={() => handleUseTemplate(template)}
-                    className="w-full h-9 rounded-xl text-xs font-semibold gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs cursor-pointer group-hover:shadow-md group-hover:shadow-primary/20"
+                    className={`w-full h-9 rounded-xl text-xs font-semibold gap-1.5 shadow-xs cursor-pointer transition-all ${
+                      isProTpl && !isPro
+                        ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-amber-500/20 hover:shadow-md"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90 group-hover:shadow-md group-hover:shadow-primary/20"
+                    }`}
                   >
-                    <span>Customize in Studio</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    {isProTpl && !isPro ? (
+                      <>
+                        <Crown className="w-3.5 h-3.5 text-amber-200" />
+                        <span>Unlock with Pro</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Customize in Studio</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </motion.div>
@@ -341,6 +368,7 @@ export function TemplatesClient() {
 
       <Footer />
       <AuthModal />
+      <UpgradeModal />
     </div>
   );
 }
