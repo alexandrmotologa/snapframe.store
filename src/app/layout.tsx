@@ -251,6 +251,8 @@ const jsonLd = {
 
 
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { PostHogProvider } from "@/providers/posthog-provider";
 import { ToastContainer } from "@/components/ui/toast";
@@ -314,6 +316,8 @@ export default function RootLayout({
             </TooltipProvider>
           </PostHogProvider>
         </ThemeProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
