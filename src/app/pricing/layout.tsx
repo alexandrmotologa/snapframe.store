@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing & Plans - SnapFrame Pro",
+  title: "Pricing - SnapFrame Pro",
   description:
-    "Transparent and affordable pricing for mobile app developers and design agencies. Get SnapFrame Pro for unlimited projects, real-time cloud sync, 4K exports, and AI superpowers.",
+    "Pricing for mobile developers and agencies. Get SnapFrame Pro for unlimited projects, real-time cloud sync, 4K exports, and multi-language localization.",
   alternates: {
     canonical: "https://snapframe.store/pricing",
   },
   openGraph: {
-    title: "SnapFrame Pro - Pricing & Plans",
-    description: "Export high-resolution App Store & Google Play screenshots with AI superpowers and cloud sync.",
+    title: "SnapFrame Pro - Pricing",
+    description: "Export high-resolution App Store and Google Play screenshots with cloud sync and Fastlane metadata.",
     url: "https://snapframe.store/pricing",
   },
 };

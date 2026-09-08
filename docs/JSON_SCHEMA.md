@@ -1,10 +1,8 @@
-# SnapFrame JSON Schema Reference
+# SnapFrame JSON schema reference
 
-SnapFrame projects and screenshot sets can be generated, edited, imported, and exported programmatically as JSON. This is ideal for CI/CD pipelines, bulk generation, or AI-assisted workflows (ChatGPT, Claude, Gemini).
+SnapFrame projects and screenshot sets can be imported and exported programmatically as JSON. This enables automation in CI/CD pipelines, bulk generation scripts, or prompt workflows with models like ChatGPT, Claude, or Gemini.
 
----
-
-## 1. Top-Level Structure
+## 1. Top-level structure
 
 ```json
 {
@@ -35,44 +33,44 @@ SnapFrame projects and screenshot sets can be generated, edited, imported, and e
   "screens": [
     {
       "caption": "AI FITNESS COACH",
-      "headline": "Track Workouts & Transform Faster",
-      "subheadline": "Precision metrics and personalized AI training plans",
+      "headline": "Track Workouts and Build Habits",
+      "subheadline": "Targeted metrics and structured training plans",
       "badges": ["Smart Log", "500+ Exercises", "Apple Health Sync"]
     }
   ]
 }
 ```
 
----
-
-## 2. Fields Reference
+## 2. Fields reference
 
 ### `theme`
-- `name` *(string)*: Human-readable theme name.
+- `name` *(string)*: Theme label.
 - `backgroundType` *(string)*: `"solid" | "gradient" | "mesh"`.
 - `gradient` *(object)*:
   - `direction`: `"to-b" | "to-r" | "to-br" | "to-bl" | "to-tr" | "to-tl"`.
   - `stops`: Array of `{ "color": "#hex", "position": 0-100 }`.
-- `textColor` *(string)*: Primary text hex code (e.g. `"#ffffff"`).
-- `accentColor` *(string)*: Accent hex code for badges & highlights.
+- `textColor` *(string)*: Primary text hex color (for example, `"#ffffff"`).
+- `accentColor` *(string)*: Accent hex color for badges and highlights.
 
 ### `mockup`
-- `device` *(string)*: Device preset ID:
+- `device` *(string)*: Device preset identifier:
   - iOS: `"iphone-17-pro-max" | "iphone-16-pro" | "ipad-pro-13"`
   - Android: `"pixel-10-pro-xl" | "samsung-s25-ultra" | "samsung-tab-s10-ultra"`
 - `frameType` *(string)*: `"3d" | "flat" | "titanium" | "clay" | "glass" | "neon" | "wireframe"`.
-- `showFrame` *(boolean)*: Toggle device mockup frame.
-- `showShadow` *(boolean)*: Toggle ambient drop shadow.
+- `showFrame` *(boolean)*: Toggles the device mockup frame.
+- `showShadow` *(boolean)*: Toggles the drop shadow.
 
 ### `screens[]`
-- `caption` *(string)*: Uppercase eyebrow / badge text above the headline.
-- `headline` *(string)*: Main bold feature headline (25-40 chars recommended).
+- `caption` *(string)*: Uppercase text above the headline.
+- `headline` *(string)*: Primary feature headline (typically 25 to 40 characters).
 - `subheadline` *(string, optional)*: Secondary supporting description.
 - `badges` *(string[], optional)*: Feature pills or callouts.
-- `background` *(object, optional)*: Override background for this specific slide.
+- `background` *(object, optional)*: Overrides the background for this specific screen.
 
----
+## 3. Working with prompts
 
-## 3. How to use with ChatGPT / Claude (Prompt-to-Deck)
-
-In the SnapFrame editor, open the **AI Prompt / JSON** studio (or click the `<Code2 />` button in the top toolbar), copy the generated prompt, paste it into ChatGPT / Claude, and paste the returned JSON back into the **Import JSON** tab!
+To generate screenshot sets with external language models:
+1. In the SnapFrame editor, open the JSON studio modal via the code icon in the top toolbar.
+2. Copy the generation prompt provided in the dialog.
+3. Paste the prompt into your model of choice (ChatGPT, Claude, or Gemini).
+4. Copy the returned JSON and paste it into the "Import JSON" tab.

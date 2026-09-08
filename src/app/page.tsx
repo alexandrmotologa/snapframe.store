@@ -323,32 +323,32 @@ export default function LandingPage() {
               <BrandHeroIcon size="xl" />
             </div>
 
-            {/* Superpowers Suite Badge */}
+            {/* Studio Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-6 shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
-              <span>AI-Powered App Store &amp; Google Play Screenshot Studio</span>
+              <span>App Store &amp; Google Play Screenshot Studio</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-5 bg-gradient-to-b from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent leading-[1.15]">
-              Create stunning app screenshots in minutes
+              Create app screenshots in minutes
             </h1>
             <p className="text-muted-foreground text-base sm:text-xl max-w-2xl mb-8 leading-relaxed">
-              Design high-converting App Store &amp; Google Play screenshots with 3D device mockups, panoramic continuous flows, multilingual translation, and 4K exports.
+              Design App Store and Google Play screenshots with device mockups, panoramic backgrounds, multilingual translation, and Fastlane exports.
             </p>
 
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-2 justify-center mb-10 max-w-3xl">
               {[
-                "⚡ Prompt-to-Deck JSON Studio",
-                "🎨 Instant Color Harmony (0 Credits)",
-                "📸 Instant Ctrl+V Paste",
-                "📱 3D & Flat Vector Mockups",
-                "🎨 Continuous Panorama Flows",
-                "🤖 Vision AI Auto-Pilot",
-                "💾 Native Desktop File Save Picker",
-                "⚡ Fastlane Deliverfile ZIP",
-                "🌐 40+ Languages i18n",
-                "📱 Live Store & Tablet Simulator",
+                "Prompt-to-Deck JSON",
+                "Palette extraction",
+                "Clipboard paste (Ctrl+V)",
+                "3D & flat vector mockups",
+                "Continuous panoramas",
+                "Vision layout drafts",
+                "Direct folder export",
+                "Fastlane package",
+                "40+ languages",
+                "Store & tablet simulator",
               ].map((f) => (
                 <span key={f} className="px-3 py-1 rounded-full bg-card/90 dark:bg-secondary/60 border border-border/70 dark:border-border/50 text-foreground/90 dark:text-secondary-foreground text-xs font-medium backdrop-blur-md shadow-2xs hover:bg-secondary transition-colors">
                   {f}
@@ -466,10 +466,10 @@ export default function LandingPage() {
         <section className="space-y-6">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              Everything you need to dominate the App Stores
+              Built for App Store and Google Play releases
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              From continuous panoramic storytelling to automated vision AI and developer-ready Fastlane packages.
+              Create panoramic layouts, generate localized metadata, and export structured packages ready for submission.
             </p>
           </div>
 
@@ -481,7 +481,7 @@ export default function LandingPage() {
               </div>
               <h3 className="font-bold text-base text-foreground">Panoramic Continuous Flows</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Create seamless multi-screen narratives where background gradients, device mockups, and visual accents span fluidly across adjacent screenshot frames.
+                Connect backgrounds, gradients, and device mockups across multiple screenshot frames in a continuous sequence.
               </p>
             </div>
 
@@ -490,9 +490,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4 shadow-xs">
                 <Sparkles className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-foreground">Vision AI Auto-Pilot &amp; Copy</h3>
+              <h3 className="font-bold text-base text-foreground">Vision Drafts and Copywriting</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Automatically analyze UI screenshots with vision intelligence to generate persuasive marketing headlines, matching color palettes, and tone presets.
+                Inspect UI screenshots with vision models to draft headlines, subtitles, and matching background colors.
               </p>
             </div>
 
@@ -501,9 +501,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-2xl bg-pink-500/10 border border-pink-500/20 text-pink-600 dark:text-pink-400 flex items-center justify-center mb-4 shadow-xs">
                 <Maximize2 className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-foreground">Custom Canvas &amp; Social Presets</h3>
+              <h3 className="font-bold text-base text-foreground">Custom Canvas and Social Presets</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Design for Product Hunt (1270×760), Twitter/X, Instagram, and custom freeform dimensions (W × H) with real-time mockup frame scaling (50%–150%).
+                Export for Product Hunt (1270x760), Twitter/X, Instagram, and custom dimensions with adjustable device scaling.
               </p>
             </div>
 
@@ -512,9 +512,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-4 shadow-xs">
                 <Globe className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-foreground">Instant 40+ Language i18n</h3>
+              <h3 className="font-bold text-base text-foreground">40+ Language Localizations</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Localize entire screenshot sets across 40+ App Store and Google Play languages with 1-click batch translation and custom localized typography.
+                Localize screenshot copy across 40+ languages with length limits that fit mobile headers.
               </p>
             </div>
 
@@ -522,9 +522,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 shadow-xs">
                 <Smartphone className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-foreground">Live Store &amp; Tablet Simulator</h3>
+              <h3 className="font-bold text-base text-foreground">Store and Tablet Simulator</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Preview your screenshots in a realistic App Store and Google Play listing on iPhone, iPad Pro 13&quot;, Pixel, and Samsung Galaxy Tablets before launch.
+                Preview screenshots in realistic App Store and Google Play layouts on iPhone, iPad Pro 13&quot;, Pixel, and Galaxy tablets.
               </p>
             </div>
 
@@ -532,9 +532,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 shadow-xs">
                 <Zap className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-base text-foreground">4K Lossless Export &amp; Fastlane</h3>
+              <h3 className="font-bold text-base text-foreground">4K Export and Fastlane Packages</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Export pixel-perfect PNGs, multi-platform ZIP archives, and automated Fastlane Deliver/Supply metadata ready for immediate deployment.
+                Export high-resolution PNGs, organized ZIP archives, and Fastlane Deliver or Supply metadata ready for deployment.
               </p>
             </div>
           </div>
@@ -553,9 +553,9 @@ export default function LandingPage() {
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground">
                 {reviews === null ? (
-                  "Loading verified creator reviews from App Store & Google Play developers..."
+                  "Loading creator reviews from App Store & Google Play developers..."
                 ) : (
-                  `Real feedback from ${approvedReviews.length} verified mobile creators who shipped App Store & Google Play updates with SnapFrame.`
+                  `Feedback from ${approvedReviews.length} verified creators who publish to the App Store and Google Play with SnapFrame.`
                 )}
               </p>
             </div>
@@ -733,10 +733,10 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.1),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_70%)] pointer-events-none" />
           <div className="relative z-10 max-w-2xl mx-auto space-y-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-              Ready to boost your App Store conversion rate?
+              Ready to create your screenshot sets?
             </h2>
             <p className="text-xs sm:text-base text-muted-foreground leading-relaxed">
-              Join developers, agencies, and top indie creators who build high-converting screenshots with SnapFrame. Get started free in under 3 minutes.
+              Build App Store and Google Play screenshots with device frames, panoramic layouts, and Fastlane packages. Start for free without a credit card.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Button

@@ -25,47 +25,47 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     category: "Account & Sync",
     question: "What is the difference between Guest, Free Registered, and Pro accounts?",
-    answer: `• Guest Mode (Unregistered): 1 session project with 1-click clipboard PNG copying for the active screen (ZIP packages require signing in).\n• Free Registered (Google/GitHub): Stores up to 3 projects locally on your device, ${DEFAULT_FREE_AI_CREDITS} complimentary AI credits, free ZIP export of up to 3 screens per set (1 platform), 1-click clipboard copy for screens 1–3, Phone Live Store simulator, standard 2D & Titanium frames, and 100% free unlimited Video/GIF & Store Icon Studio exports.\n• SnapFrame Pro ($9/mo or $69/yr): Unlimited projects with real-time Multi-Device Cloud Sync (Firestore), full 10-screen multi-platform ZIP packages (iOS + iPad + Android + Tablet), Custom Canvas Dimensions (freeform W×H), Social Media Presets (Product Hunt, Twitter, Instagram 1:1, Web Hero), Mockup Frame Scaling (50%–150%), 1-click clipboard copy on all 10 screens, Dual Theme Generator (Light & Dark sets in 1-click), iPad Pro & Tablet Store Simulator, all luxury 3D mockup frames (Clay, Glass, Neon, Wireframe), batch 40+ language localizations, Fastlane metadata suite, 4K lossless exports, and Unlimited AI Generations under our Fair Usage Policy (~${PRO_MONTHLY_AI_CREDITS.toLocaleString()}/month).`,
+    answer: `• Guest Mode: 1 session project with clipboard PNG copying for the active screen (ZIP packages require signing in).\n• Free Registered (Google or GitHub): Saves up to 3 projects locally in your browser, ${DEFAULT_FREE_AI_CREDITS} trial AI credits, ZIP export of up to 3 screens per set (1 platform), clipboard copy for screens 1 to 3, phone store simulator, flat and titanium frames, and unlimited video, GIF, and icon exports.\n• SnapFrame Pro ($9/mo or $69/yr): Unlimited projects with multi-device cloud sync (Firestore), full 10-screen multi-platform ZIP packages (iOS, iPad, Android, Tablet), custom canvas dimensions, social media presets, mockup frame scaling (50% to 150%), clipboard copy on all 10 screens, dual light and dark set generation, tablet store simulator, 3D mockup frames, batch 40+ language localizations, Fastlane metadata package, 4K lossless exports, and unlimited AI generations under our fair usage policy (~${PRO_MONTHLY_AI_CREDITS.toLocaleString()}/month).`,
   },
   {
     category: "Account & Sync",
     question: "How does Multi-Device Cloud Sync work and will I lose my local projects?",
-    answer: "You will never lose your work. For Free users, projects are stored locally in your browser storage. When you upgrade to SnapFrame Pro, our system automatically migrates and uploads all your existing local projects to your secure Google Cloud Firestore account. From that point forward, every change syncs across all your devices (Mac, Windows, iPad, etc.) in real time.",
+    answer: "Free plan projects stay in your local browser storage. When you upgrade to SnapFrame Pro, all existing local projects automatically upload to Google Cloud Firestore, keeping your work synchronized in real time across your devices.",
   },
   {
     category: "Account & Sync",
     question: "Can I access my projects from another computer or browser on the Free plan?",
-    answer: "Free plan projects are saved to the local browser storage of the device where they were created. To seamlessly edit and synchronize projects across multiple laptops, desktops, and mobile devices, upgrade to SnapFrame Pro.",
+    answer: "Free plan projects remain in the browser where you created them. To access and edit your projects across multiple computers or tablets, upgrade to SnapFrame Pro.",
   },
   {
     category: "AI & Features",
     question: "How does the Unlimited AI Generations Fair Usage Policy work?",
-    answer: `SnapFrame Pro is built to give human developers and creators unlimited, uninterrupted creative workflow. To protect our infrastructure from automated scraper bots and abuse, a generous Fair Usage threshold of ~${PRO_MONTHLY_AI_CREDITS.toLocaleString()} AI generations per month is applied. This covers AI Auto-Pilot Vision analysis, AI copywriting, 3D background pop-outs, and multi-language translations in 40+ languages—far more than needed even for active agencies managing dozens of client apps.`,
+    answer: `To maintain service availability and prevent automated abuse, a monthly fair usage limit of ~${PRO_MONTHLY_AI_CREDITS.toLocaleString()} AI generations applies to Pro accounts. This covers vision layout analysis, copywriting, and multi-language translations in 40+ languages, which is plenty for active publishing across multiple apps.`,
   },
   {
     category: "AI & Features",
     question: "Are the Video / GIF and App Icon Studio tools free?",
-    answer: "Yes! Creating 60fps MP4/WebM animated teaser videos, GIF carousels, official App Store & Google Play 1024x1024 icons, and generating full Xcode AppIcon.appiconset.zip and Android mipmap.zip asset packages runs client-side in your browser and is 100% free and unlimited for all registered accounts.",
+    answer: "Yes. Creating 60fps MP4 and WebM videos, animated GIFs, 1024x1024 store icons, and Xcode or Android icon asset packages runs client-side in your browser and is free for all registered accounts.",
   },
   {
     category: "Store Assets",
     question: "Are the exported screenshots and mockups commercially licensed?",
-    answer: "Yes! 100% of all mockups, screenshots, video previews, and app icons you create with SnapFrame include a perpetual, royalty-free commercial license. You can upload them directly to App Store Connect, Google Play Console, your marketing websites, and advertising campaigns.",
+    answer: "Yes. All mockups, screenshots, video previews, and app icons created with SnapFrame include a commercial license. You can publish them directly to App Store Connect, Google Play Console, websites, and marketing campaigns.",
   },
   {
     category: "Store Assets",
     question: "Can I inspect the source code and what license does SnapFrame use?",
-    answer: "SnapFrame is source-available on GitHub under the Business Source License 1.1 (BSL 1.1), maintained by MTLG Labs (Alexandr Motologa). Developers are welcome to review the codebase, submit contributions, and test locally for evaluation. However, operating a competing commercial SaaS or public screenshot generation service using this code is strictly prohibited.",
+    answer: "SnapFrame is source-available on GitHub under the Business Source License 1.1 (BSL 1.1), maintained by MTLG Labs. You can inspect the codebase, submit contributions, and test locally. Operating a competing commercial screenshot service using this code is not permitted.",
   },
   {
     category: "Pricing & Refunds",
     question: "What is your Refund Policy for SnapFrame Pro?",
-    answer: "We offer a 14-day money-back guarantee for unutilized accounts. If you subscribe to SnapFrame Pro and request a cancellation within 14 calendar days without having consumed AI generation credits, without exporting Pro 10-screen asset packages, and without having synced projects to multi-device Firestore cloud storage, you will receive a 100% full refund through Paddle. Once AI compute, Pro exports, or cloud storage infrastructure is actively utilized, third-party server, delivery, and model costs are permanently incurred on your behalf and the service is considered fulfilled.",
+    answer: "We offer a 14-day money-back guarantee for unutilized accounts. If you subscribe to SnapFrame Pro and request a cancellation within 14 calendar days without using AI generation credits, exporting Pro 10-screen packages, or saving projects to cloud storage, you will receive a full refund through Paddle. Once AI generations, Pro exports, or cloud sync have been used, computing expenses have been incurred and the subscription is considered fulfilled.",
   },
   {
     category: "Pricing & Refunds",
     question: "Can I cancel my subscription anytime?",
-    answer: "Yes, you can cancel your subscription at any time with 1 click from your account dashboard or via the Paddle customer portal. Upon cancellation, you retain full Pro access until the end of your prepaid billing period, and no further renewals will occur.",
+    answer: "Yes. You can cancel your subscription at any time from your account dashboard or through the Paddle customer portal. You retain Pro access until the end of your prepaid billing period, with no automatic renewal.",
   },
 ];
 

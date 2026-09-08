@@ -1,29 +1,27 @@
-# 📦 Export Suite, Fastlane Package & Store Submission
+# Export package, Fastlane structure, and store submission
 
-This document outlines the multi-device export pipeline, Fastlane metadata generation, and App Store / Google Play submission compliance checks.
+This document outlines the multi-device export pipeline, Fastlane metadata generation, and store compliance checks in SnapFrame.
 
----
+## 1. Export package structure (ZIP archive)
 
-## 1. Export Package Structure (ZIP Architecture)
-
-When exporting an entire project, SnapFrame builds a structured, non-colliding ZIP file using [ExportModal.tsx](file:///b:/workgit/simple-screenshot-market/src/components/editor/ExportModal.tsx):
+When exporting an entire project, SnapFrame builds a structured ZIP file using [ExportModal.tsx](file:///b:/workgit/simple-screenshot-market/src/components/editor/ExportModal.tsx):
 
 ```
-My_Awesome_App_Screenshots.zip
+My_App_Screenshots.zip
 ├── App Store (iPhone)/
-│   ├── MyApp_iPhone_01@1x.png  (1290 × 2796 px)
+│   ├── MyApp_iPhone_01@1x.png  (1290 x 2796 px)
 │   ├── MyApp_iPhone_02@1x.png
 │   └── ...
 ├── App Store (iPad)/
-│   ├── MyApp_iPad_01@1x.png    (2048 × 2732 px)
+│   ├── MyApp_iPad_01@1x.png    (2048 x 2732 px)
 │   ├── MyApp_iPad_02@1x.png
 │   └── ...
 ├── Google Play (Phone)/
-│   ├── MyApp_Android_Phone_01@1x.png (1080 × 2400 px)
+│   ├── MyApp_Android_Phone_01@1x.png (1080 x 2400 px)
 │   ├── MyApp_Android_Phone_02@1x.png
 │   └── ...
 ├── Google Play (Tablet)/
-│   ├── MyApp_Android_Tablet_01@1x.png (1600 × 2560 px)
+│   ├── MyApp_Android_Tablet_01@1x.png (1600 x 2560 px)
 │   ├── MyApp_Android_Tablet_02@1x.png
 │   └── ...
 ├── fastlane/
@@ -51,42 +49,33 @@ My_Awesome_App_Screenshots.zip
 └── metadata.json
 ```
 
----
+## 2. Store submission checks
 
-## 2. Store Submission Validator
+Before exporting, SnapFrame checks screenshot dimensions against store criteria:
 
-Before exporting, SnapFrame automatically verifies the project against official developer guidelines:
+1. Resolution standards:
+   - Apple 6.7" / 6.9" displays: 1290 x 2796 px or 1320 x 2868 px.
+   - Apple 13" iPad displays: 2048 x 2732 px.
+   - Google Play: 16:9 or 9:16 aspect ratio with minimum dimension of 1080 px.
+2. Color profile: 72 DPI, 24-bit sRGB color space.
+3. No alpha channel transparency: Flattens transparency to prevent App Store Connect upload rejections.
+4. Validation badge: Displays confirmation in the export dialog once criteria pass.
 
-1. **Resolution Compliance:**
-   - Apple 6.7" / 6.9" displays: 1290 × 2796 px or 1320 × 2868 px.
-   - Apple 13" iPad displays: 2048 × 2732 px.
-   - Google Play: 16:9 / 9:16 aspect ratio with minimum dimension of 1080px.
-2. **Color Profile:** 72 DPI, 24-bit sRGB color profile.
-3. **No Alpha Channel Transparency:** Eliminates transparency artifacts that can trigger App Store Connect upload rejections.
-4. **Validation Badge:** Renders `100% Store Submission Verified (PASSED)` in the export dialog.
+## 3. Fastlane metadata structure
 
----
+The export builder generates files compatible with Fastlane Deliver (iOS) and Fastlane Supply (Android):
 
-## 3. Fastlane Metadata Automation
+- iOS (`deliver`): Creates `name.txt`, `subtitle.txt`, `promotional_text.txt`, `keywords.txt`, `description.txt`, and `release_notes.txt` per language.
+- Android (`supply`): Creates `title.txt`, `short_description.txt`, and `full_description.txt`.
+- Root `metadata.json`: Machine-readable summary containing export timestamps, device models, and localized file paths.
 
-The export suite generates ready-to-deploy **Fastlane Deliver** and **Fastlane Supply** metadata structures:
+## 4. Clipboard copy
 
-- **iOS (`deliver`):** Automatically creates `name.txt`, `subtitle.txt`, `promotional_text.txt`, `keywords.txt`, `description.txt`, and `release_notes.txt` per language.
-- **Android (`supply`):** Automatically creates `title.txt`, `short_description.txt`, and `full_description.txt`.
-- **Root `metadata.json`:** Machine-readable JSON summary containing export timestamps, platform versions, resolutions, and localization catalogs.
+- Available in the top editor navigation bar and inside the export dialog.
+- Renders the active screen on an off-screen canvas and writes it directly to the system clipboard via the `navigator.clipboard.write()` API for pasting into Figma, Slack, or Notion.
 
----
+## 5. Account tier export limits
 
-## 4. 1-Click Lossless 4K Clipboard Copy
-
-- Available directly in the top editor navbar and inside the export dialog.
-- Generates a full-resolution PNG on an off-screen canvas and writes it directly to the system clipboard via the `navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])` API for instant pasting into Figma, Slack, Keynote, or Notion.
-
----
-
-## 5. Tier-Based Export Capabilities
-
-- **👤 Guest Mode (Unregistered):** 1-Click Clipboard copy for the first active screen. ZIP downloads prompt a free Google/GitHub sign-in.
-- **🟢 Free Registered ($0):** Free export of up to 3 screenshots per set for 1 primary device platform in 1 language, 1-Click Clipboard PNG copy for screens 1 to 3, and standard resolution (1x/2x).
-- **⭐ SnapFrame Pro ($9/mo or $69/yr):** Complete 10-screen multi-platform ZIP package (iOS + iPad + Android + Tablet), Custom Canvas Dimensions & Freeform W × H, Social Media & Marketing Presets (Product Hunt, Twitter/X, Instagram, Web Hero), Custom Mockup Frame Scaling (50%–150%), 1-Click Clipboard PNG copy for all 10 screens, Dual Theme Generator (Light & Dark sets in 1-click), iPad Pro & Tablet Store Simulator, batch 40+ language localizations, Fastlane metadata suite, and 4K lossless master resolution (@3x).
-
+- Guest: 1-click clipboard copy for the active screen. ZIP downloads prompt for a free account.
+- Free Registered ($0): Export up to 3 screenshots per set for 1 platform in 1 language, clipboard copy for screens 1 to 3, standard 1x/2x resolution.
+- SnapFrame Pro ($9/mo or $69/yr): Full 10-screen multi-platform ZIP package (iOS, iPad, Android, Tablet), custom canvas dimensions, social media presets, mockup frame scaling (50% to 150%), clipboard copy on all screens, dual light/dark set generation, store simulator, batch 40+ language localizations, Fastlane metadata package, and 4K lossless export (@3x).

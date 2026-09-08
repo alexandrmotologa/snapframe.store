@@ -134,13 +134,13 @@ export default function RefundPolicyPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Unutilized Accounts (Full 100% Refund):</strong> If you purchase SnapFrame Pro and request a refund within 14 days without having consumed AI compute credits on your Pro subscription, without downloading Pro 10-screen ZIP exports, and without having synced projects to multi-device Firestore cloud storage, you will receive an unconditional 100% refund.
+                <strong>Unutilized Accounts:</strong> If you purchase SnapFrame Pro and request a refund within 14 calendar days without having used AI generation credits, downloaded Pro 10-screen ZIP exports, or synced projects to cloud storage, you will receive a full refund.
               </li>
               <li>
-                <strong>Actively Utilized Accounts (Non-Refundable):</strong> Once a Pro subscriber actively utilizes the paid infrastructure — specifically by <em>performing AI generations (such as AI Vision Auto-Pilot, AI Copywriter, AI Store Listing, or AI Multi-Language Translation)</em>, by <em>exporting Pro multi-platform 10-screen ZIP archives / Fastlane metadata</em>, or by <em>synchronizing project data to our dedicated Multi-Device Cloud Storage (Firestore)</em> — non-recoverable third-party server, database, and API expenses are permanently incurred on your behalf. Consequently, once these resources are actively consumed, the subscription is considered fulfilled and is no longer eligible for a retrospective refund.
+                <strong>Utilized Accounts:</strong> If you have generated AI content (such as Vision Auto-Pilot, copywriting, store listings, or translations), exported Pro 10-screen ZIP packages or Fastlane metadata, or saved projects to cloud storage, third-party computing and model expenses have already been incurred on your behalf. In those situations, the subscription is considered fulfilled and is not eligible for a refund.
               </li>
               <li>
-                <strong>Cancel Anytime:</strong> If your account has been utilized and you wish to discontinue, you can cancel your subscription with 1 click. You will retain full Pro access until the conclusion of your billing cycle and will never be charged again.
+                <strong>Cancel Anytime:</strong> If your account has been utilized and you wish to discontinue, you can cancel your subscription at any time. You will retain full Pro access until the end of your paid billing period, with no further charges.
               </li>
             </ul>
           </section>

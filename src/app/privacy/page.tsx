@@ -183,10 +183,10 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">4</span>
-              AI Superpowers & Machine Learning Processing
+              AI Tools &amp; Machine Learning Processing
             </h2>
             <p>
-              SnapFrame provides optional AI features (AI Auto-Pilot, AI Caption Generator, Multi-Language Translation, and ASO Metadata Optimizer) powered by enterprise API endpoints (Google Gemini, OpenAI, Groq, and Mistral):
+              SnapFrame provides optional AI tools (Vision Auto-Pilot, Copywriter, Multi-Language Translation, and ASO Metadata Optimizer) powered by API providers (Google Gemini, OpenAI, Groq, and Mistral):
             </p>
             <ul className="list-disc pl-6 space-y-1.5">
               <li>Text prompts or image previews submitted to AI features are processed in real-time strictly to return the generated captions, translations, or design layouts.</li>

@@ -17,7 +17,7 @@ const APP_URL = "https://snapframe.store";
 const APP_NAME = "SnapFrame";
 const TITLE = "SnapFrame - Free App Store & Google Play Screenshot Generator";
 const DESCRIPTION =
-  "Create stunning App Store and Google Play screenshots in minutes. Free online screenshot generator with device mockups, multilingual export, AI captions, animated GIFs, and custom designs.";
+  "Create App Store and Google Play screenshots in minutes. Online screenshot generator with device mockups, multilingual export, layout suggestions, animated GIFs, and Fastlane packages.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "SnapFrame — App Store Screenshot Generator",
+        alt: "SnapFrame: App Store Screenshot Generator",
       },
     ],
     locale: "en_US",

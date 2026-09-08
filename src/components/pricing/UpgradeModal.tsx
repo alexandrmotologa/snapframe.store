@@ -153,10 +153,10 @@ export function UpgradeModal() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground mt-3">
-            Scale Your App Installs With <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Pro Superpowers</span>
+            Upgrade to <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SnapFrame Pro</span>
           </h2>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-xl">
-            Unlock unlimited AI Vision screen generation, 4K Ultra-HD lossless exports, animated video ads, and batch translation in 40+ languages.
+            Get full 10-screen multi-platform packages, 4K lossless exports, cloud sync, and translations in 40+ languages.
           </p>
 
           {/* Billing Cycle Switcher */}

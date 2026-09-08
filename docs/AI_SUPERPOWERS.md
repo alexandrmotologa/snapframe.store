@@ -1,88 +1,84 @@
-# 🤖 AI Superpowers & Multi-Provider Prompt Engine
+# AI provider architecture and tools
 
-SnapFrame includes an enterprise-grade AI suite designed to eliminate the tedious parts of App Store screenshot creation and App Store Optimization (ASO).
+SnapFrame includes AI tools for screenshot layout suggestions, copywriting, and App Store Optimization (ASO) metadata generation.
 
----
+## 1. Multi-provider architecture and failover
 
-## 1. Multi-Provider Architecture & Failover
-
-All AI interactions run through [`src/lib/ai/aiService.ts`](file:///b:/workgit/simple-screenshot-market/src/lib/ai/aiService.ts) on Next.js Server-Side routes protected by Firebase ID Token Authentication (`Authorization: Bearer <idToken>`) and Rate Limiting.
+All AI interactions run through [`src/lib/ai/aiService.ts`](file:///b:/workgit/simple-screenshot-market/src/lib/ai/aiService.ts) on Next.js server-side routes protected by Firebase ID token authentication (`Authorization: Bearer <idToken>`) and sliding-window rate limiting.
 
 ```
-API Request (Bearer Token) → serverAuth.ts → aiService.ts (Priority Cascade)
-  ├─ 1. Google Gemini 3.6 Flash (GEMINI_API_KEY) ── [Primary: Vision + Speed]
-  ├─ 2. OpenAI GPT-4o-mini (OPENAI_API_KEY) ── [Fallback 1: ASO & Multimodal]
-  ├─ 3. Groq GPT-OSS 120B / Llama 3.2 Vision (GROQ_API_KEY) ── [Fallback 2: Ultra-low latency]
-  ├─ 4. Mistral Small / Pixtral 12B Vision (MISTRAL_API_KEY) ── [Fallback 3: Localization & Vision]
-  └─ 5. xAI Grok 3 / Grok 2 Vision (XAI_API_KEY) ── [Fallback 4: Advanced Reasoning & Vision]
+API Request (Bearer Token) -> serverAuth.ts -> aiService.ts (Priority Cascade)
+  ├─ 1. Google Gemini 3.6 Flash (GEMINI_API_KEY) [Primary: Vision + Speed]
+  ├─ 2. OpenAI GPT-4o-mini (OPENAI_API_KEY) [Fallback 1: ASO + Multimodal]
+  ├─ 3. Groq GPT-OSS 120B / Llama 3.2 Vision (GROQ_API_KEY) [Fallback 2: Latency]
+  ├─ 4. Mistral Small / Pixtral 12B Vision (MISTRAL_API_KEY) [Fallback 3: Localization + Vision]
+  └─ 5. xAI Grok 3 / Grok 2 Vision (XAI_API_KEY) [Fallback 4: Reasoning + Vision]
 ```
 
-If a provider encounters a **Rate Limit (429)**, timeout, or quota exhaustion, the failover runner seamlessly attempts the next configured key without throwing an error to the user. All providers in the chain support both text generation and multimodal screenshot vision analysis.
+If a provider returns a rate limit error (HTTP 429), timeout, or quota exhaustion, the runner calls the next configured provider. All providers in the chain support text generation and multimodal screenshot analysis.
 
----
+## 2. Tool endpoints
 
-## 2. The 6 AI Superpowers
+### Vision auto-pilot (`/api/ai/vision-screens`)
+- Endpoint: `POST /api/ai/vision-screens`
+- Input: Screenshot image array (base64 data URLs), app name, category, and target language.
+- Process:
+  1. Inspects each screenshot to identify the feature shown (such as an analytics chart, settings view, onboarding screen, or paywall).
+  2. Generates headlines (30 characters or fewer) and descriptive subtitles.
+  3. Proposes matching background color gradients based on dominant colors in the app interface.
+  4. Populates all screens in the active set with the drafted copy and themes.
 
-### 1️⃣ 1-Click Vision Auto-Pilot (`/api/ai/vision-screens`)
-- **Endpoint:** `POST /api/ai/vision-screens`
-- **Input:** Screenshots array (base64/data URLs), app name, category/niche, target language.
-- **Workflow:**
-  1. Multimodal vision models inspect each screenshot image to detect what feature is presented (e.g. Analytics chart, Dark mode toggle, Onboarding hero, Paywall / Subscription).
-  2. Generates punchy headlines (≤ 30 chars) and benefit-oriented subcaptions.
-  3. Formulates matching panoramic color gradient palettes based on the dominant colors found in the app UI.
-  4. Automatically populates all screens in the active set with 1 click.
+### Store listing and ASO generator (`/api/ai/store-listing`)
+- Endpoint: `POST /api/ai/store-listing`
+- Input: App name, category, keywords, target language, and screen headlines.
+- Store character constraints enforced:
 
-### 2️⃣ AI Store Listing & ASO Copilot (`/api/ai/store-listing`)
-- **Endpoint:** `POST /api/ai/store-listing`
-- **Input:** App name, category, keywords, target language, screen headlines.
-- **Strict Store Character Constraints Enforced:**
-
-| Store | Field | Maximum Character Limit | Format |
+| Store | Field | Maximum character limit | Format |
 | :--- | :--- | :--- | :--- |
-| **App Store (iOS)** | `name` | **30 characters** | High-conversion app title |
-| **App Store (iOS)** | `subtitle` | **30 characters** | Core value proposition |
-| **App Store (iOS)** | `promotionalText` | **170 characters** | Marketing announcement |
-| **App Store (iOS)** | `keywords` | **100 characters** | Comma-separated, no spaces |
-| **App Store (iOS)** | `description` | **4000 characters** | Formatted with emoji bullets |
-| **App Store (iOS)** | `whatsNew` | **500 characters** | Release highlights |
-| **Google Play** | `title` | **30 characters** | App title |
-| **Google Play** | `shortDescription` | **80 characters** | Punchy summary |
-| **Google Play** | `fullDescription` | **4000 characters** | Full feature breakdown |
-| **Google Play** | `whatsNew` | **500 characters** | Version updates |
+| App Store (iOS) | `name` | 30 characters | App title |
+| App Store (iOS) | `subtitle` | 30 characters | Primary value proposition |
+| App Store (iOS) | `promotionalText` | 170 characters | Marketing announcement |
+| App Store (iOS) | `keywords` | 100 characters | Comma-separated list without spaces |
+| App Store (iOS) | `description` | 4000 characters | Formatted text |
+| App Store (iOS) | `whatsNew` | 500 characters | Release notes |
+| Google Play | `title` | 30 characters | App title |
+| Google Play | `shortDescription` | 80 characters | Summary |
+| Google Play | `fullDescription` | 4000 characters | Feature description |
+| Google Play | `whatsNew` | 500 characters | Version updates |
 
-### 3️⃣ AI Copywriter & Tone Switcher (`/api/ai/copywriter`)
-- **Endpoint:** `POST /api/ai/copywriter`
-- **Supported Tones:**
-  - `high-energy`: Bold, inspiring, active voice (e.g. "Crush Every Workout").
-  - `minimalist`: Ultra-clean, 2-3 words (e.g. "Effortless Focus").
-  - `benefit-driven`: Focuses on solved pain points (e.g. "Save 4 Hours Daily").
-  - `fomo`: Social proof & hype (e.g. "Join 100K+ Creators").
-  - `b2b`: Professional, enterprise credibility (e.g. "Bank-Grade Security").
-- **Actions:**
-  - `rewrite`: Rewrites text in selected tone.
-  - `shorten`: Condenses text guaranteed to fit under 28–30 characters for mobile canvas widths.
-  - `emojis`: Contextual emoji insertion for click-through rate optimization.
-  - `benefit`: Conversion from technical feature description to customer-centric benefit proposition.
-  - `punchy`: Increases emotional appeal and CTA power with active verbs.
-  - `ideas`: Generates 5 distinct headline variations with character length meters.
+### Copywriter and tone switcher (`/api/ai/copywriter`)
+- Endpoint: `POST /api/ai/copywriter`
+- Supported tones:
+  - `high-energy`: Active verbs and concise phrasing.
+  - `minimalist`: 2 to 3 words.
+  - `benefit-driven`: Focuses on solved problems.
+  - `fomo`: Social proof and momentum.
+  - `b2b`: Professional business terminology.
+- Actions:
+  - `rewrite`: Rewrites text in the selected tone.
+  - `shorten`: Condenses text under 30 characters to fit mobile canvas widths.
+  - `emojis`: Inserts relevant emojis.
+  - `benefit`: Converts technical feature descriptions into user benefits.
+  - `punchy`: Focuses on active verbs.
+  - `ideas`: Generates 5 distinct headline variations.
 
-### 4️⃣ AI Magic Theme Matcher (`/api/ai/palette`)
-- **Endpoint:** `POST /api/ai/palette`
-- **Generates 5 High-Conversion Themes:**
-  1. **OLED Midnight:** Deep indigo and black luxury dark mode with luminous accents.
-  2. **Clean Cupertino:** Minimalist Apple ice-white and cool slate gradients.
-  3. **Vibrant Sunset:** Warm crimson, fiery coral, and violet flow.
-  4. **Cyber Neon:** Electric cyan and magenta glow.
-  5. **Pastel Aurora:** Aesthetic lavender, mint, and peach.
-  6. **Emerald Matrix:** Deep emerald and forest dark tones.
+### Palette matcher (`/api/ai/palette`)
+- Endpoint: `POST /api/ai/palette`
+- Generates preset gradient themes:
+  1. OLED Midnight: Deep indigo and black dark palette.
+  2. Clean Cupertino: Slate and off-white gradients.
+  3. Vibrant Sunset: Coral, crimson, and violet transitions.
+  4. Cyber Neon: Cyan and magenta accents.
+  5. Pastel Aurora: Lavender, mint, and peach tones.
+  6. Emerald Matrix: Forest green and dark slate tones.
 
-### 5️⃣ Smart Clean Status Bar Cleaner
-- Renders an authentic, crisp vector status bar directly on canvas over screenshots.
-- Features `9:41` clock, full 4-bar cellular signal, `5G` badge, and 100% full battery indicator.
-- Includes `🌙 Dark` (white icons) and `☀️ Light` (black icons) color switching.
+### Clean status bar
+- Renders a vector status bar directly on canvas over screenshots.
+- Displays 9:41 time, signal bars, network indicator, and full battery icon.
+- Supports light (black icons) and dark (white icons) color switching.
 
-### 6️⃣ Cultural Marketing Localization (`/api/ai/translate`)
-- **Endpoint:** `POST /api/ai/translate`
-- **Catalog:** Full support for 60+ App Store & Google Play global languages and regional locales.
-- **Core Rule:** Translates contextually for natural marketing appeal rather than literal word-by-word translation.
-- **Length Constraint:** Condenses longer languages (e.g., German, French) to prevent text overflow beyond mobile device headers.
+### Marketing localization (`/api/ai/translate`)
+- Endpoint: `POST /api/ai/translate`
+- Catalog: Supports 60+ App Store and Google Play languages.
+- Translation approach: Adapts copy for natural marketing reading rather than literal word-by-word substitution.
+- Length constraints: Condenses longer target languages (such as German or French) to avoid text truncation on mobile canvas headers.

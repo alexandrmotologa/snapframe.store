@@ -41,31 +41,31 @@ import { PRO_MONTHLY_AI_CREDITS, DEFAULT_FREE_AI_CREDITS } from "@/lib/constants
 const PRICING_FAQS = [
   {
     q: "What are the export differences between Free and Pro?",
-    a: "Free accounts can export up to 3 screenshots per set for a single platform (e.g. iPhone) in your primary language, with full commercial rights. SnapFrame Pro unlocks the complete 10-screen multi-platform ZIP package (iPhone, iPad Pro, Android Phone, and Android Tablet), batch 40+ language exports in organized subfolders, and the complete Fastlane & App Store Connect metadata suite.",
+    a: "Free accounts can export up to 3 screenshots per set for a single platform (such as iPhone) in your primary language, with commercial rights. SnapFrame Pro includes 10-screen multi-platform ZIP packages (iPhone, iPad Pro, Android Phone, and Android Tablet), batch 40+ language exports in organized folders, and Fastlane metadata.",
   },
   {
     q: "How does project saving and Multi-Device Cloud Sync work?",
-    a: "Free accounts can create up to 3 projects, which are saved locally in your current browser (localStorage). When you upgrade to SnapFrame Pro, Multi-Device Cloud Sync via Google Cloud Firestore is automatically activated: all your existing local projects are securely backed up to the cloud and available in real-time across your Mac, PC, and iPad.",
+    a: "Free accounts can save up to 3 projects in local browser storage. SnapFrame Pro automatically backs up existing and new projects to Google Cloud Firestore, keeping changes synchronized across your devices in real time.",
   },
   {
     q: "What is the difference between Free and Pro AI generations?",
-    a: `Free accounts receive ${DEFAULT_FREE_AI_CREDITS} complimentary AI credits upon registration with Google or GitHub to test our AI Auto-Pilot and copywriter. SnapFrame Pro includes unlimited AI generations under our generous Fair Usage Policy (up to ${PRO_MONTHLY_AI_CREDITS.toLocaleString()} generations/month), covering Vision Auto-Pilot, 3D Background Cutouts, and multi-language translations in 40+ languages.`,
+    a: `Free accounts receive ${DEFAULT_FREE_AI_CREDITS} trial credits upon registration with Google or GitHub. SnapFrame Pro includes unlimited AI generations under our fair usage policy (up to ${PRO_MONTHLY_AI_CREDITS.toLocaleString()} generations/month) for layout drafts, copywriting, and translations in 40+ languages.`,
   },
   {
     q: "Are Video / GIF and App Icon Studio exports free?",
-    a: "Yes! Creating and exporting 60fps MP4/WebM videos, animated GIFs, official App Store / Google Play 1024x1024 icons, and full Xcode AppIcon.appiconset.zip / Android mipmap.zip packages is 100% free and unlimited for all registered accounts.",
+    a: "Yes. Creating 60fps MP4 and WebM videos, animated GIFs, 1024x1024 store icons, and Xcode or Android icon asset packages runs locally in your browser and is free for all registered accounts.",
   },
   {
     q: "What is your refund policy?",
-    a: "We offer a 14-day money-back guarantee for unutilized accounts. If you purchase SnapFrame Pro and request a refund within 14 calendar days without having consumed AI generation credits or stored data in multi-device cloud sync, you will receive a 100% full refund through Paddle. Once AI credits or cloud storage are actively utilized, computational costs have been incurred on your behalf and the service is considered fulfilled.",
+    a: "We offer a 14-day money-back guarantee for unutilized accounts. If you purchase SnapFrame Pro and request a refund within 14 calendar days without having used AI generation credits or saved data to cloud storage, you will receive a full refund through Paddle. Once AI credits or cloud storage are utilized, computing expenses have been incurred and the subscription is considered fulfilled.",
   },
   {
     q: "Can I use the exported screenshots for commercial apps?",
-    a: "Yes! 100% of the artwork, device mockups, and screenshots you export with SnapFrame come with a perpetual commercial license. You own all rights to publish them to the Apple App Store, Google Play, marketing websites, and ad campaigns.",
+    a: "Yes. All mockups, screenshots, and visual assets you export with SnapFrame come with a commercial license. You own all rights to publish them to the App Store, Google Play, websites, and marketing campaigns.",
   },
   {
     q: "What payment methods are accepted and who processes billing?",
-    a: "Our order process is conducted by our online reseller and Merchant of Record, Paddle.com. Through Paddle, we accept all major credit/debit cards (Visa, Mastercard, American Express), Apple Pay, Google Pay, and PayPal worldwide with automatic VAT/sales tax invoicing.",
+    a: "Orders are processed by Paddle.com, our online reseller and Merchant of Record. Paddle accepts major credit and debit cards (Visa, Mastercard, American Express), Apple Pay, Google Pay, and PayPal with automated invoicing.",
   },
 ];
 
@@ -290,14 +290,14 @@ export default function PricingPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground">
-            Ship High-Converting Screenshots{" "}
+            App Store Screenshots{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-              In Seconds
+              Ready to Ship
             </span>
           </h1>
 
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Start for free with 3 AI credits or upgrade to SnapFrame Pro for unlimited AI Auto-Pilot, 4K lossless exports, and Fastlane store automation.
+            Start for free with 3 trial credits or upgrade to SnapFrame Pro for multi-device sync, 4K exports, and Fastlane packages.
           </p>
 
           {/* Billing Cycle Switcher */}

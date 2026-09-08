@@ -1,31 +1,29 @@
-# 🚀 Deployment Guide (Vercel & Firebase)
+# Deployment guide for Vercel and Firebase
 
-This guide covers deploying SnapFrame to **Vercel** and connecting optional cloud services like Firebase.
-
----
+This guide covers deploying SnapFrame to Vercel and connecting cloud services like Firebase and Paddle.
 
 ## 1. Deploying to Vercel
 
-SnapFrame is optimized for zero-config deployment on Vercel.
+SnapFrame is configured for standard Next.js deployment on Vercel.
 
-### Step 1: Import Repository
-1. Log in to [Vercel](https://vercel.com).
-2. Click **"Add New..."** → **"Project"**.
-3. Select your GitHub repository (`snapframe.store`).
-4. Framework Preset will automatically detect **Next.js**.
+### Step 1: Import repository
+1. Sign in to [Vercel](https://vercel.com).
+2. Click "Add New..." and select "Project".
+3. Choose your GitHub repository (`snapframe.store`).
+4. The framework preset will automatically detect Next.js.
 
-### Step 2: Configure Environment Variables
-In the **Environment Variables** section of the Vercel project setup (or in **Project Settings → Environment Variables**), add your configuration:
+### Step 2: Configure environment variables
+Add the following configuration in the Vercel project settings:
 
 ```env
-# AI Superpowers (Gemini & Groq provide 100% permanent free tiers)
+# AI providers (Gemini and Groq offer free tiers)
 GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 MISTRAL_API_KEY=your_mistral_api_key_here
-XAI_API_KEY=your_xai_grok_key_here          # Optional (Grok 3 / Grok 2 Vision)
-OPENAI_API_KEY=your_openai_api_key_here     # Optional (GPT-4o-mini)
+XAI_API_KEY=your_xai_grok_key_here          # Optional
+OPENAI_API_KEY=your_openai_api_key_here     # Optional
 
-# Firebase Client Configuration (NEXT_PUBLIC_ for browser SDK)
+# Firebase client configuration (browser SDK)
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-app.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-app-id
@@ -34,11 +32,11 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
 NEXT_PUBLIC_FIREBASE_APP_ID=1:1234567890:web:...
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-...
 
-# Firebase Admin Service Account (Server-side token verification & cloud sync)
+# Firebase Admin service account (token verification and cloud sync)
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-...@your-app-id.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 
-# Paddle Billing Configuration (v2)
+# Paddle billing configuration
 NEXT_PUBLIC_PADDLE_ENV=sandbox               # "sandbox" or "production"
 NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=test_...
 NEXT_PUBLIC_PADDLE_PRICE_MONTHLY=pri_...
@@ -46,39 +44,34 @@ NEXT_PUBLIC_PADDLE_PRICE_ANNUAL=pri_...
 PADDLE_WEBHOOK_SECRET_KEY=ntfset_...
 ```
 
-> **Note on `FIREBASE_PRIVATE_KEY`:** You can paste the multi-line private key directly into Vercel's environment variable value field.
+For `FIREBASE_PRIVATE_KEY`, you can paste the multi-line private key directly into the environment variable field.
 
 ### Step 3: Deploy
-Click **"Deploy"**. Vercel will build and launch your production deployment in under 2 minutes.
+Click "Deploy". Vercel will build and launch your deployment.
 
----
+## 2. Setting up AI API keys
 
-## 2. Setting Up Free API Keys for AI
+### Google Gemini (Text and vision)
+1. Open [Google AI Studio](https://aistudio.google.com/).
+2. Create an API key and set it as `GEMINI_API_KEY`.
+3. The free tier supports multimodal screenshot analysis, text generation, and translations.
 
-### Google Gemini (Recommended - Text & Vision)
-1. Go to [Google AI Studio](https://aistudio.google.com/).
-2. Click **"Get API Key"**.
-3. Create a new key and paste it as `GEMINI_API_KEY`.
-4. Free Tier supports 1,500 requests/day, multimodal screenshot vision, copy generation, and multi-language translation.
+### Groq Cloud (Text and vision)
+1. Open [Groq Console](https://console.groq.com/).
+2. Create an API key and set it as `GROQ_API_KEY`.
+3. Powers fast text generation and fallback vision analysis.
 
-### Groq Cloud (Recommended - Ultra-fast Text & Vision)
-1. Go to [Groq Console](https://console.groq.com/).
-2. Generate a free API key and set it as `GROQ_API_KEY`.
-3. Powers high-speed copywriting and fallback Vision analysis.
-
-### Mistral AI (Localization & Vision)
-1. Go to [Mistral Console](https://console.mistral.ai/).
-2. Generate an API key and add it as `MISTRAL_API_KEY`.
+### Mistral AI (Localization and vision)
+1. Open [Mistral Console](https://console.mistral.ai/).
+2. Create an API key and set it as `MISTRAL_API_KEY`.
 
 ### xAI Grok (Optional)
-1. Go to [xAI Console](https://console.x.ai/).
+1. Open [xAI Console](https://console.x.ai/).
 2. Add your API key as `XAI_API_KEY`.
 
----
+## 3. Local production build verification
 
-## 3. Local Production Build Testing
-
-Before pushing to production, you can verify your build locally:
+Before pushing updates, test the production build locally:
 
 ```bash
 # Type checking
@@ -87,6 +80,6 @@ npx tsc --noEmit
 # Production build
 npm run build
 
-# Start local production server
+# Start production server
 npm run start
 ```

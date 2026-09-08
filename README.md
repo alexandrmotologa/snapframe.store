@@ -1,130 +1,114 @@
-# 📸 SnapFrame — App Store & Google Play Screenshot Studio
+# SnapFrame: App Store and Google Play Screenshot Studio
 
-> **SnapFrame** is an ultra-fast, professional, and open-source screenshot generator for mobile apps. Create stunning, high-converting App Store (iOS & iPadOS) and Google Play (Phone & Android Tablet) screenshot presentations in seconds with built-in AI Superpowers, panoramic multi-screen backgrounds, official vector device frames, and full Fastlane metadata export.
+SnapFrame is an open-source screenshot editor for mobile applications. It creates App Store (iOS and iPadOS) and Google Play (Phone and Android Tablet) screenshot sets with vector device frames, panoramic multi-screen backgrounds, localization, and Fastlane export packages.
 
----
+## Features
 
-## ✨ Key Features
+### AI tools and generation
+- Structured JSON studio: Import and export complete multi-slide screenshot projects as structured JSON. Prompts can generate 5 to 10 slide decks with headlines and badge pills. See [`docs/JSON_SCHEMA.md`](./docs/JSON_SCHEMA.md).
+- Automated project draft: Multimodal vision models (`gemini-3.6-flash`, `gpt-4o-mini`, `groq-llama-3.2-vision`, `mistral-pixtral`, `grok-2-vision`) inspect uploaded screenshots to draft headlines, subtitles, and matching background gradients.
+- Store listing and ASO generator: Generates localized App Store and Google Play metadata with store character limit enforcement:
+  - iOS: App Name (30 chars max), Subtitle (30 chars max), Promotional Text (170 chars max), Keywords (100 chars max), Description, and Release Notes.
+  - Android: App Title (30 chars max), Short Description (80 chars max), Full Description, and Release Notes.
+- Copywriter adjustments: Adapts copy across tones (active, minimal, benefit-focused, social proof, enterprise), shortens text under 30 characters, and offers headline alternatives.
+- Screenshot palette extraction: Local color quantization (median-cut and HSL harmony) extracts color palettes directly from uploaded screenshots, with optional vision model suggestions.
+- Clean status bar: Overlays a vector status bar (9:41 AM, battery indicator, signal bars, network badge) with light and dark mode toggles to meet store guidelines.
+- Multilingual localization: Translates text across 60+ languages with length constraints to prevent header overflow.
+- Protected endpoints: AI routes use Firebase ID token authentication, sliding-window rate limiting, anti-SSRF filtering, and server-managed API keys.
 
-### 🤖 AI Superpowers Suite (5-Provider Failover Engine)
-- **⚡ JSON & AI Prompt-to-Deck Studio:** Generate, import, and export complete multi-slide screenshot projects as structured JSON. Includes 1-click ready-to-use prompts for ChatGPT, Claude 3.7, and Gemini to generate full 5-10 slide screenshot decks with headline copy and badge pills in seconds. See [`docs/JSON_SCHEMA.md`](./docs/JSON_SCHEMA.md).
-- **✨ 1-Click Project Auto-Pilot:** Powered by Multimodal AI Vision (`gemini-3.6-flash`, `gpt-4o-mini`, `groq-llama-3.2-vision`, `mistral-pixtral`, `grok-2-vision`). Analyzes your uploaded app screenshots and automatically populates high-converting headlines, benefit subtitles, and panoramic matching color gradients across all screens in 1 click.
-- **📈 AI Store Listing & ASO Generator:** Generates full, compliant App Store and Google Play metadata in any target language with strict store character limit enforcement:
-  - *iOS:* App Name (≤ 30c), Subtitle (≤ 30c), Promotional Text (≤ 170c), Keywords Bank (≤ 100c), Description & What's New.
-  - *Android:* App Title (≤ 30c), Short Description (≤ 80c), Full Description & What's New.
-- **🪄 AI Copywriter & Tone Switcher:** Instant tone adaptations (🚀 *High Energy*, ✨ *Minimalist*, 🎯 *Benefit-Driven*, 🔥 *FOMO / Social Proof*, 💼 *B2B Enterprise*), auto-shorten under 30 characters, and 5 alternative headline suggestions.
-- **🎨 Instant Client-Side Color Harmony & AI Palette:** Zero-latency, zero-token local color quantization (median-cut & HSL color harmony) that instantly extracts screenshot palettes (*Screenshot Harmony*, *Vivid Glow*, *Moody Muted*, *Bold Spectrum*, *Clean Light*, *OLED Pitch Black*), backed by Gemini AI Vision for deep contextual suggestions.
-- **🧼 Smart Clean Status Bar:** Automatically overlays a crisp vector status bar (9:41 AM, 100% battery, 5G, 4 signal bars) with light/dark theme toggle, ensuring 100% compliance with Apple Store guidelines.
-- **🌍 Native Cultural Localization:** Contextual, idiom-aware marketing translations across 60+ languages & regional dialects with strict length constraints.
-- **🔒 Enterprise Security & Rate Limiting:** All AI endpoints enforce Firebase ID token verification, in-memory sliding window rate limiting, anti-SSRF protections, and secure server-managed keys.
+### Device and platform support
+- Apple iOS and iPadOS: iPhone 17 Pro, 16 Pro, 15 Pro, 14, and iPad Pro 13" (2048 x 2732 px).
+- Google Play and Android tablets: Google Pixel 10/11 Pro XL, Pixel 10/11 Pro, Pixel 9 Pro, Samsung Galaxy S25 Ultra, S24 Ultra, Samsung Galaxy Tab S9 Ultra, Galaxy Tab S7, and Galaxy Tab A.
+- Manufacturer color finishes: Exact HEX colors including Natural Titanium, Desert Titanium, Obsidian, Porcelain, Titanium Gray, and Ultramarine.
+- Proportional scaling: Adding tablet sets automatically adapts and scales existing layouts from phone dimensions.
 
----
+### Design and canvas tools
+- Batch captions editor: Edit primary headlines and subtitles across all 10 screens in a single table with live canvas synchronization.
+- Project brand kit: Save custom brand colors per project to apply across backgrounds, typography, and shapes.
+- Quick text actions: One-click actions to shorten text under 30 characters, add emojis, focus on benefits, adjust tone, or generate alternatives.
+- System clipboard paste (`Ctrl+V` / `Cmd+V`): Paste screenshots directly into the active device mockup without saving files locally first.
+- Keyboard shortcuts: Layer creation shortcuts (`T` for Text, `S` for Shape, `M` for Mockup, `V` for Select/Deselect), arrow nudges (1px or 10px with Shift), duplicate (`Ctrl+D`), undo/redo (`Ctrl+Z` / `Ctrl+Y`), and help overlay (`?`).
+- Magnetic snapping and guides: Center, margin, and layer boundary alignment guides with visual indicators.
+- Native eye dropper: Sample colors directly from the canvas using the browser `EyeDropper` API.
+- Continuous panoramic flow: Split gradients, waves, or wide panorama images across consecutive screens.
+- Block elements: Over 30 pre-built UI elements including Dynamic Island capsules, notification banners, guarantee seals, comparison cards, and metric callouts.
+- Responsive studio interface: Horizontal scroll rails with mouse wheel support, tab centering, and dedicated toolbars for each layer type.
+- 3D screen deck covers: Layered deck preview on project cards showing the first screens with ambient lighting extracted from the project colors.
+- Project autosave: Real-time saving status with debounced cloud persistence and header breadcrumbs for renaming.
+- Typography: 20+ Google Fonts including Inter, Montserrat, Poppins, Outfit, Space Grotesk, and Playfair Display.
+- Canvas engine: Consistent 2D rendering across the live editor, store simulator, clipboard copy, and ZIP export.
 
-### 📱 Multi-Platform & Tablet Support
-- **Apple iOS & iPadOS:** iPhone 17 Pro, 16 Pro, 15 Pro, 14, and iPad Pro 13" (2048 × 2732 px).
-- **Google Play & Android Tablets:** Google Pixel 10/11 Pro XL, Google Pixel 10/11 Pro, Google Pixel 9 Pro, Samsung Galaxy S25 Ultra, S24 Ultra, Samsung Galaxy Tab S9 Ultra, Galaxy Tab S7, and Galaxy Tab A.
-- **Official Color Finishes:** Authentic HEX colors including *Natural Titanium*, *Desert Titanium*, *Obsidian*, *Porcelain*, *Titanium Gray*, *Ultramarine*, and more.
-- **Proportional Scaling:** Adding a phone or tablet set automatically adapts and scales existing project templates proportionally.
+### Export and store submission
+- Multi-platform ZIP archive: Exports into separate folders for `App Store (iPhone)/`, `App Store (iPad)/`, `Google Play (Phone)/`, and `Google Play (Tablet)/`.
+- Direct folder save: Supports the Chromium File System Access API (`showSaveFilePicker`) with download fallbacks for other browsers.
+- Testing variants: Generate visual variations (dark mode, studio light, vivid accent, bold layout) for store A/B tests.
+- Fastlane package: Generates a ready-to-run `Deliverfile` alongside structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`) for command-line deployment.
+- Multiple export formats: Supports lossless PNG, compressed WebP, and high-quality JPEG.
+- Live store simulator: Preview screenshot sets inside mockup App Store and Google Play interfaces across phone and tablet sizes.
+- Animated GIF export: Render screenshot cycles as animated GIFs for marketing.
+- Clipboard copy: Copy any screen directly to the clipboard at full resolution for Figma, Slack, or Notion.
+- Store size guides: Built-in specifications for 2026 store requirements at `/app-store-screenshot-sizes` and `/google-play-screenshot-sizes`.
 
----
+### Account tiers
 
-### 🎨 Design & Canvas Capabilities
-- **📝 Batch Captions Editor (Multi-Screen Headline Table):** Review and edit primary headlines and subtitles across all 10 screens in a single compact tabular view with live debounced canvas synchronization.
-- **🎨 Project Brand Kit & Saved Colors:** Save custom corporate and app brand colors (HEX) per project with 1-click application across backgrounds, text typography, and graphic shapes.
-- **🪄 Quick AI Text Actions:** 1-click optimization chips (✂️ *Shorten <30c*, 🔥 *Add Emojis*, 🎯 *Benefit-Driven*, 🚀 *High Energy*, ✨ *Rewrite Tone*, 💡 *5 Alternatives*) with strict App Store length limits.
-- **Global Clipboard Paste (`Ctrl+V` / `Cmd+V`):** Paste screenshots directly from your system clipboard (`Win+Shift+S` / `Cmd+Shift+4`) straight into the selected device mockup frame without saving files or opening disk dialogs.
-- **⚡ Pro Keyboard Shortcuts:** Quick-create layers with single keystrokes (`T` for Text, `S` for Shape, `M` for Mockup, `V` for Select/Deselect), pixel-perfect arrow nudge (`1px` or `10px` with Shift), duplicate (`Ctrl+D`), undo/redo (`Ctrl+Z` / `Ctrl+Y`), and instant cheat sheet (`?`).
-- **🧲 Smart Magnetic Snapping & Alignment Guides:** Intelligent multi-point alignment snapping (screen center, safe margins, and sibling layer boundaries) with real-time glowing cyan and magenta guide lines.
-- **🔍 Native EyeDropper Color Picker:** 1-click screen color sampling directly from screenshots using `window.EyeDropper` API across background, text, and shape inspectors.
-- **Continuous Panoramic Flow:** Connect seamless backgrounds, waves, gradients, or custom uploaded ultra-wide panoramas across multiple screens.
-- **30+ Drag-and-Drop Block Elements:** Dynamic Islands, Live Activity workouts, iOS Toggle switches, Push Notification banners, Editors' Choice laurels, 30-Day Guarantee seals, Growth stats (+142%), and Before/After comparison cards.
-- **Responsive & Adaptable Studio UI:** Built-in horizontal scroll rails with interactive chevrons, vertical-to-horizontal mouse wheel conversion, and automatic tab centering across all category filters (Templates, Block Elements, Color Themes, Stickers, Languages).
-- **Ergonomic Template Cards & Controls:** Full-width titles with tooltip support, cleanly separated PRO and Screen-count indicators, responsive 2-column platform scope selectors ("All Platforms" vs "Active Only"), and a 5-column icon+label background switcher.
-- **3D Multi-Screen Dashboard Covers:** Realistic layered 3D screen deck preview with dynamic ambient glow extracted from project background palettes, interactive hover micro-gallery (screen peek), app icon monograms, and headline teasers.
-- **Real-Time Save Engine & Breadcrumb Renaming:** Live `Saving...` / `Cloud Synced` status badge with 1-click force save and header breadcrumb navigation (`Projects / [Name]`).
-- **20+ Google Fonts:** Inter, Montserrat, Poppins, Outfit, Space Grotesk, Syne, Playfair Display, and more.
-- **Lossless 2D Canvas Engine:** 100% visual parity between the real-time editor, Live Store Simulator, PNG clipboard copy, and production 4K ZIP export.
-
----
-
-### 📦 Pro Export Suite & Store Submission
-- **Structured Multi-Platform ZIP:** Dedicated non-colliding folders (`App Store (iPhone)/`, `App Store (iPad)/`, `Google Play (Phone)/`, `Google Play (Tablet)/`).
-- **💾 Native File System Access API (`showSaveFilePicker`):** Direct desktop folder destination selection dialog on Chromium browsers (Chrome, Edge, Opera, Brave) with graceful instant fallback for Firefox and Safari.
-- **⚡ ASO A/B Testing Variant Generator:** 1-click generation of alternative test sets (High-Contrast Dark, Minimalist Clean Studio, Vibrant Glow, Bold Conversion Focus).
-- **Fastlane `Deliverfile` & App Store Connect Package:** Includes an automated `Deliverfile` ready for `fastlane deliver`, `README-FASTLANE.md` instructions, and structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`, etc.).
-- **Multi-Format Export Control:** Choose between **PNG Lossless (4K)**, **WebP (Optimized, <8MB)**, and **JPEG (High Quality 90%)** for App Store upload compliance.
-- **Live Store Simulator:** Interactive Apple App Store and Google Play preview with device switching and instant multi-language preview.
-- **GIF Animator:** Export animated showcase GIFs of your screenshot sets.
-- **1-Click 4K PNG Clipboard Copy:** Instantly copy active screens to clipboard for Figma, Slack, or Notion.
-- **App Store & Google Play Screenshot Guides:** Built-in 2026 developer reference guides at `/app-store-screenshot-sizes` and `/google-play-screenshot-sizes`.
-
-### 💎 Account Tiers & Architecture
-
-| Feature | 👤 Guest Mode | 🟢 Free Registered (Google/GitHub) | ⭐ SnapFrame Pro ($9/mo or $69/yr) |
+| Feature | Guest | Free Registered (Google/GitHub) | SnapFrame Pro ($9/mo or $69/yr) |
 | :--- | :--- | :--- | :--- |
-| **Max Projects** | 1 Active Session Project | **3 Projects** (Stored locally on device) | **Unlimited Projects** |
-| **Cloud Synchronization** | ❌ Local Browser Only | ❌ Local Browser Only | **☁️ Multi-Device Real-Time Cloud Sync** (Google Firestore) |
-| **Upgrade Migration** | N/A | Local projects automatically migrate to Cloud on Pro upgrade | Instant multi-device sync across Mac, PC, iPad |
-| **AI Generations** | 🔒 Sign in required | **3 Complimentary AI Credits** | **Unlimited AI Generations** (Fair Usage: 1,500/mo) |
-| **Batch Captions Editor** | 🔒 Sign in required | **Screens 1 to 3** | **All 10 Screens + 1-Click AI Batch Rewrite** |
-| **Brand Kit Palette** | 1 Color Slot | **3 Saved Brand Colors** | **12 Saved Brand Colors** |
-| **1-Click Clipboard Copy** | ✅ Included (Screens 1–3) | ✅ Included (Screens 1–3) | **✅ Lossless Copy on all 10 screens** |
-| **Screenshot Export (ZIP)** | 🔒 Sign in required | **Up to 3 screens per set (1 platform)** | **All 10 screens per set (All platforms)** |
-| **Multi-Platform Batch** | 🔒 Sign in required | 1 Platform (e.g. iPhone only) | **Full Multi-Platform ZIP (iOS + iPad + Android + Tablet)** |
-| **Multi-Language Batch** | 🔒 Sign in required | 1 Active Language | **Batch 40+ Languages in organized folders** |
-| **Fastlane & ASO Package** | 🔒 Sign in required | ❌ Not included (raw images only) | **✅ Complete Fastlane (`.txt`, `.json`) suite** |
-| **Custom Canvas & Social Presets** | ❌ Standard store sizes only | Standard store sizes only | **✅ Freeform W × H + Product Hunt / Twitter / IG / Web Presets** |
-| **A/B Testing Variant Generator** | ❌ Not included | ❌ Not included | **✅ 4 Conversion Strategies (Dark, Clean, Glow, Bold)** |
-| **Smart Alignment Guides** | ✅ Included | ✅ Included | **✅ Included** |
-| **Mockup Frame Scaling** | 100% Fixed Scale | 100% Fixed Scale | **✅ Custom Mockup Scaling (50% to 150%)** |
-| **Dual Theme Generator** | 🔒 Sign in required | ❌ Not included | **✅ 1-Click matching Light & Dark sets** |
-| **Live Store Simulator** | 🔒 Sign in required | **Phone Simulator (iPhone & Android)** | **Phone & Tablet Simulator (iPad Pro 13" & Tabs)** |
-| **Mockup Frame Styles** | 2D & Titanium standard | 2D & Titanium standard | **All Luxury 3D Frames (Clay, Glass, Neon, Wireframe)** |
-| **Video & Animated GIF Studio** | 🔒 Sign in required | **100% Free & Unlimited** (60fps MP4/WebM/GIF) | **100% Free & Unlimited** |
-| **Store App Icon & Dev Packs** | 🔒 Sign in required | **100% Free & Unlimited** (Xcode & Android zips) | **100% Free & Unlimited** |
-| **4K Lossless Master Exports** | ❌ Standard 1x/2x | Standard 1x/2x | **✅ 4K Ultra-HD Lossless Exports (@3x)** |
-| **Templates** | Standard templates | Standard templates | **All 12+ Pro Niche Showcases + 55+ Curated Kits** |
-| **Pro Custom Presets** | ❌ Not included | ❌ Not included | **✅ Save Custom Presets + Submit to Community Gallery** |
-| **Templates SEO Gallery** | ✅ Included (`/templates`) | ✅ Included (`/templates`) | **✅ 1-Click Launch from `/templates`** |
-| **Commercial License** | ✅ Included | ✅ Included | ✅ Included |
+| Project limit | 1 session project | 3 projects (stored in browser) | Unlimited projects |
+| Cloud synchronization | Browser session only | Local browser storage only | Multi-device cloud sync (Firestore) |
+| Project migration | None | Local projects migrate to cloud upon upgrade | Real-time sync across devices |
+| AI generations | Sign-in required | 3 trial credits | Unlimited (Fair usage: 1,500/mo) |
+| Batch captions editor | Sign-in required | Screens 1 to 3 | All 10 screens with batch actions |
+| Brand kit palette | 1 color slot | 3 saved colors | 12 saved colors |
+| Clipboard copy | Active screen | Screens 1 to 3 | All 10 screens at full resolution |
+| ZIP export | Sign-in required | Up to 3 screens per set (1 platform) | All 10 screens (all platforms) |
+| Multi-platform batch | Sign-in required | 1 platform | Full package (iOS, iPad, Android, Tablet) |
+| Multi-language batch | Sign-in required | 1 active language | 40+ languages in organized folders |
+| Fastlane metadata package | Sign-in required | Not included | Complete Deliverfile and metadata structure |
+| Custom canvas and presets | Standard store sizes | Standard store sizes | Custom dimensions and social media presets |
+| Testing variant generator | Not included | Not included | 4 visual variant strategies |
+| Alignment guides | Included | Included | Included |
+| Mockup scaling | Fixed 100% | Fixed 100% | 50% to 150% custom scaling |
+| Dual theme generator | Sign-in required | Not included | One-click light and dark set generation |
+| Store simulator | Sign-in required | Phone simulator (iPhone and Android) | Phone and tablet simulator |
+| Mockup frame styles | Flat and titanium frames | Flat and titanium frames | 3D frames (clay, glass, neon, wireframe) |
+| Video and GIF studio | Sign-in required | Included (60fps MP4, WebM, GIF) | Included |
+| App icon generator | Sign-in required | Included (Xcode and Android asset packs) | Included |
+| High-resolution export | Standard 1x and 2x | Standard 1x and 2x | 4K lossless export (@3x) |
+| Templates | Standard templates | Standard templates | All templates and curated kits |
+| Custom presets | Not included | Not included | Save custom presets and submit to community |
+| Commercial license | Included | Included | Included |
 
----
+### Custom presets and moderation console (`/admin`)
+- Custom templates: Pro users can save active layouts, device angles, color palettes, and typography as reusable presets.
+- Community submissions: Creators can submit presets to the public gallery with author attribution.
+- Moderation panel:
+  - Excluded from indexing (`noindex, nofollow, nocache`) and search engine sitemaps.
+  - Restricted to authenticated administrator accounts.
+  - Review moderation: Approve user reviews, toggle featured badges, and verify tester status.
+  - Template moderation: Review submitted community templates with approval controls.
 
-### 🛡️ Pro Custom Presets & Master Moderation Console (`/admin`)
-- **Pro Custom Templates:** SnapFrame Pro users can save any active canvas layout, device angles, color palettes, and typography as a **Custom Template Preset** for instant reuse across future app projects.
-- **Community Gallery Submission:** Pro creators can optionally submit their presets to the public `/templates` gallery with a dedicated *„By @creator”* attribution badge.
-- **Strictly Protected `/admin` Moderation Console:**
-  - Non-indexed route (`noindex, nofollow, nocache`, excluded from `robots.txt` and `sitemap.xml`).
-  - Strict 403 isolation: Only authorized administrator accounts can access the panel or invoke moderation APIs.
-  - **Reviews Moderation:** 1-click approval of user reviews (syncs instantly to homepage carousel and Google SEO schema), featured badge toggle, and beta tester verification.
-  - **Templates Moderation:** Live visual review of user-submitted presets with 1-click approval to public gallery, Pro Suite tagging, and feedback notes.
+### Billing and account management
+- Account dashboard (`/account`): Displays active plan status, renewal dates, AI credit logs, and payment receipts.
+- Merchant of Record: Payments are processed by Paddle.com with automated invoicing and regional tax handling.
+- Customer billing hub: Update payment methods, edit tax identifiers, and download invoices through `paddle.net`.
+- 14-day refund window: Available for unutilized accounts within 14 calendar days of purchase.
+- Resource usage policy: Generating AI content or synchronizing projects to cloud storage incurs third-party computing expenses, after which subscriptions are non-refundable.
+- Cancellation: Subscriptions can be canceled at any time; access remains active through the end of the paid billing period.
 
----
+## Tech stack
 
-### 💳 Subscriptions & Account Dashboard
-- **Dedicated Account & Billing Dashboard (`/account`):** View active subscriptions, renewal dates, detailed AI credit spending logs, community review submission, and payment receipts.
-- **Merchant of Record:** Paddle.com processes all transactions securely worldwide with automatic invoice generation and VAT calculation.
-- **Paddle Buyer Hub:** Manage cards, update tax/VAT IDs, and download VAT invoice PDFs directly via `paddle.net`.
-- **14-Day Money-Back Guarantee:** Eligible for unutilized accounts within 14 calendar days of initial purchase.
-- **Digital Resource Consumption:** Once an account actively utilizes paid compute resources (consuming at least 1 AI generation or syncing projects to dedicated Firestore cloud storage), non-recoverable third-party server and API infrastructure costs are incurred on your behalf, and the service is considered fulfilled.
-- **1-Click Cancellation:** Cancel anytime with zero penalties; full access remains until the end of your billing cycle.
+- Framework: Next.js 16 (App Router, Turbopack, React 19)
+- Language: TypeScript (strict mode)
+- Styling: Tailwind CSS
+- Icons: Lucide Icons
+- Testing: Vitest test suite with 65+ unit tests
+- State management: Zustand with modular slices (selection, UI, history, content) and undo/redo stacks
+- Canvas rendering: HTML5 Canvas 2D with high-DPI scaling and LRU image cache management
+- Compression: JSZip and FileSaver
+- AI backend: Multi-provider failover service (Google Gemini, OpenAI, Groq, Mistral, xAI Grok)
+- Security: Firebase Admin token authentication, sliding-window rate limiting, and SVG proxy sandboxing
 
----
-
-- **Framework:** [Next.js 16](https://nextjs.org/) (App Router, Turbopack, React 19)
-- **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Icons:** [Lucide Icons](https://lucide.dev/)
-- **Testing:** [Vitest](https://vitest.dev/) automated unit test suite with 65+ tests and 100% path-alias resolution
-- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) with modular slices (selection, ui, history, content), undo/redo history stack & local persistence
-- **Canvas Rendering:** Native HTML5 Canvas 2D with high-DPI supersampling & LRU cache eviction
-- **Export & Compression:** [JSZip](https://stuk.github.io/jszip/) & FileSaver
-- **AI Backend:** Universal 5-provider failover engine (Google Gemini, OpenAI, Groq, Mistral, xAI Grok)
-- **Security:** Firebase Admin ID token authentication, sliding window rate limiting, anti-SSRF protections, and SVG sandbox CSP
-
----
-
-## 🚀 Getting Started
+## Getting started
 
 ### 1. Clone the repository
 ```bash
@@ -143,97 +127,79 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 
-Configure your API keys in `.env.local`:
+Set your API keys in `.env.local`:
 ```env
-# AI Providers (Gemini & Groq offer 100% free permanent tiers)
+# AI providers (Gemini and Groq provide free tiers)
 GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 MISTRAL_API_KEY=your_mistral_api_key_here
 
-# Firebase Configuration (For Authentication & Cloud Project Saves)
+# Firebase configuration (Authentication and cloud storage)
 NEXT_PUBLIC_FIREBASE_API_KEY=...
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
 ```
 
-### 4. Run automated test suite
+### 4. Run automated tests
 ```bash
 npm test
 ```
 
-### 5. Run the development server
+### 5. Start the development server
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
----
-
-## 📁 Project Structure
+## Project structure
 
 ```
 snapframe.store/
-├── docs/                      # Comprehensive technical documentation
-│   ├── ARCHITECTURE.md        # State management slices, canvas engine & layer pipeline
-│   ├── AI_SUPERPOWERS.md      # AI multi-provider failover, Vision & ASO copilot
-│   ├── DEVICES_AND_CANVAS.md  # Device matrix, vector frames, and tablet support
-│   ├── EXPORT_AND_ASO.md      # Fastlane, store submission guidelines & ZIP builder
-│   └── DEPLOYMENT.md          # Vercel & Firebase deployment guide
-├── public/                    # Static assets, logos, device mockups & favicons
-│   ├── logos/                 # High-resolution vector and 3D brand logo assets
-│   └── mockups/               # SVG & PNG vector device frames
+├── docs/                      # Technical documentation
+│   ├── ARCHITECTURE.md        # State management, canvas pipeline, and store slices
+│   ├── AI_SUPERPOWERS.md      # AI failover engine, vision analysis, and ASO generator
+│   ├── DEVICES_AND_CANVAS.md  # Device models, vector frames, and tablet adaptation
+│   ├── EXPORT_AND_ASO.md      # Fastlane integration, validation checks, and ZIP builder
+│   └── DEPLOYMENT.md          # Deployment guide for Vercel and Firebase
+├── public/                    # Static assets, logos, and device mockups
+│   ├── logos/                 # Brand assets
+│   └── mockups/               # Device frame vector assets
 ├── src/
-│   ├── app/                   # Next.js App Router (pages, layouts, skeletons & API routes)
-│   │   ├── account/           # User Account, Subscriptions, AI Credit Ledger & Paddle Hub (with loading skeleton)
-│   │   ├── api/
-│   │   │   ├── account/       # Billing & subscription management endpoint
-│   │   │   ├── ai/            # AI endpoints (vision-screens, copywriter, store-listing, translate, palette)
-│   │   │   └── webhooks/      # Paddle signature verification & subscription webhooks
-│   │   ├── editor/[projectId]/# Main interactive studio workspace (with loading skeleton)
-│   │   ├── projects/          # Dedicated Projects dashboard, search & management (with loading skeleton)
-│   │   ├── pricing/           # Pricing plans & transparent comparison (with SEO layout)
-│   │   ├── faq/               # Frequently asked questions & guides (with SEO layout)
-│   │   ├── refunds/           # 14-day refund policy & dispute guidelines
-│   │   ├── terms/             # Terms of Service & Commercial licensing
-│   │   ├── privacy/           # Privacy Policy & Data protection (GDPR/CCPA)
-│   │   └── page.tsx           # High-converting Landing page & Feature showcase
-│   ├── components/
-│   │   ├── auth/              # AuthModal, UserMenu & provider OAuth linking
-│   │   ├── editor/            # Canvas, toolbar, timeline, filmstrip, background selector & modals
-│   │   │   ├── card/          # Canvas screen card drawers, overlays, and interaction hooks
-│   │   │   ├── panels/        # Sidebar panels (Text, Background, Platforms, Blocks, StoreListing, Localization, etc.)
-│   │   │   ├── toolbar/       # Modular contextual toolbars (Text, Shape, Mockup, Screen)
-│   │   │   ├── AIAutoPilotModal.tsx
-│   │   │   ├── CanvasBackgroundSelector.tsx
-│   │   │   ├── ExportModal.tsx
-│   │   │   └── StorePreviewModal.tsx
-│   │   ├── dashboard/         # Project cards, creation modal, rename modal & footer
-│   │   ├── auth/              # Google & GitHub OAuth modal, User Menu & account linking
-│   │   └── ui/                # UI primitives (HorizontalScrollRail, buttons, dropdowns, inputs, dialogs)
-│   └── lib/
-│       ├── ai/                # Unified server-side AI provider service
-│       ├── canvasBackgrounds.ts # 8 workspace background patterns (Square Grid, Dots, Blueprint, Isometric, etc.)
-│       ├── devices.ts         # Device database (iPhone, iPad, Pixel, Galaxy, Tabs)
-│       ├── renderScreenToCanvas.ts # Universal 4K Canvas 2D rendering engine
-│       ├── store/             # Modular Zustand store with slices (selection, ui, history, content)
-│       └── types.ts           # Core TypeScript types & layer schemas
-├── .env.example               # Environment variables template
+│   ├── app/                   # Next.js App Router pages and API routes
+│   │   ├── account/           # Account overview, subscriptions, and credit logs
+│   │   ├── api/               # Server-side API endpoints (account, AI, webhooks)
+│   │   ├── editor/[projectId]/# Screenshot editor workspace
+│   │   ├── projects/          # Projects catalog and management
+│   │   ├── pricing/           # Pricing plans and feature comparisons
+│   │   ├── faq/               # Frequently asked questions
+│   │   ├── refunds/           # Refund policy
+│   │   ├── terms/             # Terms of service
+│   │   ├── privacy/           # Privacy policy
+│   │   └── page.tsx           # Home page
+│   ├── components/            # React UI and editor components
+│   │   ├── auth/              # Authentication dialogs and user menu
+│   │   ├── editor/            # Canvas, panels, toolbars, and export modals
+│   │   ├── dashboard/         # Project cards and dashboard footer
+│   │   └── ui/                # Base UI elements
+│   └── lib/                   # Shared utilities, store, and rendering logic
+│       ├── ai/                # AI provider integration service
+│       ├── devices.ts         # Device models and color specifications
+│       ├── renderScreenToCanvas.ts # Canvas 2D rendering pipeline
+│       ├── store/             # Zustand state management slices
+│       └── types.ts           # TypeScript type definitions
+├── .env.example               # Environment variable template
 └── package.json
 ```
 
----
+## Documentation
 
-## 📖 Documentation Index
+For technical details, see the [`docs/`](./docs/) directory:
+- [Technical architecture and state model](./docs/ARCHITECTURE.md)
+- [AI provider architecture and tools](./docs/AI_SUPERPOWERS.md)
+- [Devices, tablets, and vector frames](./docs/DEVICES_AND_CANVAS.md)
+- [Export package and ASO guide](./docs/EXPORT_AND_ASO.md)
+- [Deployment on Vercel and Firebase](./docs/DEPLOYMENT.md)
 
-For in-depth documentation, please explore the [`docs/`](./docs/) directory:
-- [Technical Architecture & State Model](./docs/ARCHITECTURE.md)
-- [AI Superpowers & Prompt Engine](./docs/AI_SUPERPOWERS.md)
-- [Devices, Tablets & Vector Frames](./docs/DEVICES_AND_CANVAS.md)
-- [Export Suite & ASO Metadata Guide](./docs/EXPORT_AND_ASO.md)
-- [Deployment on Vercel & Firebase](./docs/DEPLOYMENT.md)
+## License
 
----
-
-## 📄 License
-
-This repository is licensed under the **Business Source License 1.1 (BSL 1.1)**. You are free to view, test, and contribute to the code, but you may not use it to operate a competing commercial SaaS or hosted screenshot service. See the [LICENSE](./LICENSE) file for details.
+This repository is licensed under the Business Source License 1.1 (BSL 1.1). You may evaluate, test, and contribute to the code, but you may not use it to operate a competing commercial screenshot service. See the [LICENSE](./LICENSE) file for terms.

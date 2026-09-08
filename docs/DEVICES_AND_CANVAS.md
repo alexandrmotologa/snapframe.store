@@ -1,55 +1,49 @@
-# 📱 Devices, Tablets & Canvas Engine
+# Devices, tablets, and canvas engine
 
-This document details the supported device catalog, vector mockup bezel rendering, and tablet layout adaptations.
+This document details supported device models, vector bezel rendering, and tablet layout adaptations in SnapFrame.
 
----
+## 1. Supported device matrix
 
-## 1. Supported Device Matrix
+SnapFrame provides pre-configured device models for Apple and Android platforms.
 
-SnapFrame provides pre-configured, pixel-perfect device models for both Apple and Android ecosystems.
-
-### Apple Devices (iOS & iPadOS):
-| Device Model | Canvas Resolution | Aspect Ratio | Screen Type | Available Colors |
+### Apple devices (iOS and iPadOS)
+| Device model | Canvas resolution | Aspect ratio | Screen type | Available colors |
 | :--- | :--- | :--- | :--- | :--- |
-| **iPhone 17 Pro** | 1320 × 2868 px | 19.5:9 | Dynamic Island | Black, White, Natural, Desert Titanium |
-| **iPhone 16 Pro** | 1320 × 2868 px | 19.5:9 | Dynamic Island | Black, White, Natural, Desert Titanium |
-| **iPhone 16** | 1290 × 2796 px | 19.5:9 | Dynamic Island | Black, White, Pink, Teal, Ultramarine |
-| **iPhone 15 Pro** | 1290 × 2796 px | 19.5:9 | Dynamic Island | Black, White, Natural, Blue Titanium |
-| **iPhone 14** | 1170 × 2532 px | 19.5:9 | Notch | Midnight, Starlight, Blue, Purple, Red |
-| **iPad Pro 13"** | 2048 × 2732 px | 4:3 | Slim Bezel / Tablet | Space Black, Silver |
+| iPhone 17 Pro | 1320 x 2868 px | 19.5:9 | Dynamic Island | Black, White, Natural, Desert Titanium |
+| iPhone 16 Pro | 1320 x 2868 px | 19.5:9 | Dynamic Island | Black, White, Natural, Desert Titanium |
+| iPhone 16 | 1290 x 2796 px | 19.5:9 | Dynamic Island | Black, White, Pink, Teal, Ultramarine |
+| iPhone 15 Pro | 1290 x 2796 px | 19.5:9 | Dynamic Island | Black, White, Natural, Blue Titanium |
+| iPhone 14 | 1170 x 2532 px | 19.5:9 | Notch | Midnight, Starlight, Blue, Purple, Red |
+| iPad Pro 13" | 2048 x 2732 px | 4:3 | Slim Bezel / Tablet | Space Black, Silver |
 
-### Android Devices (Phones & Tablets):
-| Device Model | Canvas Resolution | Aspect Ratio | Screen Type | Available Colors |
+### Android devices (Phones and tablets)
+| Device model | Canvas resolution | Aspect ratio | Screen type | Available colors |
 | :--- | :--- | :--- | :--- | :--- |
-| **Google Pixel 10/11 Pro XL** | 1344 × 2992 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
-| **Google Pixel 10/11 Pro** | 1280 × 2856 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
-| **Google Pixel 9 Pro XL** | 1344 × 2992 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
-| **Google Pixel 9 Pro** | 1280 × 2856 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
-| **Samsung Galaxy S25 Ultra** | 1440 × 3120 px | 19.5:9 | Center Hole-Punch | Titanium Black, Gray, Silverblue, Whitesilver |
-| **Samsung Galaxy S24 Ultra** | 1440 × 3120 px | 19.5:9 | Center Hole-Punch | Titanium Black, Gray, Violet, Yellow |
-| **Samsung Galaxy Tab S9 Ultra** | 1848 × 2960 px | 16:10 | Mini Notch / Tablet | Graphite, Beige |
-| **Samsung Galaxy Tab S7 / S8** | 1600 × 2560 px | 16:10 | Slim Bezel / Tablet | Mystic Black, Mystic Silver |
-| **Samsung Galaxy Tab A** | 1200 × 1920 px | 16:10 | Slim Bezel / Tablet | Dark Gray, Silver |
+| Google Pixel 10/11 Pro XL | 1344 x 2992 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
+| Google Pixel 10/11 Pro | 1280 x 2856 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
+| Google Pixel 9 Pro XL | 1344 x 2992 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
+| Google Pixel 9 Pro | 1280 x 2856 px | 20:9 | Center Hole-Punch | Obsidian, Porcelain, Hazel, Rose Quartz |
+| Samsung Galaxy S25 Ultra | 1440 x 3120 px | 19.5:9 | Center Hole-Punch | Titanium Black, Gray, Silverblue, Whitesilver |
+| Samsung Galaxy S24 Ultra | 1440 x 3120 px | 19.5:9 | Center Hole-Punch | Titanium Black, Gray, Violet, Yellow |
+| Samsung Galaxy Tab S9 Ultra | 1848 x 2960 px | 16:10 | Mini Notch / Tablet | Graphite, Beige |
+| Samsung Galaxy Tab S7 / S8 | 1600 x 2560 px | 16:10 | Slim Bezel / Tablet | Mystic Black, Mystic Silver |
+| Samsung Galaxy Tab A | 1200 x 1920 px | 16:10 | Slim Bezel / Tablet | Dark Gray, Silver |
 
----
+## 2. Vector bezel and frame rendering
 
-## 2. Vector Bezel & Frame Rendering
+Device frames are rendered using 2D Canvas vector paths:
 
-Device frames in SnapFrame are rendered via **mathematical 2D Canvas vector paths** rather than static raster bitmapped images:
+1. Bezel scaling: Scaled as `physicalW * bezelRatio` to maintain hardware proportions.
+2. Corner radius: Matches hardware squircle radiuses for each supported model.
+3. Hardware buttons: Draws side rockers, power buttons, and action buttons.
+4. Camera cutouts:
+   - Dynamic Island: Pill-shaped cutout with camera aperture and sensor layout.
+   - Hole-punch: Centered circular camera cutout with anti-aliasing.
+   - Tablet mini-notch: Proportional top cutout for slim tablet bezels.
 
-1. **Bezel Ratio Scaling:** Calculated as `physicalW * bezelRatio` for authentic physical frame proportions.
-2. **Squircle & Corner Radiuses:** Matches the exact iOS and Android hardware squircle radius.
-3. **Hardware Buttons:** Renders metallic titanium gradients for volume rockers, power buttons, and action buttons.
-4. **Notch & Dynamic Island:**
-   - *Dynamic Island:* Pill-shaped cutout with camera aperture and ambient light sensors.
-   - *Hole-Punch:* Centered circular camera cutout with sub-pixel anti-aliasing.
-   - *Tablet Mini-Notch:* Proportional top-edge cutout for ultra-thin tablet bezels.
+## 3. Manufacturer color mapping (`COLOR_HEX_MAP`)
 
----
-
-## 3. Official Color Mapping (`COLOR_HEX_MAP`)
-
-All devices use curated, manufacturer-accurate color tokens in [devices.ts](file:///b:/workgit/simple-screenshot-market/src/lib/devices.ts):
+Devices use color tokens matching manufacturer finishes in [devices.ts](file:///b:/workgit/simple-screenshot-market/src/lib/devices.ts):
 
 ```typescript
 export const COLOR_HEX_MAP: Record<string, string> = {
@@ -79,10 +73,8 @@ export const COLOR_HEX_MAP: Record<string, string> = {
 };
 ```
 
----
+## 4. Multi-set layout adaptation
 
-## 4. Multi-Set Proportional Adaptation
-
-When switching between phone and tablet sets or adding new platforms:
-- **Phone Sets (9:16 / 19.5:9):** Optimized for single-handed mobile scanning with centered or top typography.
-- **Tablet Sets (4:3 / 16:10):** Expands horizontal canvas real estate, balances typography margins, and scales screenshot frames to eliminate awkward letterboxing.
+When switching between phone and tablet sets:
+- Phone sets (9:16 / 19.5:9): Position typography above or centered over device mockups.
+- Tablet sets (4:3 / 16:10): Expand horizontal margins and adjust mockup scale to prevent excessive empty space.
