@@ -25,7 +25,7 @@
 
 ---
 
-## Studio Showcase
+## Studio Preview
 
 ### Multi-Device Live Studio & Panoramic Canvas
 Design complete 10-screen visual sets with simultaneous App Store (iOS) and Google Play (Android) rails, 3D realistic vector frames (Natural Titanium, Obsidian, Porcelain), floating action toolbars, and continuous panoramic background flow across slides:
@@ -249,6 +249,10 @@ For technical details, see the [`docs/`](./docs/) directory:
 - [Devices, tablets, and vector frames](./docs/DEVICES_AND_CANVAS.md)
 - [Export package and ASO guide](./docs/EXPORT_AND_ASO.md)
 - [Deployment on Vercel and Firebase](./docs/DEPLOYMENT.md)
+
+## Contributing
+
+Please review [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on code style, component development, and pull requests.
 
 ## License
 
