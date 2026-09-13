@@ -1,8 +1,57 @@
-# SnapFrame: App Store and Google Play Screenshot Studio
+<p align="center">
+  <a href="https://snapframe.store" target="_blank" rel="noopener noreferrer">
+    <img src="docs/images/banner.png" alt="SnapFrame Banner - Turn Raw Screenshots Into Store-Ready Masterpieces" width="920" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  </a>
+</p>
 
-SnapFrame is an open-source screenshot editor for mobile applications. It creates App Store (iOS and iPadOS) and Google Play (Phone and Android Tablet) screenshot sets with vector device frames, panoramic multi-screen backgrounds, localization, and Fastlane export packages.
+<h1 align="center">SnapFrame</h1>
+
+<p align="center">
+  <b>Studio-grade App Store & Google Play Screenshot Generator powered by AI Auto-Pilot & 3D Vector Mockups</b>
+</p>
+
+<p align="center">
+  <a href="https://snapframe.store"><img src="https://img.shields.io/badge/Live_Studio-snapframe.store-6366f1?style=flat&logo=safari&logoColor=white" alt="Live Studio" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16%20Turbopack-black?style=flat&logo=next.js&logoColor=white" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/React-19-61dafb?style=flat&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/License-BSL_1.1-amber" alt="License: BSL 1.1" />
+</p>
+
+<p align="center">
+  SnapFrame is an open-source, studio-grade screenshot editor and ASO production engine for mobile applications. Stop fighting Figma layouts: generate conversion-optimized App Store (iOS and iPadOS) and Google Play (Phone and Android Tablet) screenshot sets in under 60 seconds with 3D realistic vector device frames, continuous panoramic flow, multi-modal AI Vision auto-pilot, and one-click Fastlane export packages.
+</p>
+
+---
+
+## Studio Showcase
+
+### Multi-Device Live Studio & Panoramic Canvas
+Design complete 10-screen visual sets with simultaneous App Store (iOS) and Google Play (Android) rails, 3D realistic vector frames (Natural Titanium, Obsidian, Porcelain), floating action toolbars, and continuous panoramic background flow across slides:
+
+<p align="center">
+  <img src="docs/images/editor-canvas-overview.png" alt="SnapFrame Multi-Device Studio Canvas" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+### Platforms & Store Readiness Matrix
+Manage target device sets (iPhone 17/16 Pro Max, Google Pixel 10/11 Pro XL, iPad Pro 13", Android Tablet) and social media launch presets (Product Hunt Gallery, Twitter / X Posts, Instagram) with real-time pre-submission dimension verification:
+
+<p align="center">
+  <img src="docs/images/editor-platforms-devices.png" alt="SnapFrame Platforms and Store Readiness Drawer" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+### Curated Templates & Niche Design Kits
+Apply battle-tested, high-converting design systems (Cyberpunk Neon, Editorial Monolith, Synthetix AI, Nordic Sage, Apex Crypto Terminal) or save custom team presets for instant reuse across client apps:
+
+<p align="center">
+  <img src="docs/images/editor-templates-presets.png" alt="SnapFrame Templates and Presets Drawer" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+---
 
 ## Features
+
 
 ### AI tools and generation
 - Structured JSON studio: Import and export complete multi-slide screenshot projects as structured JSON. Prompts can generate 5 to 10 slide decks with headlines and badge pills. See [`docs/JSON_SCHEMA.md`](./docs/JSON_SCHEMA.md).
@@ -160,7 +209,8 @@ snapframe.store/
 │   ├── AI_SUPERPOWERS.md      # AI failover engine, vision analysis, and ASO generator
 │   ├── DEVICES_AND_CANVAS.md  # Device models, vector frames, and tablet adaptation
 │   ├── EXPORT_AND_ASO.md      # Fastlane integration, validation checks, and ZIP builder
-│   └── DEPLOYMENT.md          # Deployment guide for Vercel and Firebase
+│   ├── DEPLOYMENT.md          # Deployment guide for Vercel and Firebase
+│   └── images/                # Studio screenshots, banners, and visual assets
 ├── public/                    # Static assets, logos, and device mockups
 │   ├── logos/                 # Brand assets
 │   └── mockups/               # Device frame vector assets
