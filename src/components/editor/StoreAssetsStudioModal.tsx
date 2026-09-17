@@ -55,7 +55,7 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
   const project = projectId ? getProject(projectId) : projects[0];
   const appName = project?.name || "My App";
 
-  const [activeTab, setActiveTab] = useState<"icon" | "feature-graphic" | "social">("icon");
+  const [activeTab, setActiveTab] = useState<"icon" | "feature-graphic" | "product-hunt" | "twitter" | "social">("icon");
   const [isExporting, setIsExporting] = useState(false);
 
   // ── 1. App Icon State ───────────────────────────────────────────────────────
@@ -104,6 +104,7 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
     showStoreBadges: true,
     screenshotSrc: availableScreenshots[0] || "",
     secondaryScreenshotSrc: availableScreenshots[1] || "",
+    tertiaryScreenshotSrc: availableScreenshots[2] || availableScreenshots[0] || "",
     bgGradient: FEATURE_GRAPHIC_PRESETS[0].bgGradient,
     ambientLighting: true,
     gridPattern: true,
@@ -240,9 +241,16 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
 
       offscreen.toBlob((blob) => {
         if (blob) {
-          const dims = featureConfig.format === "google-play" ? "1024x500" : "1200x630";
-          downloadBlob(blob, `${appName.toLowerCase().replace(/\s+/g, "-")}-feature-graphic-${dims}.${ext}`);
-          toast.success(`Exported ${featureConfig.format === "google-play" ? "Google Play 1024×500" : "Social 1200×630"} Graphic!`);
+          const dims =
+            featureConfig.format === "product-hunt"
+              ? "1270x760"
+              : featureConfig.format === "twitter-landscape"
+              ? "1200x675"
+              : featureConfig.format === "google-play"
+              ? "1024x500"
+              : "1200x630";
+          downloadBlob(blob, `${appName.toLowerCase().replace(/\s+/g, "-")}-${featureConfig.format}-${dims}.${ext}`);
+          toast.success(`Exported ${dims} Launch Asset!`);
         }
         setIsExporting(false);
       }, mime, 0.98);
@@ -303,6 +311,38 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
             >
               <Smartphone className="w-3.5 h-3.5" />
               <span>Google Play 1024×500</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("product-hunt");
+                setFeatureConfig((p) => ({ ...p, format: "product-hunt", layout: "triple-phone-perspective" }));
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === "product-hunt"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <span>Product Hunt 1270×760</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("twitter");
+                setFeatureConfig((p) => ({ ...p, format: "twitter-landscape", layout: "triple-phone-perspective" }));
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === "twitter"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Share2 className="w-3.5 h-3.5 text-sky-400" />
+              <span>X/Twitter 1200×675</span>
             </button>
 
             <button
@@ -422,7 +462,17 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
                   <div className="absolute -inset-2 bg-gradient-to-r from-indigo-500/25 via-purple-500/25 to-pink-500/25 rounded-2xl blur-xl opacity-60" />
                   <canvas
                     ref={featureCanvasRef}
-                    className="relative w-full aspect-[1024/500] shadow-2xl rounded-2xl border border-border/80 object-contain"
+                    style={{
+                      aspectRatio:
+                        featureConfig.format === "product-hunt"
+                          ? "1270 / 760"
+                          : featureConfig.format === "twitter-landscape"
+                          ? "1200 / 675"
+                          : featureConfig.format === "social-og"
+                          ? "1200 / 630"
+                          : "1024 / 500",
+                    }}
+                    className="relative w-full shadow-2xl rounded-2xl border border-border/80 object-contain"
                   />
                 </div>
 
@@ -430,10 +480,14 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
                   <p className="text-xs font-bold text-foreground">
                     {activeTab === "feature-graphic"
                       ? "Google Play Feature Graphic (1024 × 500 px)"
+                      : activeTab === "product-hunt"
+                      ? "Product Hunt Gallery & Launch Banner (1270 × 760 px)"
+                      : activeTab === "twitter"
+                      ? "X / Twitter Landscape Card (1200 × 675 px)"
                       : "Social OpenGraph Launch Card (1200 × 630 px)"}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    High-impact banner for store promotion, search ads, and Product Hunt launches.
+                    High-impact banner for store promotion, viral social launch posts, and Product Hunt campaigns.
                   </p>
                 </div>
               </div>
@@ -726,6 +780,7 @@ export function StoreAssetsStudioModal({ open, onClose, projectId }: Props) {
                     {[
                       { id: "hero-right", label: "Angled 3D Hero" },
                       { id: "dual-phone", label: "Dual Overlap" },
+                      { id: "triple-phone-perspective", label: "Triple Launch Pack" },
                       { id: "panorama-glow", label: "Panorama Glow" },
                       { id: "minimalist", label: "Minimalist Studio" },
                     ].map((l) => (

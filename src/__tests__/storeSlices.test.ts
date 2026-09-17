@@ -255,6 +255,36 @@ describe("Zustand Store Slices & Features", () => {
       const textLayer = currentSet.screens[0].layers[0] as TextLayer;
       expect(textLayer.content).toBe("Discover Next Gen");
     });
+
+    it("should auto-frame screenshot layer based on focal analysis", async () => {
+      const store = useEditorStore.getState();
+      const targetSet = store.screenSets[0];
+      const targetScreen = targetSet.screens[0];
+
+      // Add a screenshot layer with mock placement
+      store.addLayer(targetSet.id, targetScreen.id, {
+        type: "screenshot",
+        x: 100,
+        y: 100,
+        width: 800,
+        height: 1600,
+        rotation: 0,
+        opacity: 1,
+        objectFit: "cover",
+        cornerRadius: 40,
+        showDeviceFrame: true,
+      });
+
+      const analysis = await store.autoFrameScreenshot(targetScreen.id);
+      expect(analysis).not.toBeNull();
+      expect(analysis?.optimalYOffset).toBeGreaterThan(0);
+
+      const updatedScreen = useEditorStore
+        .getState()
+        .screenSets[0].screens.find((s) => s.id === targetScreen.id);
+      const screenshotLayer = updatedScreen?.layers.find((l) => l.type === "screenshot");
+      expect(screenshotLayer?.y).toBe(Math.round(targetScreen.height * analysis!.optimalYOffset));
+    });
   });
 
   describe("LanguageStore Persistence", () => {

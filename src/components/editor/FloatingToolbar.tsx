@@ -244,6 +244,7 @@ export function FloatingToolbar() {
               update={(u) => update(u as Partial<ScreenshotLayer>)}
               showDeviceFrame={set.mockup?.showFrame !== false}
               onOpenCutout={() => setShowCutoutModal(true)}
+              screenId={screen.id}
             />
             <Separator orientation="vertical" className="h-5 mx-0.5 shrink-0" />
           </>

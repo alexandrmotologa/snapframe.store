@@ -188,6 +188,8 @@ export interface ImageLayer {
   cornerRadius: number;
   locked?: boolean;
   groupId?: string;
+  /** When true, layer will span seamlessly into the next screen (panoramic cross-screen effect) */
+  spanNextScreen?: boolean;
 }
 
 export interface FocusOverlay {
@@ -244,6 +246,8 @@ export interface ScreenshotLayer {
   statusBarTheme?: "light" | "dark";
   locked?: boolean;
   groupId?: string;
+  /** When true, mockup will span seamlessly into the next screen (panoramic cross-screen effect) */
+  spanNextScreen?: boolean;
 }
 
 export interface ShapeLayer {
@@ -274,6 +278,10 @@ export interface ShapeLayer {
     offsetY: number;
   };
   locked?: boolean;
+  /** When true, shape/card will span seamlessly into the next screen */
+  spanNextScreen?: boolean;
+  /** Optional locale override for badges (e.g. "en", "de", "fr", "ro") */
+  locale?: string;
 }
 
 export interface FlagLayer {
@@ -508,5 +516,33 @@ export interface UploadedAsset {
   dataUrl: string;
   width?: number;
   height?: number;
+}
+
+// ── Video & Smart Framing Types ──
+
+export interface VideoRenderConfig {
+  width: number;
+  height: number;
+  fps: 30 | 60;
+  durationPerSlideSeconds: number;
+  transitionDurationSeconds: number;
+  transitionStyle: "slide" | "fade" | "cut";
+  codec: "libx264";
+  bitrate: string; // e.g. '12M'
+}
+
+export interface VideoRenderProgress {
+  phase: "rendering_canvases" | "encoding_ffmpeg" | "finalizing";
+  currentFrame: number;
+  totalFrames: number;
+  percent: number;
+  message: string;
+}
+
+export interface FocalRegionAnalysis {
+  optimalYOffset: number; // Percentage from 0 to 1
+  headerClearanceNeeded: boolean;
+  bottomBarDetected: boolean;
+  confidenceScore: number;
 }
 

@@ -167,6 +167,76 @@ const SOCIAL_PROOF_PRESETS: BlockPreset[] = [
       } as any];
     },
   },
+  {
+    id: "appstore-badge-dark",
+    name: "Apple App Store Badge",
+    category: "social-proof",
+    keywords: ["apple", "app store", "ios", "badge", "download", "official"],
+    preview: (
+      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black border border-white/30 text-white shadow-xs">
+        <span className="text-sm"></span>
+        <div className="flex flex-col text-left leading-none">
+          <span className="text-[8px] text-white/70">Download on the</span>
+          <span className="text-[11px] font-bold">App Store</span>
+        </div>
+      </div>
+    ),
+    getLayers: (sw, sh) => {
+      const w = Math.round(sw * 0.58);
+      const h = Math.round(w * 0.32);
+      return [{
+        type: "shape",
+        shape: "appstore-badge",
+        text: "App Store",
+        subtext: "Download on the",
+        fill: "#000000",
+        stroke: "rgba(255,255,255,0.3)",
+        strokeWidth: 4,
+        cornerRadius: Math.round(h * 0.18),
+        x: Math.round((sw - w) / 2),
+        y: Math.round((sh - h) / 2),
+        width: w,
+        height: h,
+        rotation: 0,
+        opacity: 1,
+      } as any];
+    },
+  },
+  {
+    id: "googleplay-badge-dark",
+    name: "Google Play Store Badge",
+    category: "social-proof",
+    keywords: ["google", "play store", "android", "badge", "get it on", "official"],
+    preview: (
+      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black border border-white/30 text-white shadow-xs">
+        <span className="text-xs text-emerald-400">▶</span>
+        <div className="flex flex-col text-left leading-none">
+          <span className="text-[8px] text-white/70">GET IT ON</span>
+          <span className="text-[11px] font-bold">Google Play</span>
+        </div>
+      </div>
+    ),
+    getLayers: (sw, sh) => {
+      const w = Math.round(sw * 0.58);
+      const h = Math.round(w * 0.32);
+      return [{
+        type: "shape",
+        shape: "googleplay-badge",
+        text: "Google Play",
+        subtext: "GET IT ON",
+        fill: "#000000",
+        stroke: "rgba(255,255,255,0.3)",
+        strokeWidth: 4,
+        cornerRadius: Math.round(h * 0.18),
+        x: Math.round((sw - w) / 2),
+        y: Math.round((sh - h) / 2),
+        width: w,
+        height: h,
+        rotation: 0,
+        opacity: 1,
+      } as any];
+    },
+  },
 ];
 
 // ── 2. IOS WIDGETS & DYNAMIC ISLAND ──────────────────────────────────────────

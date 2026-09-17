@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Download, Package, Loader2, CheckCircle2, Globe, Copy, FileText, Film, Lock, Sparkles, Crown } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { X, Download, Package, Loader2, CheckCircle2, Globe, Copy, FileText, Film, Lock, Sparkles, Crown, ShieldCheck, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -11,6 +11,7 @@ import { useLanguageStore, getLang } from "@/lib/store/languageStore";
 import { useAuthStore } from "@/lib/store/authStore";
 import { toast } from "@/lib/store/toastStore";
 import { renderScreenToCanvas } from "@/lib/renderScreenToCanvas";
+import { lintScreenSet } from "@/lib/linter/storeLinter";
 import { cn } from "@/lib/utils";
 import { AppleStoreIcon, GooglePlayIcon } from "@/components/icons/StoreIcons";
 import { ALL_DEVICES, isTabletDevice } from "@/lib/devices";
@@ -60,6 +61,21 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
   const maxScreensPerSet = isPro ? 10 : 3;
   const screensPerLang = activeSets.reduce((acc, ss) => acc + Math.min(ss.screens.length, maxScreensPerSet), 0);
   const totalScreens = screensPerLang * Math.max(activeLangs.length, 1);
+
+  const [showAuditDetails, setShowAuditDetails] = useState(false);
+
+  // Pre-submission store linter computation
+  const lintResults = useMemo(() => {
+    return activeSets.map((ss) => ({
+      set: ss,
+      result: lintScreenSet(ss),
+    }));
+  }, [activeSets]);
+
+  const totalErrors = lintResults.reduce((sum, r) => sum + r.result.issueCounts.error, 0);
+  const totalWarnings = lintResults.reduce((sum, r) => sum + r.result.issueCounts.warning, 0);
+  const minScore = lintResults.length > 0 ? Math.min(...lintResults.map((r) => r.result.score)) : 100;
+  const allIssues = lintResults.flatMap((r) => r.result.issues);
 
   const toggleSet = (id: string) => {
     if (!isPro && screenSets.length > 1) {
@@ -631,6 +647,86 @@ export function ExportModal({ projectId, onClose, onOpenGifStudio, onOpenAssetsS
               </div>
             </div>
           )}
+
+          {/* ── PRE-SUBMISSION STORE AUDIT ──────────────────────────────── */}
+          <div className="rounded-xl border border-border/60 bg-secondary/20 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck
+                  className={cn(
+                    "w-4 h-4",
+                    totalErrors > 0
+                      ? "text-rose-400"
+                      : totalWarnings > 0
+                      ? "text-amber-400"
+                      : "text-emerald-400"
+                  )}
+                />
+                <span className="text-xs font-semibold text-foreground">
+                  Store Preflight Audit
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "text-[11px] font-bold px-2 py-0.5 rounded-full border",
+                    totalErrors > 0
+                      ? "bg-rose-500/15 border-rose-500/40 text-rose-300"
+                      : totalWarnings > 0
+                      ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                      : "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                  )}
+                >
+                  {totalErrors > 0
+                    ? `${totalErrors} Policy Error${totalErrors > 1 ? "s" : ""}`
+                    : totalWarnings > 0
+                    ? `${minScore}/100 · ${totalWarnings} Warning${totalWarnings > 1 ? "s" : ""}`
+                    : "100/100 · Ready to Publish"}
+                </span>
+                {allIssues.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAuditDetails(!showAuditDetails)}
+                    className="text-xs text-muted-foreground hover:text-foreground p-1 transition-colors cursor-pointer"
+                    title={showAuditDetails ? "Hide audit details" : "Show audit details"}
+                  >
+                    {showAuditDetails ? (
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {allIssues.length > 0 && showAuditDetails && (
+              <div className="pt-2 border-t border-border/40 space-y-2 max-h-48 overflow-y-auto pr-1">
+                {allIssues.map((issue) => (
+                  <div
+                    key={issue.id}
+                    className={cn(
+                      "p-2 rounded-lg text-xs space-y-0.5 border",
+                      issue.severity === "error"
+                        ? "bg-rose-950/30 border-rose-500/30 text-rose-200"
+                        : "bg-amber-950/25 border-amber-500/30 text-amber-200"
+                    )}
+                  >
+                    <div className="flex items-center justify-between font-semibold">
+                      <span className="flex items-center gap-1.5">
+                        <AlertTriangle className="w-3 h-3 shrink-0" />
+                        Screen #{issue.screenIndex + 1}: {issue.message}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-wider opacity-75 font-mono">
+                        {issue.severity}
+                      </span>
+                    </div>
+                    <p className="text-[11px] opacity-80 pl-4">{issue.suggestion}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Scale + Format row */}
           <div className="grid grid-cols-2 gap-4">

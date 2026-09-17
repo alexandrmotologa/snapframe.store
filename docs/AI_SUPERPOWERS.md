@@ -82,3 +82,12 @@ If a provider returns a rate limit error (HTTP 429), timeout, or quota exhaustio
 - Catalog: Supports 60+ App Store and Google Play languages.
 - Translation approach: Adapts copy for natural marketing reading rather than literal word-by-word substitution.
 - Length constraints: Condenses longer target languages (such as German or French) to avoid text truncation on mobile canvas headers.
+
+### Saliency smart framing (`src/lib/ai/smartFraming.ts`)
+- Client-side execution: Runs directly on 2D canvas pixel buffers without server round-trips.
+- Algorithm:
+  1. Downsamples screenshot to $120 \times 240$ buffer.
+  2. Applies vertical and horizontal Sobel gradient convolutions to calculate edge energy distribution across rows.
+  3. Detects high-density edge clusters in the top 15% (navigation bars, headlines) and bottom 15% (tab bars, floating action buttons).
+  4. Calculates optical centroid $\bar{y}_{\text{centroid}}$ to derive `optimalYOffset` (clamped between 12% and 40%).
+- Store integration: Accessible via `autoFrameScreenshot(screenId)` on `useEditorStore` with history tracking.

@@ -62,6 +62,7 @@ Apply battle-tested, high-converting design systems (Cyberpunk Neon, Editorial M
 - Copywriter adjustments: Adapts copy across tones (active, minimal, benefit-focused, social proof, enterprise), shortens text under 30 characters, and offers headline alternatives.
 - Screenshot palette extraction: Local color quantization (median-cut and HSL harmony) extracts color palettes directly from uploaded screenshots, with optional vision model suggestions.
 - Clean status bar: Overlays a vector status bar (9:41 AM, battery indicator, signal bars, network badge) with light and dark mode toggles to meet store guidelines.
+- Saliency smart framing: Client-side Sobel edge convolution scans uploaded screenshots to identify focal zones (headers, cards, bottom toolbars). It calculates optical centroids and sets frame offsets to keep headlines in the top third and prevent cutting off navigation bars.
 - Multilingual localization: Translates text across 60+ languages with length constraints to prevent header overflow.
 - Protected endpoints: AI routes use Firebase ID token authentication, sliding-window rate limiting, anti-SSRF filtering, and server-managed API keys.
 
@@ -94,7 +95,12 @@ Apply battle-tested, high-converting design systems (Cyberpunk Neon, Editorial M
 - Fastlane package: Generates a ready-to-run `Deliverfile` alongside structured text files (`name.txt`, `subtitle.txt`, `description.txt`, `keywords.txt`) for command-line deployment.
 - Multiple export formats: Supports lossless PNG, compressed WebP, and high-quality JPEG.
 - Live store simulator: Preview screenshot sets inside mockup App Store and Google Play interfaces across phone and tablet sizes.
-- Animated GIF export: Render screenshot cycles as animated GIFs for marketing.
+- Lossless video and GIF studio: Compiles H.264 MP4 videos using a WebAssembly FFmpeg pipeline (`@ffmpeg/ffmpeg`) with constant 60 FPS / 30 FPS pacing, `-pix_fmt yuv420p`, and cubic ease slide/cross-fade transitions to meet strict Apple App Store Video Preview and Google Play requirements. Also exports WebM streams and animated GIF palettes.
+- Pre-submission store linter: Real-time preflight compliance audit directly in the export dialog checking Google Play prohibited rankings/pricing claims (`#1`, `Free`, `Top Rated`, review stars), Apple App Store alpha transparency, WCAG AA contrast, and search thumbnail legibility.
+- Panoramic seam spanning: Pixel-perfect cross-screen layer continuity enabling device mockups, cards, and shapes to span continuously across screen boundaries ($X_{i+1} = X_i - W$).
+- Official localized store badges: Vector-rendered Apple App Store and Google Play badges with native translations across 16+ languages (English, Romanian, German, French, Spanish, Japanese, Korean, Chinese, etc.).
+- Marketing launch pack generator: 1-click marketing banners for Product Hunt gallery (1270×760 px), X / Twitter landscape cards (1200×675 px), and Triple Launch Pack 3-phone perspective mockups.
+- AI Smart Framing: Optical saliency detection via 2D Sobel gradient convolution, centering focal points and core UI elements with 1 click in editor toolbars.
 - Clipboard copy: Copy any screen directly to the clipboard at full resolution for Figma, Slack, or Notion.
 - Store size guides: Built-in specifications for 2026 store requirements at `/app-store-screenshot-sizes` and `/google-play-screenshot-sizes`.
 
@@ -149,8 +155,8 @@ Apply battle-tested, high-converting design systems (Cyberpunk Neon, Editorial M
 - Framework: Next.js 16 (App Router, Turbopack, React 19)
 - Language: TypeScript (strict mode)
 - Styling: Tailwind CSS
-- Icons: Lucide Icons
-- Testing: Vitest test suite with 65+ unit tests
+- Testing: Vitest test suite with 110+ unit tests across 18 test suites
+- Video and media: WebAssembly FFmpeg (`@ffmpeg/ffmpeg`, `@ffmpeg/util`) for constant-framerate lossless H.264 MP4 encoding and animated GIF synthesis
 - State management: Zustand with modular slices (selection, UI, history, content) and undo/redo stacks
 - Canvas rendering: HTML5 Canvas 2D with high-DPI scaling and LRU image cache management
 - Compression: JSZip and FileSaver

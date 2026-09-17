@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ScreenshotLayer } from "@/lib/types";
 import { useEditorStore } from "@/lib/store/editorStore";
 import {
@@ -10,11 +10,14 @@ import {
   Minus,
   Plus,
   Scissors,
+  Sparkles,
+  Columns2,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { ColorInput } from "@/components/ui/color-input";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/store/toastStore";
 import { ToolbarBtn as Btn, ToolbarNumInput as NumInput } from "./ToolbarPrimitives";
 
 export interface FloatingMockupToolsProps {
@@ -22,6 +25,7 @@ export interface FloatingMockupToolsProps {
   update: (updates: Partial<ScreenshotLayer>) => void;
   showDeviceFrame: boolean;
   onOpenCutout: () => void;
+  screenId?: string;
 }
 
 export function FloatingMockupTools({
@@ -29,7 +33,9 @@ export function FloatingMockupTools({
   update,
   showDeviceFrame,
   onOpenCutout,
+  screenId,
 }: FloatingMockupToolsProps) {
+  const [isFraming, setIsFraming] = useState(false);
   return (
     <>
       <Btn
@@ -310,6 +316,60 @@ export function FloatingMockupTools({
           )}
         </PopoverContent>
       </Popover>
+
+      {/* Panoramic Seam Spanning Toggle */}
+      <Btn
+        active={Boolean(sl.spanNextScreen)}
+        onClick={() => {
+          const nextVal = !sl.spanNextScreen;
+          update({ spanNextScreen: nextVal });
+          useEditorStore.getState().recordHistory();
+          if (nextVal) {
+            toast.success("Panoramic Seam Spanning enabled! Layer will span continuously into the next screen.");
+          } else {
+            toast.info("Panoramic Seam Spanning disabled.");
+          }
+        }}
+        title={
+          sl.spanNextScreen
+            ? "Panoramic Spanning: ON (Layer spans into next screen). Click to disable."
+            : "Panoramic Spanning: OFF (Click to span layer seamlessly into the next screen)"
+        }
+      >
+        <Columns2 className="w-3.5 h-3.5" />
+      </Btn>
+
+      {/* AI Smart Frame Button */}
+      {screenId && (
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              setIsFraming(true);
+              const res = await useEditorStore.getState().autoFrameScreenshot(screenId);
+              if (res) {
+                toast.success(`Smart Frame: focal point optimized (${Math.round(res.optimalYOffset * 100)}% Y)`);
+              } else {
+                toast.info("Upload a screenshot first to apply Smart Framing.");
+              }
+            } catch {
+              toast.error("Failed to auto-frame screenshot.");
+            } finally {
+              setIsFraming(false);
+            }
+          }}
+          disabled={isFraming}
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg font-medium transition-all shrink-0 cursor-pointer shadow-xs",
+            "bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-rose-500/15 border border-orange-500/30 hover:border-orange-500/60 text-foreground",
+            isFraming && "opacity-60 cursor-not-allowed"
+          )}
+          title="AI Smart Frame: Auto-detect focal point and center key UI elements"
+        >
+          <Sparkles className={cn("w-3.5 h-3.5 text-amber-500", isFraming && "animate-spin")} />
+          <span className="hidden sm:inline">{isFraming ? "Framing..." : "Smart Frame"}</span>
+        </button>
+      )}
 
       {/* 3D Pop-Out / AI Cutout Button */}
       <button
