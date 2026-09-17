@@ -510,3 +510,31 @@ export interface UploadedAsset {
   height?: number;
 }
 
+// ── Video & Smart Framing Types ──
+
+export interface VideoRenderConfig {
+  width: number;
+  height: number;
+  fps: 30 | 60;
+  durationPerSlideSeconds: number;
+  transitionDurationSeconds: number;
+  transitionStyle: "slide" | "fade" | "cut";
+  codec: "libx264";
+  bitrate: string; // e.g. '12M'
+}
+
+export interface VideoRenderProgress {
+  phase: "rendering_canvases" | "encoding_ffmpeg" | "finalizing";
+  currentFrame: number;
+  totalFrames: number;
+  percent: number;
+  message: string;
+}
+
+export interface FocalRegionAnalysis {
+  optimalYOffset: number; // Percentage from 0 to 1
+  headerClearanceNeeded: boolean;
+  bottomBarDetected: boolean;
+  confidenceScore: number;
+}
+

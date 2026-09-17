@@ -53,7 +53,7 @@ The studio store is split into single-responsibility Zustand slices composed int
 - `SelectionSlice` (`selectionSlice.ts`): Tracks `activeSetId`, `activeScreenId`, `activeLayerId`, and `selectedLayerIds` (multi-select), with getter helpers (`getActiveSet()`, `getActiveScreen()`, `getActiveLayer()`).
 - `UiSlice` (`uiSlice.ts`): Manages `zoom` (clamped between 0.1 and 2.0), `showGrid`, `showGuides`, and `canvasBackground`.
 - `HistorySlice` (`historySlice.ts`): Maintains an immutable snapshot stack for state recovery, recording actions via `recordHistory()` with debouncing for high-frequency updates, and providing `undo()` and `redo()`.
-- `ContentSlice` (`contentSlice.ts`): Provides CRUD operations for screen sets, screens, and individual layers (text, screenshot, shape, sticker), alongside dual-theme generation, theme application, and template instantiation.
+- `ContentSlice` (`contentSlice.ts`): Provides CRUD operations for screen sets, screens, and individual layers (text, screenshot, shape, sticker), alongside dual-theme generation, theme application, template instantiation, and `autoFrameScreenshot` using client-side Sobel saliency detection.
 
 ### `projectStore.ts`
 - Project metadata: Stores `id`, `name`, `thumbnail`, `createdAt`, and `updatedAt`.
@@ -112,6 +112,13 @@ The rendering engine generates consistent graphics across the live editor, store
    - Before and after comparison cards
    - Metric callouts (+142%)
    - Callout shapes and arrows
+
+### 3.3 Client-side WebAssembly FFmpeg pipeline (`ffmpegVideoRenderer.ts`)
+- Singleton loader: Lazily imports `@ffmpeg/ffmpeg` and `@ffmpeg/util`, caching the initialized engine across export requests.
+- Timeline synthesis: Calculates required frames via $F = (N \times D_{\text{slide}} + (N - 1) \times D_{\text{trans}}) \times \text{FPS}$.
+- Cubic ease transitions: Composites frames with smooth easing ($p^2 \times (3 - 2p)$) across slide, cross-fade, and cut transitions.
+- Store compliance: Encodes H.264 MP4 (`-pix_fmt yuv420p`, constant 60 or 30 FPS, `-movflags +faststart`) to meet Apple App Store Video Preview and Google Play requirements.
+- Virtual FS cleanup: Deletes intermediate frame files from memory immediately following encoding.
 
 ## 4. Proportional template scaling
 

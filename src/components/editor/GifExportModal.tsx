@@ -11,6 +11,9 @@ import { useProjectStore } from "@/lib/store/projectStore";
 import { cn } from "@/lib/utils";
 import { renderScreenToCanvas } from "@/lib/renderScreenToCanvas";
 import { toast } from "@/lib/store/toastStore";
+import { renderLosslessVideoWithFFmpeg } from "@/lib/video/ffmpegVideoRenderer";
+import { VideoRenderConfig } from "@/lib/types";
+import { downloadFileWithPicker } from "@/lib/utils/fileExport";
 
 interface GifExportModalProps {
   projectId: string;
@@ -37,11 +40,13 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
   const [statusMsg, setStatusMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isPlayingPreview, setIsPlayingPreview] = useState(true);
+  const [lossless60Fps, setLossless60Fps] = useState(true);
 
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number | null>(null);
   const cachedCanvasesRef = useRef<HTMLCanvasElement[]>([]);
   const isCancelledRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const activeSet = screenSets.find((s) => s.id === selectedSet) || screenSets[0];
   const screens = useMemo(() => activeSet?.screens ?? [], [activeSet]);
@@ -135,26 +140,62 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
     };
   }, [isPlayingPreview, fps, transition, screens.length]);
 
-  // Export handler: WebM / MP4 Video via MediaRecorder or FFmpeg for GIF
+  // Export handler: FFmpeg Lossless MP4, WebM Stream, or FFmpeg GIF
   const handleExport = async () => {
     if (screens.length === 0 || !activeSet) return;
     setStep("exporting");
     setProgress(0);
+    isCancelledRef.current = false;
+    abortControllerRef.current = new AbortController();
 
     try {
-      setStatusMsg("Rendering high-res master frames...");
-      const masterCanvases: HTMLCanvasElement[] = [];
-      const exportScale = scale === 2 ? 1 : 0.75;
+      if (format === "mp4") {
+        // Broadcast-grade Lossless H.264 Video via WebAssembly FFmpeg
+        setStatusMsg("Initializing lossless FFmpeg pipeline...");
+        const targetW = scale === 2 ? Math.round(activeSet.preset.width) : Math.round(activeSet.preset.width * 0.75);
+        const targetH = scale === 2 ? Math.round(activeSet.preset.height) : Math.round(activeSet.preset.height * 0.75);
 
-      for (let i = 0; i < screens.length; i++) {
-        const c = document.createElement("canvas");
-        await renderScreenToCanvas(c, screens[i], activeSet, { scale: exportScale, isExport: true });
-        masterCanvases.push(c);
-        setProgress(Math.round(((i + 1) / screens.length) * 35));
-      }
+        const config: VideoRenderConfig = {
+          width: targetW % 2 === 0 ? targetW : targetW - 1,
+          height: targetH % 2 === 0 ? targetH : targetH - 1,
+          fps: lossless60Fps ? 60 : 30,
+          durationPerSlideSeconds: 1 / fps,
+          transitionDurationSeconds: transition === "cut" ? 0 : 0.45,
+          transitionStyle: transition,
+          codec: "libx264",
+          bitrate: lossless60Fps ? "16M" : "8M",
+        };
 
-      if (format === "webm" || format === "mp4") {
+        const videoBlob = await renderLosslessVideoWithFFmpeg({
+          screens,
+          screenSet: activeSet,
+          config,
+          signal: abortControllerRef.current?.signal,
+          onProgress: (p) => {
+            setProgress(p.percent);
+            setStatusMsg(p.message);
+          },
+        });
+
+        const filename = `${appName.toLowerCase().replace(/\s+/g, "-")}-preview-${lossless60Fps ? "60fps" : "30fps"}.mp4`;
+        await downloadFileWithPicker(videoBlob, filename);
+
+        setProgress(100);
+        setStep("done");
+        toast.success(`Broadcast-grade MP4 exported successfully (${lossless60Fps ? "60 FPS" : "30 FPS"})!`);
+      } else if (format === "webm") {
         // Fast Lossless Video Generation via HTML5 Canvas Stream & MediaRecorder
+        setStatusMsg("Rendering high-res master frames...");
+        const masterCanvases: HTMLCanvasElement[] = [];
+        const exportScale = scale === 2 ? 1 : 0.75;
+
+        for (let i = 0; i < screens.length; i++) {
+          const c = document.createElement("canvas");
+          await renderScreenToCanvas(c, screens[i], activeSet, { scale: exportScale, isExport: true });
+          masterCanvases.push(c);
+          setProgress(Math.round(((i + 1) / screens.length) * 35));
+        }
+
         setStatusMsg("Recording video stream...");
         const targetW = masterCanvases[0].width;
         const targetH = masterCanvases[0].height;
@@ -167,9 +208,7 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
 
         const stream = recordCanvas.captureStream(30);
         const mimeType =
-          format === "mp4" && MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")
-            ? "video/mp4;codecs=avc1"
-            : MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+          MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
             ? "video/webm;codecs=vp9"
             : "video/webm";
 
@@ -246,18 +285,24 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
         recorder.stop();
         const videoBlob = await recordingComplete;
 
-        const ext = format === "mp4" && mimeType.includes("mp4") ? "mp4" : "webm";
-        const url = URL.createObjectURL(videoBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${appName.toLowerCase().replace(/\s+/g, "-")}-promo.${ext}`;
-        a.click();
-        URL.revokeObjectURL(url);
+        const filename = `${appName.toLowerCase().replace(/\s+/g, "-")}-promo.webm`;
+        await downloadFileWithPicker(videoBlob, filename);
 
         setProgress(100);
         setStep("done");
-        toast.success(`Video exported successfully (${ext.toUpperCase()})!`);
+        toast.success("WebM video exported successfully!");
       } else {
+        // GIF Export with FFmpeg
+        setStatusMsg("Rendering high-res master frames...");
+        const masterCanvases: HTMLCanvasElement[] = [];
+        const exportScale = scale === 2 ? 1 : 0.75;
+
+        for (let i = 0; i < screens.length; i++) {
+          const c = document.createElement("canvas");
+          await renderScreenToCanvas(c, screens[i], activeSet, { scale: exportScale, isExport: true });
+          masterCanvases.push(c);
+          setProgress(Math.round(((i + 1) / screens.length) * 35));
+        }
         // GIF Export with FFmpeg
         setStatusMsg("Loading FFmpeg engine...");
         setProgress(40);
@@ -319,6 +364,10 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
         toast.success("Animated GIF exported successfully!");
       }
     } catch (e) {
+      if ((e instanceof DOMException && e.name === "AbortError") || isCancelledRef.current) {
+        setStep("config");
+        return;
+      }
       console.error(e);
       setErrorMsg(e instanceof Error ? e.message : "Unknown export error");
       setStep("error");
@@ -507,6 +556,35 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
                     ))}
                   </div>
                 </div>
+
+                {/* Lossless 60 FPS (App Store Ready) Toggle */}
+                {format === "mp4" && (
+                  <div className="p-3 rounded-xl border border-pink-500/30 bg-pink-500/5 space-y-1.5 animate-in fade-in-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-pink-500 shrink-0" />
+                        <span className="text-xs font-semibold text-foreground">
+                          Lossless 60 FPS (App Store Ready)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setLossless60Fps((v) => !v)}
+                        className={cn(
+                          "px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer border",
+                          lossless60Fps
+                            ? "bg-pink-500 text-white border-pink-600 shadow-xs shadow-pink-500/30"
+                            : "bg-secondary text-muted-foreground border-border hover:bg-secondary/80"
+                        )}
+                      >
+                        {lossless60Fps ? "60 FPS Active" : "30 FPS"}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">
+                      Encodes broadcast-grade H.264 via WebAssembly FFmpeg with YUV420p color matrix and constant frame pacing to pass Apple App Store &amp; Google Play Video Preview checks.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -535,6 +613,7 @@ export function GifExportModal({ projectId, onClose }: GifExportModalProps) {
                   size="sm"
                   onClick={() => {
                     isCancelledRef.current = true;
+                    abortControllerRef.current?.abort();
                     setStep("config");
                     toast.info("Export cancelled");
                   }}

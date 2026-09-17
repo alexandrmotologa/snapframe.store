@@ -1,4 +1,4 @@
-import { Layer, Screen, ScreenSet, Background, MockupSettings, ThemeId, UploadedAsset, Template } from "@/lib/types";
+import { Layer, Screen, ScreenSet, Background, MockupSettings, ThemeId, UploadedAsset, Template, FocalRegionAnalysis } from "@/lib/types";
 import { CanvasBackgroundId } from "@/lib/canvasBackgrounds";
 
 export interface HistoryEntry {
@@ -69,6 +69,7 @@ export interface ContentSlice {
   updateAllScreensBackground: (setId: string, background: Background) => void;
   applyPanoramicBackground: (setId: string, imageUrl: string, naturalWidth: number, naturalHeight: number) => void;
   autoFillScreenshots: (setId: string, urls: string[]) => void;
+  autoFrameScreenshot: (screenId: string) => Promise<FocalRegionAnalysis | null>;
 
   addLayer: (setId: string, screenId: string, layer: Omit<Layer, "id"> | Layer) => void;
   addLayers: (setId: string, screenId: string, layers: (Omit<Layer, "id"> | Layer)[]) => void;

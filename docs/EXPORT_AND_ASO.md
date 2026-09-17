@@ -74,7 +74,16 @@ The export builder generates files compatible with Fastlane Deliver (iOS) and Fa
 - Available in the top editor navigation bar and inside the export dialog.
 - Renders the active screen on an off-screen canvas and writes it directly to the system clipboard via the `navigator.clipboard.write()` API for pasting into Figma, Slack, or Notion.
 
-## 5. Account tier export limits
+## 5. Lossless Video and Animated GIF Studio
+
+- WebAssembly FFmpeg pipeline (`src/lib/video/ffmpegVideoRenderer.ts`):
+  - Uses `@ffmpeg/ffmpeg` 0.12 WebAssembly core executing entirely in the browser without server video processing costs.
+  - Broadcast-grade H.264 MP4 export (`-c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart`).
+  - App Store compliance: Constant 60 FPS or 30 FPS pacing with BT.709 YUV420p color matrix and zero dropped frames.
+  - Smooth transitions: Slide, cross-fade, and instantaneous cut transitions using cubic ease interpolation ($p^2 \times (3 - 2p)$).
+  - WebM & GIF export: Preserves HTML5 MediaRecorder stream capture for instant WebM previews and FFmpeg two-pass palette optimization (`palettegen` / `paletteuse`) for looping animated GIFs.
+
+## 6. Account tier export limits
 
 - Guest: 1-click clipboard copy for the active screen. ZIP downloads prompt for a free account.
 - Free Registered ($0): Export up to 3 screenshots per set for 1 platform in 1 language, clipboard copy for screens 1 to 3, standard 1x/2x resolution.

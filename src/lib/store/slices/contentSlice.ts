@@ -5,6 +5,7 @@ import { themeById } from "@/lib/themes";
 import { nanoid } from "@/lib/utils";
 import { ALL_DEVICES, isTabletDevice } from "@/lib/devices";
 import { MAX_SCREENS_PER_SET } from "@/lib/constants";
+import { analyzeScreenshotImage } from "@/lib/ai/smartFraming";
 
 /**
  * Reusable helper to proportionally scale and transform layers when changing device or canvas dimensions
@@ -1147,6 +1148,67 @@ export const createContentSlice: StateCreator<EditorStore, [], [], ContentSlice>
       }),
     });
     get().recordHistory();
+  },
+
+  autoFrameScreenshot: async (screenId: string) => {
+    const { screenSets } = get();
+    let targetSet: ScreenSet | undefined;
+    let targetScreen: Screen | undefined;
+
+    for (const ss of screenSets) {
+      const scr = ss.screens.find((s) => s.id === screenId);
+      if (scr) {
+        targetSet = ss;
+        targetScreen = scr;
+        break;
+      }
+    }
+
+    if (!targetSet || !targetScreen) return null;
+
+    const screenshotLayer = targetScreen.layers.find(
+      (l) => l.type === "screenshot"
+    ) as ScreenshotLayer | undefined;
+
+    if (!screenshotLayer) return null;
+
+    let analysis: import("@/lib/types").FocalRegionAnalysis;
+    if (screenshotLayer.src) {
+      analysis = await analyzeScreenshotImage(screenshotLayer.src);
+    } else {
+      analysis = {
+        optimalYOffset: 0.22,
+        headerClearanceNeeded: false,
+        bottomBarDetected: false,
+        confidenceScore: 0.7,
+      };
+    }
+
+    const newY = Math.round(targetScreen.height * analysis.optimalYOffset);
+
+    set({
+      screenSets: get().screenSets.map((ss) => {
+        if (ss.id !== targetSet!.id) return ss;
+        return {
+          ...ss,
+          screens: ss.screens.map((s) => {
+            if (s.id !== screenId) return s;
+            return {
+              ...s,
+              layers: s.layers.map((l) => {
+                if (l.id === screenshotLayer.id) {
+                  return { ...l, y: newY };
+                }
+                return l;
+              }),
+            };
+          }),
+        };
+      }),
+    });
+
+    get().recordHistory();
+    return analysis;
   },
 
   addScreenSet: (store) => {
