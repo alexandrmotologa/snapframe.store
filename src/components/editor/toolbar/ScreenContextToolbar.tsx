@@ -5,9 +5,10 @@ import { useEditorStore } from "@/lib/store/editorStore";
 import { Screen, ScreenSet, ScreenshotLayer, TextLayer } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Palette, Check, Type } from "lucide-react";
+import { Palette, Check, Type, Sparkles } from "lucide-react";
 import { cn, nanoid } from "@/lib/utils";
 import { ColorInput } from "@/components/ui/color-input";
+import { toast } from "@/lib/store/toastStore";
 
 // ── Curated Solid Color Swatches ──────────────────────────────────────────────
 export const SOLID_SWATCHES = [
@@ -58,6 +59,7 @@ export function ScreenContextToolbar({ screen, screenSet }: ScreenContextToolbar
 
   const [bgPopoverOpen, setBgPopoverOpen] = useState(false);
   const [bgTab, setBgTab] = useState<"solid" | "gradient">("solid");
+  const [isFraming, setIsFraming] = useState(false);
 
   const existingScreenshots = screen.layers.filter(
     (l) => l.type === "screenshot"
@@ -418,6 +420,38 @@ export function ScreenContextToolbar({ screen, screenSet }: ScreenContextToolbar
         <Type className="w-3.5 h-3.5" />
         <span>+ Text</span>
       </button>
+
+      {/* ── AI Smart Frame ── */}
+      {existingScreenshots.length > 0 && (
+        <button
+          type="button"
+          disabled={isFraming}
+          onClick={async () => {
+            try {
+              setIsFraming(true);
+              const res = await useEditorStore.getState().autoFrameScreenshot(screen.id);
+              if (res) {
+                toast.success(`Smart Frame: focal point centered (${Math.round(res.optimalYOffset * 100)}% Y)`);
+              } else {
+                toast.info("Upload a screenshot first to apply Smart Framing.");
+              }
+            } catch {
+              toast.error("Failed to auto-frame screenshot.");
+            } finally {
+              setIsFraming(false);
+            }
+          }}
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg font-medium transition-all shrink-0 cursor-pointer shadow-xs",
+            "bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-rose-500/15 border border-orange-500/30 hover:border-orange-500/60 text-foreground",
+            isFraming && "opacity-60 cursor-not-allowed"
+          )}
+          title="AI Smart Frame: analyze visual saliency & auto-align to key interface elements"
+        >
+          <Sparkles className={cn("w-3.5 h-3.5 text-amber-500", isFraming && "animate-spin")} />
+          <span>{isFraming ? "Framing..." : "Smart Frame"}</span>
+        </button>
+      )}
     </div>
   );
 }

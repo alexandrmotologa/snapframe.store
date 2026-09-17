@@ -10,6 +10,7 @@ import {
 import { ALL_DEVICES, IOS_DEVICES, ANDROID_DEVICES, COLOR_HEX_MAP, isTabletDevice } from "@/lib/devices";
 import { cn, loadGoogleFont, drawBackgroundToCanvas } from "@/lib/utils";
 import { getTextGradientPreset } from "@/lib/textPresets";
+import { drawStoreBadge } from "@/lib/badges/storeBadges";
 import { Draggable } from "@hello-pangea/dnd";
 import { ScreenVerticalMenu } from "@/components/editor/ScreenVerticalMenu";
 import {
@@ -187,8 +188,21 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
       ctx.globalAlpha = 1;
     }
 
-    // ── Layers ────────────────────────────────────────────────────────────────
-    for (const layer of screen.layers) {
+    // ── Layers (with Panoramic Seam Spanning from previous screen) ─────────
+    const screenIndex = screenSet?.screens?.findIndex((s) => s.id === screen.id) ?? -1;
+    const prevScreen = screenIndex > 0 ? screenSet.screens[screenIndex - 1] : null;
+    const spanningLayers = prevScreen
+      ? (prevScreen.layers as any[])
+          .filter((l) => Boolean(l.spanNextScreen))
+          .map((l) => ({
+            ...l,
+            id: `${l.id}_span`,
+            x: l.x - (prevScreen.width || screen.width),
+          }))
+      : [];
+
+    const allLayers = [...spanningLayers, ...screen.layers];
+    for (const layer of allLayers) {
       ctx.save();
       ctx.globalAlpha = layer.opacity ?? 1;
 
@@ -1054,23 +1068,7 @@ export const ScreenCard = memo(function ScreenCard({ screen, screenSet, index, h
           sl.shape === "googleplay-dark" ||
           sl.shape === "googleplay-light"
         ) {
-          const isAppStore = sl.shape.startsWith("appstore");
-          const isLight = sl.shape.includes("light");
-          const badgeSrc = isAppStore
-            ? isLight ? "/badges/appstore-light.svg" : "/badges/appstore-dark.svg"
-            : isLight ? "/badges/googleplay-light.svg" : "/badges/googleplay-dark.svg";
-
-          try {
-            const badgeImg = await loadImage(badgeSrc);
-            ctx.drawImage(badgeImg, sl.x, sl.y, sl.width, sl.height);
-          } catch {
-            // Fallback rendering
-            ctx.fillStyle = isLight ? "#FFFFFF" : "#000000";
-
-            ctx.beginPath();
-            ctx.roundRect(sl.x, sl.y, sl.width, sl.height, Math.min(sl.width, sl.height) * 0.2);
-            ctx.fill();
-          }
+          drawStoreBadge(ctx, sl, activeLang);
 
         } else if (sl.shape === "rating-badge") {
           const bx = sl.x, by = sl.y, bw = sl.width, bh = sl.height;

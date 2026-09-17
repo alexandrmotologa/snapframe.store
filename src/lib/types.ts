@@ -188,6 +188,8 @@ export interface ImageLayer {
   cornerRadius: number;
   locked?: boolean;
   groupId?: string;
+  /** When true, layer will span seamlessly into the next screen (panoramic cross-screen effect) */
+  spanNextScreen?: boolean;
 }
 
 export interface FocusOverlay {
@@ -244,6 +246,8 @@ export interface ScreenshotLayer {
   statusBarTheme?: "light" | "dark";
   locked?: boolean;
   groupId?: string;
+  /** When true, mockup will span seamlessly into the next screen (panoramic cross-screen effect) */
+  spanNextScreen?: boolean;
 }
 
 export interface ShapeLayer {
@@ -274,6 +278,10 @@ export interface ShapeLayer {
     offsetY: number;
   };
   locked?: boolean;
+  /** When true, shape/card will span seamlessly into the next screen */
+  spanNextScreen?: boolean;
+  /** Optional locale override for badges (e.g. "en", "de", "fr", "ro") */
+  locale?: string;
 }
 
 export interface FlagLayer {

@@ -1,6 +1,6 @@
 export interface FeatureGraphicConfig {
-  format: "google-play" | "social-og" | "in-app-event";
-  layout: "hero-right" | "dual-phone" | "panorama-glow" | "minimalist";
+  format: "google-play" | "social-og" | "in-app-event" | "product-hunt" | "twitter-landscape";
+  layout: "hero-right" | "dual-phone" | "panorama-glow" | "minimalist" | "triple-phone-perspective";
   
   // Content
   appName: string;
@@ -13,6 +13,7 @@ export interface FeatureGraphicConfig {
   iconSrc?: string;
   screenshotSrc?: string;
   secondaryScreenshotSrc?: string;
+  tertiaryScreenshotSrc?: string;
   
   // Background Styling
   bgGradient: {
@@ -28,7 +29,9 @@ export interface FeatureGraphicConfig {
 
 export const FEATURE_GRAPHIC_FORMATS = {
   "google-play": { width: 1024, height: 500, label: "Google Play Feature Graphic (1024×500)" },
-  "social-og": { width: 1200, height: 630, label: "Social Share & Product Hunt (1200×630)" },
+  "social-og": { width: 1200, height: 630, label: "Social Share & OpenGraph (1200×630)" },
+  "product-hunt": { width: 1270, height: 760, label: "Product Hunt Gallery & Header (1270×760)" },
+  "twitter-landscape": { width: 1200, height: 675, label: "X / Twitter Landscape Card (1200×675)" },
   "in-app-event": { width: 1920, height: 1080, label: "In-App Event & Promo Card (1920×1080)" },
 };
 
@@ -154,10 +157,11 @@ export async function renderFeatureGraphicToCanvas(
   }
 
   // Load external assets (icon & screenshots)
-  const [iconImg, screenImg1, screenImg2] = await Promise.all([
+  const [iconImg, screenImg1, screenImg2, screenImg3] = await Promise.all([
     loadImage(config.iconSrc || ""),
     loadImage(config.screenshotSrc || ""),
     loadImage(config.secondaryScreenshotSrc || ""),
+    loadImage(config.tertiaryScreenshotSrc || ""),
   ]);
 
   // 4. Render Layout
@@ -167,6 +171,9 @@ export async function renderFeatureGraphicToCanvas(
       break;
     case "dual-phone":
       await renderDualPhoneLayout(ctx, config, W, H, iconImg, screenImg1, screenImg2);
+      break;
+    case "triple-phone-perspective":
+      await renderTriplePhonePerspectiveLayout(ctx, config, W, H, iconImg, screenImg1, screenImg2, screenImg3);
       break;
     case "panorama-glow":
       await renderPanoramaGlowLayout(ctx, config, W, H, iconImg);
@@ -314,7 +321,91 @@ async function renderDualPhoneLayout(
 }
 
 /**
- * Layout 3: Panorama Glow
+ * Layout 3: Triple Phone Perspective (High-converting Product Hunt & Social Launch Pack)
+ */
+async function renderTriplePhonePerspectiveLayout(
+  ctx: CanvasRenderingContext2D,
+  config: FeatureGraphicConfig,
+  W: number,
+  H: number,
+  iconImg: HTMLImageElement | null,
+  screenImg1: HTMLImageElement | null,
+  screenImg2: HTMLImageElement | null,
+  screenImg3: HTMLImageElement | null
+) {
+  // Top Header: App Icon, Name, Tagline
+  const headerY = H * 0.15;
+  const centerX = W * 0.5;
+
+  if (iconImg) {
+    const iconSize = H * 0.16;
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.roundRect(centerX - iconSize / 2, headerY - iconSize / 2, iconSize, iconSize, iconSize * 0.22);
+    ctx.clip();
+    ctx.drawImage(iconImg, centerX - iconSize / 2, headerY - iconSize / 2, iconSize, iconSize);
+    ctx.restore();
+  }
+
+  // App Name
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.font = `900 ${Math.round(H * 0.085)}px -apple-system, BlinkMacSystemFont, "Inter", sans-serif`;
+  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowBlur = 12;
+  const nameY = iconImg ? headerY + H * 0.13 : H * 0.16;
+  ctx.fillText(config.appName, centerX, nameY);
+
+  // Tagline
+  ctx.font = `500 ${Math.round(H * 0.038)}px -apple-system, BlinkMacSystemFont, "Inter", sans-serif`;
+  ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+  ctx.fillText(config.tagline, centerX, nameY + H * 0.055);
+  ctx.restore();
+
+  // 3 Phone Mockups in Elevated Perspective Fan
+  const phoneW = W * 0.23;
+  const phoneH = phoneW * 2.1;
+  const phonesBaseY = H * 0.72;
+
+  // Left Phone (Angled left, behind)
+  drawDeviceMockup(
+    ctx,
+    screenImg2 || screenImg1,
+    W * 0.24,
+    phonesBaseY + H * 0.04,
+    phoneW * 0.9,
+    phoneH * 0.9,
+    -12
+  );
+
+  // Right Phone (Angled right, behind)
+  drawDeviceMockup(
+    ctx,
+    screenImg3 || screenImg2 || screenImg1,
+    W * 0.76,
+    phonesBaseY + H * 0.04,
+    phoneW * 0.9,
+    phoneH * 0.9,
+    12
+  );
+
+  // Center Phone (Hero, front & center)
+  drawDeviceMockup(
+    ctx,
+    screenImg1,
+    W * 0.5,
+    phonesBaseY,
+    phoneW,
+    phoneH,
+    0
+  );
+}
+
+/**
+ * Layout 4: Panorama Glow
  */
 async function renderPanoramaGlowLayout(
   ctx: CanvasRenderingContext2D,
